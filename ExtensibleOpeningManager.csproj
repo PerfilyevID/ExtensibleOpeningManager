@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8D6365A8-16BE-4631-A2EB-C573DEB2C451}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ExtensibleOpeningManager</RootNamespace>
+    <AssemblyName>ExtensibleOpeningManager</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="KPLN_Loader">
+      <HintPath>..\KPLN_Loader\bin\Debug\KPLN_Loader.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="RevitAPI">
+      <HintPath>..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Commands\CommandAddComment.cs" />
+    <Compile Include="Commands\CommandAddSubElement.cs" />
+    <Compile Include="Commands\CommandApprove.cs" />
+    <Compile Include="Commands\CommandApplySubElements.cs" />
+    <Compile Include="Commands\CommandApplyWall.cs" />
+    <Compile Include="Commands\CommandGroupInstances.cs" />
+    <Compile Include="Commands\CommandLoopPlaceTaskOnPickedWall.cs" />
+    <Compile Include="Commands\CommandPlaceOpeningByOpening.cs" />
+    <Compile Include="Commands\CommandPlaceOpeningByTask.cs" />
+    <Compile Include="Commands\CommandPlaceTaskOnPickedWall.cs" />
+    <Compile Include="Commands\CommandReject.cs" />
+    <Compile Include="Commands\CommandRemoveComment.cs" />
+    <Compile Include="Commands\CommandRemoveSubElement.cs" />
+    <Compile Include="Commands\CommandReset.cs" />
+    <Compile Include="Commands\CommandSetOffset.cs" />
+    <Compile Include="Commands\CommandSetWall.cs" />
+    <Compile Include="Commands\CommandSwapType.cs" />
+    <Compile Include="Commands\CommandUngroup.cs" />
+    <Compile Include="Commands\CommandUpdate.cs" />
+    <Compile Include="Commands\CommandZoomElement.cs" />
+    <Compile Include="Common\Collections.cs" />
+    <Compile Include="Common\ExtensibleComment.cs" />
+    <Compile Include="Common\ExtensibleElement.cs" />
+    <Compile Include="Common\ExtensibleSubElement.cs" />
+    <Compile Include="Common\ExtensibleSubElements\SE_LinkedElement.cs" />
+    <Compile Include="Common\ExtensibleSubElements\SE_LinkedInstance.cs" />
+    <Compile Include="Common\ExtensibleSubElements\SE_LinkedWall.cs" />
+    <Compile Include="Common\ExtensibleSubElements\SE_LocalElement.cs" />
+    <Compile Include="Common\MonitorElements\MonitorCollection.cs" />
+    <Compile Include="Common\MonitorElements\MonitorElement.cs" />
+    <Compile Include="Common\MonitorElements\MonitorGroup.cs" />
+    <Compile Include="Common\MonitorElements\MonitorSubElement.cs" />
+    <Compile Include="Controll\UiController.cs" />
+    <Compile Include="Extensible\ExtensibleController.cs" />
+    <Compile Include="Extensible\ExtensibleConverter.cs" />
+    <Compile Include="Extensible\ExtensibleMultipleCollectionElement.cs" />
+    <Compile Include="Extensible\ExtensibleTools.cs" />
+    <Compile Include="ExternalCommands\CommandShowDockablePane.cs" />
+    <Compile Include="ExternalCommands\CommandShowPreferences.cs" />
+    <Compile Include="Filters\LinkedElementFilter.cs" />
+    <Compile Include="Filters\LinkedInstanceFilter.cs" />
+    <Compile Include="Filters\LinkedWallFilter.cs" />
+    <Compile Include="Filters\LocalElementFilter.cs" />
+    <Compile Include="Filters\LocalFilter.cs" />
+    <Compile Include="Filters\LocalInstanceFilter.cs" />
+    <Compile Include="Filters\LocalWallFilter.cs" />
+    <Compile Include="Forms\DockableManager.xaml.cs">
+      <DependentUpon>DockableManager.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DockablePreferences.cs" />
+    <Compile Include="Forms\Dialogs.cs" />
+    <Compile Include="Forms\OffsetPicker.xaml.cs">
+      <DependentUpon>OffsetPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Progress_Single.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Progress_Single.Designer.cs">
+      <DependentUpon>Progress_Single.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\RevitLinkPicker.xaml.cs">
+      <DependentUpon>RevitLinkPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\RLI_element.cs" />
+    <Compile Include="Forms\WPFSource.cs" />
+    <Compile Include="Matrix\Matrix.cs" />
+    <Compile Include="Matrix\MatrixContainer.cs" />
+    <Compile Include="Matrix\MatrixElement.cs" />
+    <Compile Include="Module.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ModuleData.cs" />
+    <Compile Include="Source\Source.cs" />
+    <Compile Include="Tools\CollectorTools.cs" />
+    <Compile Include="Tools\CreationTools.cs" />
+    <Compile Include="Tools\FamilyTools.cs" />
+    <Compile Include="Tools\Instances\Intersection.cs" />
+    <Compile Include="Tools\Instances\PlaceParameters.cs" />
+    <Compile Include="Tools\IntersectionTools.cs" />
+    <Compile Include="Controll\LoopController.cs" />
+    <Compile Include="Tools\UiTools.cs" />
+    <Compile Include="UserPreferences.cs" />
+    <Compile Include="Variables.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Forms\DockableManager.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\OffsetPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\RevitLinkPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\RevitData\199_AR_Отверстие_Гильза_Стены.rfa">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\199_AR_Отверстие_Отверстие_Стены.rfa">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\199_KR_Отверстие_Гильза_Стены.rfa">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\199_KR_Отверстие_Отверстие_Стены.rfa">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\501_MEP_Задание_Гильза_Стены.rfa">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\501_MEP_Задание_Отверстие_Стены.rfa">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Source\Buttons\Approve.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\ApproveHost.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\ApproveInstance.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\ApproveWall.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\Group.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\Offset.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\Reject.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\Reset.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\SetMonitoring.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\SwapType.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\Ungroup.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\Update.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\icon_manager.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\icon_setup.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Error.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Ok.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Remove.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Task_Approved.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Task_Errored.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Task_Unapproved.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Update.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Waiting.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Warning.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\Progress_Single.resx">
+      <DependentUpon>Progress_Single.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

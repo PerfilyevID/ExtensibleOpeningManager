@@ -1,0 +1,97 @@
+﻿using Autodesk.Revit.DB;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ExtensibleOpeningManager.Matrix;
+using ExtensibleOpeningManager.Tools;
+using ExtensibleOpeningManager.Common.ExtensibleSubElements;
+using ExtensibleOpeningManager.Forms;
+using ExtensibleOpeningManager.Tools.Instances;
+
+namespace ExtensibleOpeningManager.Controll
+{
+    public class LoopController
+    {
+        public readonly List<ElementId> CreatedElements = new List<ElementId>();
+        public bool IsActive { get; private set; }
+        private Matrix<Element> Matrix { get; set; }
+        private Document Document { get; set; }
+        private Queue<SE_LinkedWall> Walls { get; set; }
+        public LoopController(Document doc)
+        {
+            IsActive = false;
+            Matrix = new Matrix<Element>(CollectorTools.GetMepElements(doc));
+            Document = doc;
+        }
+        public void Prepare(List<RevitLinkInstance> revitLinks)
+        {
+            UiController controller = UiController.GetControllerByDocument(Document);
+            IsActive = true;
+            Walls = new Queue<SE_LinkedWall>();
+            if (Matrix == null)
+            {
+                Matrix = new Matrix<Element>(CollectorTools.GetMepElements(Document));
+            }
+            int max = 0;
+            List<SE_LinkedWall> walls = new List<SE_LinkedWall>();
+            foreach (RevitLinkInstance instance in revitLinks)
+            {
+                max += CollectorTools.GetLinkedWalls(Document, instance).Count;
+            }
+            string format = "{0} из " + max.ToString() + " элементов обработано";
+            using (Progress_Single progress = new Progress_Single("Подготовка", format, max))
+            {
+                foreach (RevitLinkInstance instance in revitLinks)
+                {
+                    foreach (SE_LinkedWall wall in CollectorTools.GetLinkedWalls(Document, instance))
+                    {
+                        progress.Increment();
+                        List<Intersection> intersections = Matrix.GetContext(wall);
+                        if (intersections.Count != 0)
+                        {
+                            foreach (Intersection i in intersections)
+                            {
+                                if (!controller.IntersectionExist(i))
+                                {
+                                    walls.Add(wall);
+                                    max++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (SE_LinkedWall wall in walls)
+            {
+                Walls.Enqueue(wall);
+            }
+        }
+        public void Next()
+        {
+            if (Walls.Count != 0)
+            {
+                SE_LinkedWall currentWall = Walls.Dequeue();
+            }
+            else
+            {
+                IsActive = false;
+                Matrix = null;
+            }
+        }
+        public void Apply()
+        {
+            Next();
+        }
+        public void Reject()
+        {
+            Next();
+        }
+        public void Skip()
+        {
+            Next();
+        }
+    }
+}

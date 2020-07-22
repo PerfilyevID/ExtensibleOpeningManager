@@ -1,0 +1,176 @@
+﻿<Page   xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:App="clr-namespace:ExtensibleOpeningManager"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="DockableDialog.Forms.DockableManager"
+        Title="Dockable Dialogs"  Height="700" Width="200"
+        x:Name="DockableDialogs"  Background="White" MinWidth="200" FontFamily="Monaco, Consolas, 'Andale Mono', 'DejaVu Sans Mono', monospace">
+    <Grid>
+        <TabControl x:Name="tabMain" Margin="-1,-3,-1,0" >
+            <TabItem x:Name="tabMonitor" Header="Мониторинг" Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnPlaceOnSelected2" Background="White" Content="Расставить на выбранной" Margin="0,0,0,0" Click="OnBtnPlaceOnSelected"/>
+                    <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnLoop2" Content="Расставить по пересечениям" Margin="0,25,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnLoop"/>
+                    <Grid VerticalAlignment="Top" Grid.Row="0"  x:Name="gridLoopButtons2" Margin="0,45,0,-7" Height="42">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="26"/>
+                            <ColumnDefinition Width="26"/>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button VerticalAlignment="Top" Height="20" x:Name="btnLoopDeny2" Grid.Column="0" Content="✖" Margin="0,5,5,0" ToolTip="Расставить задания на выбранной стене" Background="White" Foreground="#FFDE0909" Click="OnBtnLoopDeny"/>
+                        <Button VerticalAlignment="Top" Height="20" x:Name="btnLoopApply2" Grid.Column="1" Content="✔" Margin="0,5,5,0" ToolTip="Расставить задания на выбранной стене" Background="White" Foreground="#FF0DB02B" Click="OnBtnLoopApply"/>
+                        <Button VerticalAlignment="Top" Height="20" x:Name="btnLoopNext2"  Grid.Column="2" Content="Далее" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnLoopNext"/>
+                        <Button VerticalAlignment="Top" Height="20" x:Name="btnLoopSkip2" Grid.Column="3" Content="Пропустить" Margin="5,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Foreground="Black" Click="OnBtnLoopSkip"/>
+                    </Grid>
+                    <TreeView Grid.Row="1" x:Name="monitorView" Margin="-5" IsManipulationEnabled="True" IsTextSearchCaseSensitive="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Collection}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="{Binding Source.Value}"/>
+                                    <TextBlock Text=" - " xml:space="preserve"/>
+                                    <TextBlock Text="{Binding Header}"/>
+                                    <TextBlock Text=" (" xml:space="preserve"/>
+                                    <TextBlock Text="{Binding Count}"/>
+                                    <TextBlock Text=")"/>
+                                </StackPanel>
+                                <HierarchicalDataTemplate.ItemTemplate>
+                                    <DataTemplate>
+                                        <TreeViewItem PreviewMouseDoubleClick="OnItemDoubleClick" IsTextSearchEnabled="True" ClipToBounds="False" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                                            <TreeViewItem.Header>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="{Binding Source.Value}" ToolTip="{Binding ToolTip}"/>
+                                                    <TextBlock Text=" - " xml:space="preserve" ToolTip="{Binding ToolTip}"/>
+                                                    <TextBlock Text="{Binding Name}" ToolTip="{Binding ToolTip}"/>
+                                                </StackPanel>
+                                            </TreeViewItem.Header>
+                                            <StackPanel Orientation="Horizontal">
+                                                <ItemsControl ItemsSource="{Binding Collection}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Image Source="{Binding Source.Value}" ToolTip="{Binding ToolTip}"/>
+                                                                <TextBlock xml:space="preserve" Text=" " ToolTip="{Binding ToolTip}"/>
+                                                                <TextBlock Text="{Binding Name}" ToolTip="{Binding ToolTip}">
+                                                                </TextBlock>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </TreeViewItem>
+                                    </DataTemplate>
+                                </HierarchicalDataTemplate.ItemTemplate>
+                                <HierarchicalDataTemplate.ItemContainerStyle>
+                                    <Style TargetType="{x:Type TreeViewItem}">
+                                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                    </Style>
+                                </HierarchicalDataTemplate.ItemContainerStyle>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                    </TreeView>
+
+                </Grid>
+
+            </TabItem>
+            <TabItem x:Name="tabSelection" Header="Элемент" Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" MaxHeight="160"/>
+                        <RowDefinition MinHeight="80" Height="Auto" MaxHeight="140"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <WrapPanel Orientation="Horizontal" Margin="-2.5" Grid.Row="0" MaxHeight="160" HorizontalAlignment="Left">
+                        <Button x:Name="btnApprove" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Одобрить элемент" Click="OnBtnApprove">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnReject" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Отклонить элемент" Click="OnBtnReject">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnSetOffset" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Задать смещение границ" Click="OnBtnSetOffset">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnGroup" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Сгруппировать" Click="OnBtnGroup">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnUngroup" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Разгруппировать" Click="OnBtnUngroup">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnReset" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Откат изменений" Click="OnBtnReset">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnUpdate" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Пересчитать элемент" Click="OnBtnUpdate">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnApplySubElements" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Принять субэлементы" Click="OnBtnApplySubElements">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnApplyWall" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Принять стену" Click="OnBtnApplyWall">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnAddSubElement" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Добавить субэлемент" Click="OnBtnAddSubElement">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnSetWall" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Задать стену" Click="OnBtnSetWall">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                        <Button x:Name="btnSwap" Width="35" Height="35" Background="{x:Null}" Margin="2.5" ToolTip="Поменять тип" Click="OnBtnSwap">
+                            <Image Source="{Binding Value}"/>
+                        </Button>
+                    </WrapPanel>
+                    <Label Grid.Row="1" Content="Субэлементы:" Margin="-5,0,0,0"/>
+                    <ScrollViewer x:Name="svSubElements"  Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Margin="0,25,0,0" VerticalScrollBarVisibility="Auto" Background="White">
+                    </ScrollViewer>
+                    <StackPanel Orientation="Vertical" Grid.Row="2">
+                        <Label Content="Выберите свой раздел:" Margin="-5,0,0,0"/>
+                        <ComboBox x:Name="cbxDepartment" Margin="0,-3,0,0" Background="White" SelectedIndex="0" SelectionChanged="OnSubDepartmentChanged">
+                            <TextBlock Text="ОВ"/>
+                            <TextBlock Text="ВК"/>
+                            <TextBlock Text="СС"/>
+                            <TextBlock Text="ЭОМ"/>
+                        </ComboBox>
+                        <Separator Margin="0,10,0,5"/>
+                        <Button x:Name="btnPlaceKR" Content="Расставить/обновить по КР" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnKR"/>
+                        <Button x:Name="btnPlaceAR" Content="Расставить/обновить по АР" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnAR"/>
+                        <Button x:Name="btnPlaceMEP" Content="Расставить/обновить по ИС" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnMEP"/>
+                        <Separator x:Name="sep" Margin="0,10,0,5"/>
+                        <Button x:Name="btnLoop" Content="Расставить по пересечениям" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnLoop"/>
+                        <Grid x:Name="gridLoopButtons">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="26"/>
+                                <ColumnDefinition Width="26"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="btnLoopDeny" Grid.Column="0" Content="✖" Margin="0,5,5,0" ToolTip="Расставить задания на выбранной стене" Background="White" Foreground="#FFDE0909" Click="OnBtnLoopDeny"/>
+                            <Button x:Name="btnLoopApply" Grid.Column="1" Content="✔" Margin="0,5,5,0" ToolTip="Расставить задания на выбранной стене" Background="White" Foreground="#FF0DB02B" Click="OnBtnLoopApply"/>
+                            <Button x:Name="btnLoopNext"  Grid.Column="2" Content="Далее" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnLoopNext"/>
+                            <Button x:Name="btnLoopSkip" Grid.Column="3" Content="Пропустить" Margin="5,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Foreground="Black" Click="OnBtnLoopSkip"/>
+                        </Grid>
+                        <Separator Margin="0,10,0,5"/>
+                        <Button x:Name="btnPlaceOnSelected" Content="Расставить на выбранной" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnSelected"/>
+                    </StackPanel>
+                    <TextBlock Text="⌨ История" FontWeight="Medium" Margin="0,3,0,0" Grid.Row="3" MinWidth="2"/>
+                    <Rectangle x:Name="RR"  Grid.Row="3" Margin="0,20,0,80" RadiusX="2" RadiusY="2" Fill="White" Stroke="#FF707070"/>
+                    <ScrollViewer x:Name="svComments"  Grid.Row="3" Margin="1,21,1,81" VerticalScrollBarVisibility= "Auto">
+                        <StackPanel x:Name="chatPanel" CanVerticallyScroll="True"/>
+                    </ScrollViewer>
+                    <TextBox TextWrapping="Wrap" x:Name="tbMessage" Grid.Row="3" Height="45" VerticalAlignment="Bottom" Margin="0,0,0,28" Background="White" HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" SpellCheck.IsEnabled="True" BorderBrush="#FF707070"/>
+                    <Button Grid.Row="3" Content="Добавить комментарий >>" x:Name="btnChatMessage" Height="22" VerticalAlignment="Bottom" Margin="0,0,0,0" Background="White" Click="OnBtnAddComment"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Page>
