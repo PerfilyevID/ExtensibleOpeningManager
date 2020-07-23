@@ -9,12 +9,15 @@ using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Forms;
 using ExtensibleOpeningManager.Tools.Instances;
+using ExtensibleOpeningManager.Commands;
+using static KPLN_Loader.Output.Output;
+using ExtensibleOpeningManager.Common;
 
 namespace ExtensibleOpeningManager.Controll
 {
     public class LoopController
     {
-        public readonly List<ElementId> CreatedElements = new List<ElementId>();
+        public readonly List<ExtensibleElement> CreatedElements = new List<ExtensibleElement>();
         public bool IsActive { get; private set; }
         private Matrix<Element> Matrix { get; set; }
         private Document Document { get; set; }
@@ -27,13 +30,11 @@ namespace ExtensibleOpeningManager.Controll
         }
         public void Prepare(List<RevitLinkInstance> revitLinks)
         {
+            CreatedElements.Clear();
             UiController controller = UiController.GetControllerByDocument(Document);
             IsActive = true;
             Walls = new Queue<SE_LinkedWall>();
-            if (Matrix == null)
-            {
-                Matrix = new Matrix<Element>(CollectorTools.GetMepElements(Document));
-            }
+            Matrix = new Matrix<Element>(CollectorTools.GetMepElements(Document));
             int max = 0;
             List<SE_LinkedWall> walls = new List<SE_LinkedWall>();
             foreach (RevitLinkInstance instance in revitLinks)
@@ -53,7 +54,7 @@ namespace ExtensibleOpeningManager.Controll
                         {
                             foreach (Intersection i in intersections)
                             {
-                                if (!controller.IntersectionExist(i))
+                                if (!controller.IntersectionExist(i, wall))
                                 {
                                     walls.Add(wall);
                                     max++;
@@ -68,30 +69,43 @@ namespace ExtensibleOpeningManager.Controll
             {
                 Walls.Enqueue(wall);
             }
+            if (Walls.Count == 0)
+            {
+                Dialogs.ShowDialog("Новых пересечений не найдено!", "Предупреждение");
+                IsActive = false;
+                Matrix = null;
+            }
+            UiController.CurrentController.UpdateEnability();
         }
         public void Next()
         {
+            CreatedElements.Clear();
             if (Walls.Count != 0)
             {
                 SE_LinkedWall currentWall = Walls.Dequeue();
+                ModuleData.CommandQueue.Enqueue(new CommandZoomElement(currentWall));
+                ModuleData.CommandQueue.Enqueue(new CommandLoopPlaceTaskOnPickedWall(currentWall));
+                UiController.CurrentController.UpdateEnability();
             }
             else
             {
+                Dialogs.ShowDialog("Больше пересечений не найдено!", "Предупреждение");
                 IsActive = false;
                 Matrix = null;
+                UiController.CurrentController.UpdateEnability();
             }
         }
         public void Apply()
         {
-            Next();
+            ModuleData.CommandQueue.Enqueue(new CommandLoopApprove(this));
         }
         public void Reject()
         {
-            Next();
+            ModuleData.CommandQueue.Enqueue(new CommandLoopReject(this));
         }
         public void Skip()
         {
-            Next();
+            ModuleData.CommandQueue.Enqueue(new CommandLoopSkip(this));
         }
     }
 }

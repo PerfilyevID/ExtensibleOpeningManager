@@ -12,6 +12,9 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Interop;
 using System.Windows;
+using ExtensibleOpeningManager.Tools;
+using ExtensibleOpeningManager.Commands;
+using System.Windows.Media.Imaging;
 
 namespace ExtensibleOpeningManager
 {
@@ -21,7 +24,6 @@ namespace ExtensibleOpeningManager
         {
             return Result.Succeeded;
         }
-
         public Result Execute(UIControlledApplication application, string tabName)
         {
             try
@@ -33,8 +35,8 @@ namespace ExtensibleOpeningManager
                 string assembly = Assembly.GetExecutingAssembly().Location.Split(new string[] { "\\" }, StringSplitOptions.None).Last().Split('.').First();
                 #region buttons
                 RibbonPanel panel = application.CreateRibbonPanel(tabName, "Мониторинг отверстий");
-                AddPushButtonData("Открыть менеджер отверстий", "Открыть менеджер", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowDockablePane"), panel);
-                AddPushButtonData("Пользовательскте настройки модуля", "Настройки", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowPreferences"), panel);
+                AddPushButtonData("Открыть менеджер отверстий", "Открыть\nменеджер", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowDockablePane"), panel, new Source.Source(Common.Collections.Icon.OpenManager));
+                AddPushButtonData("Пользовательскте настройки модуля", "Настройки", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowPreferences"), panel, new Source.Source(Common.Collections.Icon.Settings));
                 #endregion
                 RegisterPane(application);
                 application.Idling += new EventHandler<IdlingEventArgs>(OnIdling);
@@ -53,7 +55,29 @@ namespace ExtensibleOpeningManager
         {
             UIApplication uiapp = sender as UIApplication;
             UIControlledApplication controlledApplication = sender as UIControlledApplication;
-            if (uiapp.ActiveUIDocument.Document.IsDetached || uiapp.ActiveUIDocument.Document.IsFamilyDocument) { return; }
+            try
+            {
+                if (uiapp.ActiveUIDocument != null)
+                {
+                    if (uiapp.ActiveUIDocument.Document.IsFamilyDocument)
+                    {
+                        new CommandHidePane().Execute(uiapp);
+                    }
+                    else
+                    {
+                        if (SystemClosed)
+                        {
+                            new CommandShowPane().Execute(uiapp);
+                        }
+                    }
+                }
+            }
+            catch (Exception e) { PrintError(e); }
+            if (uiapp.ActiveUIDocument.Document.IsDetached || uiapp.ActiveUIDocument.Document.IsFamilyDocument)
+            {
+                CommandQueue.Clear();
+                return; 
+            }
             while (CommandQueue.Count != 0)
             {
                 using (Transaction t = new Transaction(uiapp.ActiveUIDocument.Document, ModuleName))
@@ -93,8 +117,15 @@ namespace ExtensibleOpeningManager
             UIApplication uiapp = sender as UIApplication;
             UIControlledApplication controlledApplication = sender as UIControlledApplication;
             bool documentHasBeenModified = false;
+            UiController.GetControllerByDocument(args.GetDocument()).UpdateRevitLinkInstances();
             if (args.GetDeletedElementIds().Count != 0)
             {
+                if (UiController.GetControllerByDocument(args.GetDocument()).ElementsInLinksCollection(args.GetDeletedElementIds()))
+                {
+                    UiController.GetControllerByDocument(args.GetDocument()).UpdateAllElements();
+                    DockablePreferences.Page.UpdateItemscontroll();
+                    return;
+                }
                 UiController.GetControllerByDocument(args.GetDocument()).OnElementsRemoved(args.GetDeletedElementIds());
                 documentHasBeenModified = true;
             }
@@ -105,6 +136,12 @@ namespace ExtensibleOpeningManager
             }
             if (args.GetModifiedElementIds().Count != 0)
             {
+                if (UiController.GetControllerByDocument(args.GetDocument()).ElementsInLinksCollection(args.GetModifiedElementIds()))
+                {
+                    UiController.GetControllerByDocument(args.GetDocument()).UpdateAllElements();
+                    DockablePreferences.Page.UpdateItemscontroll();
+                    return;
+                }
                 if (UiController.GetControllerByDocument(args.GetDocument()).ElementsInExtensibleCollection(args.GetModifiedElementIds()))
                 {
                     UiController.GetControllerByDocument(args.GetDocument()).OnElementsChanged(args.GetModifiedElementIds());
@@ -121,7 +158,7 @@ namespace ExtensibleOpeningManager
                 UiController.CurrentController.UpdateEnability();
             }
         }
-        private void AddPushButtonData(string name, string text, string description, string className, RibbonPanel panel, string url = @"https://kpln.kdb24.ru/article/76440/")
+        private void AddPushButtonData(string name, string text, string description, string className, RibbonPanel panel, Source.Source imageSource, string url = @"https://kpln.kdb24.ru/article/76440/")
         {
             PushButtonData data = new PushButtonData(name, text, Assembly.GetExecutingAssembly().Location, className);
             PushButton button = panel.AddItem(data) as PushButton;
@@ -129,6 +166,7 @@ namespace ExtensibleOpeningManager
             button.LongDescription = string.Format("{0}", Assembly.GetExecutingAssembly().Location);
             button.ItemText = text;
             button.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, url));
+            button.LargeImage = new BitmapImage(new Uri(imageSource.Value));
         }
         private static void RegisterPane(UIControlledApplication application)
         {
@@ -142,7 +180,7 @@ namespace ExtensibleOpeningManager
                 dockablePaneProviderData.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser;
                 application.RegisterDockablePane(new DockablePaneId(DockablePreferences.PageGuid), "Мониторинг : Отверстия", DockablePreferences.Page as IDockablePaneProvider);
             }
-            catch (Exception) { }
+            catch (Exception e) { PrintError(e); }
         }
     }
 }

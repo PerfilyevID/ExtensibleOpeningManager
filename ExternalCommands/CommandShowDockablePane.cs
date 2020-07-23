@@ -15,8 +15,13 @@ namespace ExtensibleOpeningManager.ExternalCommands
         {
             try
             {
+                if (commandData.Application.ActiveUIDocument.Document.IsFamilyDocument)
+                {
+                    return Result.Cancelled;
+                }
                 Document doc = commandData.Application.ActiveUIDocument.Document;
                 commandData.Application.GetDockablePane(new DockablePaneId(DockablePreferences.PageGuid)).Show();
+                ModuleData.SystemClosed = false;
                 return Result.Succeeded;
             }
             catch (Exception e)

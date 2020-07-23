@@ -14,6 +14,7 @@ namespace ExtensibleOpeningManager.Common
         public static readonly List<string> ExtensibleParameter_String = new List<string> { "Document", "Instance", "Status", "Wall", "SubElementsCollection", "CommentsCollection" };
         public enum PickTypeOptions { Instance, Element }
         public enum PickOptions { Local, References }
+        public enum Icon { OpenManager, Settings }
         public enum ImageButton { Approve, Reject, Swap, Reset, Update, Group, Ungroup, Apply, ApplyWall, SetWall, ApplySubElements, AddSubElements, SetOffset }
         public enum ImageMonitor { Error, Ok, Remove, Element_Approved, Element_Errored, Element_Unapproved, Update, Waiting, Warning }
         public enum SubElementStatus { Ok, NotCommited, NotFound, NotApproved, NotCommitedInside }

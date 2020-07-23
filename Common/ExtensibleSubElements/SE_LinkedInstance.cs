@@ -2,6 +2,7 @@
 using ExtensibleOpeningManager.Extensible;
 using System;
 using System.Collections.Generic;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
 {
@@ -14,13 +15,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 return ExtensibleTools.GetSubElementComments(this);
             }
         }
-        public override ElementId LinkId
-        {
-            get
-            {
-                return LinkId;
-            }
-        }
+        public override ElementId LinkId { get; protected set; }
         public override string ToString()
         {
             try
@@ -39,9 +34,17 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                     ExtensibleConverter.ConvertPoint((Element as FamilyInstance).FacingOrientation),
                     Element.LevelId.ToString()});
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return Variables.empty;
+                PrintError(e);
+                if (Value != null)
+                {
+                    return Value;
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
 
         }
@@ -59,13 +62,29 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 }
                 else
                 {
-                    if (ExtensibleTools.GetSubElementMeta(Parent.Instance, this) != this.ToString())
+                    try
                     {
-                        return Collections.SubStatus.Changed;
+                        if (ExtensibleTools.GetSubElementMeta(Parent.Instance, this) != this.ToString())
+                        {
+                            return Collections.SubStatus.Changed;
+                        }
+                        return Collections.SubStatus.Applied;
                     }
-                    return Collections.SubStatus.Applied;
+                    catch (Exception)
+                    {
+                        return Collections.SubStatus.NotFound;
+                    }
                 }
             }
+        }
+        private string Value { get; set; }
+        public SE_LinkedInstance(string value)
+        {
+            Id = int.Parse(value.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries)[0], System.Globalization.NumberStyles.Integer);
+            Element = null;
+            Solid = null;
+            Value = value;
+            LinkId = ElementId.InvalidElementId;
         }
         public SE_LinkedInstance(Reference reference, Document doc)
         {
@@ -73,6 +92,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Document linkedDocument = linkInstance.GetLinkDocument();
             Transform transform = linkInstance.GetTotalTransform();
             Element = linkedDocument.GetElement(reference.LinkedElementId) as Element;
+            Id = Element.Id.IntegerValue;
             foreach (GeometryObject geometry in Element.get_Geometry(new Options() { DetailLevel = ViewDetailLevel.Fine, IncludeNonVisibleObjects = false }).GetTransformed(transform))
             {
                 if (geometry.GetType() == typeof(Solid))
@@ -90,11 +110,15 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                     }
                 }
             }
+            LinkId = linkInstance.Id;
+            Value = this.ToString();
         }
         public SE_LinkedInstance(RevitLinkInstance linkInstance, Element element)
         {
             Transform transform = linkInstance.GetTotalTransform();
             Element = element;
+            Id = Element.Id.IntegerValue;
+            LinkId = linkInstance.Id;
             try
             {
                 foreach (GeometryObject geometry in Element.get_Geometry(new Options() { DetailLevel = ViewDetailLevel.Fine, IncludeNonVisibleObjects = false }).GetTransformed(transform))
@@ -115,7 +139,8 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception e) { PrintError(e); }
+            Value = this.ToString();
         }
     }
 }

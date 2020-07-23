@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Events;
 using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Common.MonitorElements;
@@ -20,6 +21,8 @@ namespace ExtensibleOpeningManager.Controll
         public List<ExtensibleElement> Elements = new List<ExtensibleElement>();
         public List<ExtensibleElement> Selection = new List<ExtensibleElement>();
         public List<ExtensibleComment> Comments = new List<ExtensibleComment>();
+        public List<RevitLinkInstance> Links = new List<RevitLinkInstance>();
+        public List<int> LinksIds = new List<int>();
         public MonitorCollection MonitorCollection { get; set; }
         public string SelectionSet = "";
         public string AllSelectionSet = "";
@@ -33,9 +36,10 @@ namespace ExtensibleOpeningManager.Controll
                 {
                     MonitorCollection.AddElement(el);
                 }
-                catch (Exception) { }
+                catch (Exception e) { PrintError(e); }
             }
             Document = document;
+            Document.DocumentClosing += new EventHandler<DocumentClosingEventArgs>(OnDocumentClose);
             LoopController = new LoopController(Document);
         }
         public static UiController GetControllerByDocument(Document doc)
@@ -73,7 +77,7 @@ namespace ExtensibleOpeningManager.Controll
                     {
                         try
                         {
-                            if (sel.GetType() == typeof(SE_LocalElement) && sel.Element.Id.IntegerValue == id.IntegerValue)
+                            if (sel.GetType() == typeof(SE_LocalElement) && sel.Id == id.IntegerValue)
                             {
                                 return el;
                             }
@@ -84,6 +88,49 @@ namespace ExtensibleOpeningManager.Controll
                 catch (Exception e) { PrintError(e); }
             }
             return null;
+        }
+        public void OnDocumentClose(object sender, DocumentClosingEventArgs args)
+        {
+            if (!args.IsCancelled())
+            {
+                Controllers.Remove(this);
+            }
+        }
+        public void UpdateAllElements()
+        {
+            try
+            {
+                List<ExtensibleElement> newElementCollection = new List<ExtensibleElement>();
+                foreach (ExtensibleElement el in Elements)
+                {
+                    ExtensibleElement elem = ExtensibleElement.GetExtensibleElementByInstance(el.Instance);
+                    newElementCollection.Add(elem);
+                }
+                Elements = newElementCollection;
+                foreach (ExtensibleElement element in newElementCollection)
+                {
+                    MonitorCollection.UpdateElement(element);
+                }
+                UpdateEnability();
+            }
+            catch (Exception e)
+            {
+                PrintError(e);
+            }
+        }
+        public bool ElementsInLinksCollection(ICollection<ElementId> elements)
+        {
+            foreach (ElementId id in elements)
+            {
+                foreach (int instance in LinksIds)
+                {
+                    if (instance == id.IntegerValue)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         public bool ElementsInExtensibleCollection(ICollection<ElementId> elements)
         {
@@ -99,16 +146,16 @@ namespace ExtensibleOpeningManager.Controll
                             {
                                 if (sel.GetType() == typeof(SE_LocalElement))
                                 {
-                                    if (sel.Element.Id.IntegerValue == id.IntegerValue)
+                                    if (sel.Id == id.IntegerValue)
                                     {
                                         return true;
                                     }
                                 }
                             }
-                            catch (Exception) { }
+                            catch (Exception e) { PrintError(e); }
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception e) { PrintError(e); }
                     if (el.Id == id.IntegerValue)
                     {
                         return true;
@@ -146,16 +193,44 @@ namespace ExtensibleOpeningManager.Controll
                         {
                             if (s.GetType() == typeof(SE_LocalElement))
                             {
-                                if (s.Element.Id.IntegerValue == intersection.Element.Id.IntegerValue)
+                                if (s.Id == intersection.Element.Id.IntegerValue)
                                 {
                                     return true;
                                 }
                             }
                         }
-                        catch (Exception) { }
+                        catch (Exception e) { PrintError(e); }
                     }
                 }
-                catch (Exception) { }
+                catch (Exception e) { PrintError(e); }
+            }
+            return false;
+        }
+        public bool IntersectionExist(Intersection intersection, SE_LinkedWall wall)
+        {
+            foreach (ExtensibleElement element in Elements)
+            {
+                try
+                {
+                    if (element.Wall.Wall.Id.IntegerValue == wall.Wall.Id.IntegerValue)
+                    {
+                        foreach (ExtensibleSubElement s in element.SubElements)
+                        {
+                            try
+                            {
+                                if (s.GetType() == typeof(SE_LocalElement))
+                                {
+                                    if (s.Id == intersection.Element.Id.IntegerValue)
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                            catch (Exception e) { PrintError(e); }
+                        }
+                    }
+                }
+                catch (Exception e) { PrintError(e); }
             }
             return false;
         }
@@ -178,7 +253,7 @@ namespace ExtensibleOpeningManager.Controll
                     AllSelectionSet = string.Join(Variables.separator_element, allSelectionSet);
                 }
             }
-            catch (Exception) { }
+            catch (Exception e) { PrintError(e); }
             List<string> newSelectionSetCollection = new List<string>();
             List<ExtensibleElement> newSelection = new List<ExtensibleElement>();
             foreach (ElementId id in elements)
@@ -228,17 +303,20 @@ namespace ExtensibleOpeningManager.Controll
             {
                 if (Selection.Count == 0)
                 {
+                    UpdateSubMonitor();
                     DockablePreferences.Page.tabMain.SelectedIndex = 0;
                     ClearComments();
                 }
                 if (Selection.Count == 1)
                 {
+                    UpdateSubMonitor();
                     UpdateEnability();
                     DockablePreferences.Page.tabMain.SelectedIndex = 1;
                     UpdateComments(Selection[0].AllComments);
                 }
                 if (Selection.Count > 1)
                 {
+                    UpdateSubMonitor();
                     UpdateEnability();
                     DockablePreferences.Page.tabMain.SelectedIndex = 1;
                     ClearComments();
@@ -247,6 +325,15 @@ namespace ExtensibleOpeningManager.Controll
             catch (Exception e)
             {
                 PrintError(e);
+            }
+        }
+        public void UpdateRevitLinkInstances()
+        {
+            Links = CollectorTools.GetRevitLinks(Document);
+            LinksIds.Clear();
+            foreach (RevitLinkInstance instance in Links)
+            {
+                LinksIds.Add(instance.Id.IntegerValue);
             }
         }
         public void UpdateComments(List<ExtensibleComment> comments)
@@ -269,6 +356,35 @@ namespace ExtensibleOpeningManager.Controll
         {
             DockablePreferences.Page.monitorView.ItemsSource = MonitorCollection.Collection;
             DockablePreferences.Page.UpdateItemscontroll();
+        }
+        public MonitorElement GetMonitorElement(ExtensibleElement element)
+        {
+            foreach (MonitorGroup group in MonitorCollection.Collection)
+            {
+                if (group.Status == element.VisibleStatus)
+                {
+                    foreach (MonitorElement el in group.Collection)
+                    {
+                        if (el.Id == element.Id)
+                        {
+                            return el;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        public void UpdateSubMonitor()
+        {
+            if (Selection.Count == 1)
+            {
+                DockablePreferences.Page.SubItemsControll.ItemsSource = null;
+                DockablePreferences.Page.SubItemsControll.ItemsSource = GetMonitorElement(Selection[0]).Collection;
+            }
+            else
+            {
+                DockablePreferences.Page.SubItemsControll.ItemsSource = null;
+            }
         }
         public void UpdateEnability()
         {
@@ -300,18 +416,32 @@ namespace ExtensibleOpeningManager.Controll
                 if (LoopController.IsActive)
                 {
                     DockablePreferences.Page.btnLoop.IsEnabled = false;
-                    DockablePreferences.Page.btnLoopApply.IsEnabled = true;
-                    DockablePreferences.Page.btnLoopDeny.IsEnabled = true;
+                    DockablePreferences.Page.btnLoop2.IsEnabled = false;
+                    if (LoopController.CreatedElements.Count != 0)
+                    {
+                        DockablePreferences.Page.btnLoopApply.IsEnabled = true;
+                        DockablePreferences.Page.btnLoopDeny.IsEnabled = true; 
+                        DockablePreferences.Page.btnLoopSkip.IsEnabled = true;
+                        DockablePreferences.Page.btnLoopApply2.IsEnabled = true;
+                        DockablePreferences.Page.btnLoopDeny2.IsEnabled = true;                        
+                        DockablePreferences.Page.btnLoopSkip2.IsEnabled = true;
+                    }
+                    else
+                    {
+                        DockablePreferences.Page.btnLoopApply.IsEnabled = false;
+                        DockablePreferences.Page.btnLoopDeny.IsEnabled = false;
+                        DockablePreferences.Page.btnLoopSkip.IsEnabled = false;
+                        DockablePreferences.Page.btnLoopApply2.IsEnabled = false;
+                        DockablePreferences.Page.btnLoopDeny2.IsEnabled = false;
+                        DockablePreferences.Page.btnLoopSkip2.IsEnabled = false;
+                    }
                     DockablePreferences.Page.btnLoopNext.IsEnabled = true;
-                    DockablePreferences.Page.btnLoopSkip.IsEnabled = true;
-                    DockablePreferences.Page.btnLoopApply2.IsEnabled = true;
-                    DockablePreferences.Page.btnLoopDeny2.IsEnabled = true;
                     DockablePreferences.Page.btnLoopNext2.IsEnabled = true;
-                    DockablePreferences.Page.btnLoopSkip2.IsEnabled = true;
                 }
                 else
                 {
                     DockablePreferences.Page.btnLoop.IsEnabled = true;
+                    DockablePreferences.Page.btnLoop2.IsEnabled = true;
                     DockablePreferences.Page.btnLoopApply.IsEnabled = false;
                     DockablePreferences.Page.btnLoopDeny.IsEnabled = false;
                     DockablePreferences.Page.btnLoopNext.IsEnabled = false;
@@ -321,6 +451,8 @@ namespace ExtensibleOpeningManager.Controll
                     DockablePreferences.Page.btnLoopNext2.IsEnabled = false;
                     DockablePreferences.Page.btnLoopSkip2.IsEnabled = false;
                 }
+                if (Selection.Count == 0) { return; }
+                UpdateSubMonitor();
                 HashSet<int> wallIds = new HashSet<int>();
                 bool isNullSelection = Selection.Count == 0;
                 bool isSingleSelection = Selection.Count == 1;
@@ -337,8 +469,13 @@ namespace ExtensibleOpeningManager.Controll
                 bool isMultipleSubelements = false;
                 bool isChanged = false;
                 bool isRoundInSelection = false;
+                bool isNotFoundElementsInElement = false;
                 foreach (ExtensibleElement el in Selection)
                 {
+                    if (el.HasUnfoundSubElements() || el.WallStatus == Collections.WallStatus.NotFound)
+                    {
+                        isNotFoundElementsInElement = true;
+                    }
                     if (el.Instance != null)
                     {
                         if (el.Instance.Symbol.FamilyName == Variables.family_ar_round ||
@@ -397,19 +534,19 @@ namespace ExtensibleOpeningManager.Controll
                 {
                     DockablePreferences.Page.btnApplyWall.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isNotApproved)
+                if (isNotApproved || isChanged)
                 {
                     DockablePreferences.Page.btnApprove.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isSelectionOfSingleWall && !isRoundInSelection && !isSingleSelection)
+                if (isSelectionOfSingleWall && !isRoundInSelection && !isSingleSelection && !isNotFoundElementsInElement)
                 {
                     DockablePreferences.Page.btnGroup.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isNotRejected)
+                if (isNotRejected && !isChanged)
                 {
                     DockablePreferences.Page.btnReject.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isChanged && isSingleSelection)
+                if (isChanged && isSingleSelection && !isNotFoundElementsInElement)
                 {
                     DockablePreferences.Page.btnReset.Visibility = System.Windows.Visibility.Visible;
                 }
@@ -422,11 +559,11 @@ namespace ExtensibleOpeningManager.Controll
                 {
                     DockablePreferences.Page.btnSwap.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isMultipleSubelements && isSingleSelection)
+                if (isMultipleSubelements && isSingleSelection && !isNotFoundElementsInElement)
                 {
                     DockablePreferences.Page.btnUngroup.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isAbleToUpdate && isSingleSelection)
+                if (isAbleToUpdate && isSingleSelection && !isNotFoundElementsInElement)
                 {
                     DockablePreferences.Page.btnUpdate.Visibility = System.Windows.Visibility.Visible;
                 }
@@ -474,6 +611,17 @@ namespace ExtensibleOpeningManager.Controll
                     if (!InList(elements, el.Id))
                     {
                         newElementCollection.Add(el);
+                        foreach (ExtensibleSubElement sel in el.SubElements)
+                        {
+                            if (sel.GetType() == typeof(SE_LocalElement))
+                            {
+                                if (InList(elements, sel.Id))
+                                {
+                                    updatedElements.Add(ExtensibleElement.GetExtensibleElementByInstance(el.Instance));
+                                    break;
+                                }
+                            }
+                        }
                     }
                     else
                     {
@@ -514,14 +662,30 @@ namespace ExtensibleOpeningManager.Controll
         public void OnElementsRemoved(ICollection<ElementId> elements)
         {
             List<ExtensibleElement> newSelection = new List<ExtensibleElement>();
+            List<ExtensibleElement> updatedElements = new List<ExtensibleElement>();
             foreach (ExtensibleElement el in Elements)
             {
                 if (!InList(elements, el.Id))
                 {
                     newSelection.Add(el);
+                    foreach (ExtensibleSubElement sel in el.SubElements)
+                    {
+                        if (sel.GetType() == typeof(SE_LocalElement))
+                        {
+                            if (InList(elements, sel.Id))
+                            {
+                                updatedElements.Add(el);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             Elements = newSelection;
+            foreach (ExtensibleElement element in updatedElements)
+            {
+                MonitorCollection.UpdateElement(element);
+            }
             foreach (ElementId element in elements)
             {
                 MonitorCollection.RemoveId(element);

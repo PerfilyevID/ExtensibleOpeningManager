@@ -20,8 +20,32 @@ namespace ExtensibleOpeningManager.Extensible
             }
             ExtensibleController.Write(element.Instance, ExtensibleParameter.SubElementsCollection, string.Join(Variables.separator_element, parts));
         }
+        public static void ApplyUniqId(ExtensibleElement element)
+        {
+            string[] parts = ExtensibleController.Read(element.Instance, ExtensibleParameter.Document).Split(new string[] { Variables.separator_element }, StringSplitOptions.None);
+            if (parts.Count() != 11)
+            {
+                element.SetHashValue();
+            }
+            else
+            {
+                if (parts[0] != element.Id.ToString())
+                {
+                    element.SetHashValue();
+                }
+                else
+                {
+                    string uniqId = ExtensibleController.Read(element.Instance, ExtensibleParameter.Document);
+                    if (uniqId == "" || uniqId == string.Empty)
+                    {
+                        element.SetHashValue();
+                    }
+                }
+            }
+        }
         public static void ApplyInstance(ExtensibleElement element)
         {
+            ApplyUniqId(element);
             ExtensibleController.Write(element.Instance, ExtensibleParameter.Instance, element.ToString());
         }
         public static void AddComment(FamilyInstance instance, ExtensibleComment comment)
@@ -101,33 +125,25 @@ namespace ExtensibleOpeningManager.Extensible
         }
         public static string GetSubElementMeta(FamilyInstance instance, ExtensibleSubElement subElement)
         {
-            try
+            foreach (string part in ExtensibleController.Read(instance, ExtensibleParameter.SubElementsCollection).Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries))
             {
-                foreach (string part in ExtensibleController.Read(instance, ExtensibleParameter.SubElementsCollection).Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries))
+                string[] parts = part.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.None);
+                if (subElement.GetType() == typeof(SE_LinkedElement) || subElement.GetType() == typeof(SE_LinkedInstance))
                 {
-                    string[] parts = part.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.None);
-                    if (subElement.GetType() == typeof(SE_LinkedElement) || subElement.GetType() == typeof(SE_LinkedInstance))
+                    if (parts[1] == subElement.Element.Id.ToString() && parts[2] == subElement.LinkId.ToString())
                     {
-                        if (parts[1] == subElement.Element.Id.ToString() && parts[2] == subElement.LinkId.ToString())
-                        {
-                            return part;
-                        }
-
+                        return part;
                     }
-                    if (subElement.GetType() == typeof(SE_LocalElement))
+                }
+                if (subElement.GetType() == typeof(SE_LocalElement))
+                {
+                    if (parts[1] == subElement.Element.Id.ToString() && parts[0] == Variables.type_subelement_local_element)
                     {
-                        if (parts[1] == subElement.Element.Id.ToString() && parts[0] == Variables.type_subelement_local_element)
-                        {
-                            return part;
-                        }
+                        return part;
                     }
                 }
             }
-            catch (Exception e)
-            {
-                PrintError(e);
-            }
-            return Variables.empty;
+            return string.Empty;
         }
         public static void SetWall(FamilyInstance instance, SE_LinkedWall wall)
         {

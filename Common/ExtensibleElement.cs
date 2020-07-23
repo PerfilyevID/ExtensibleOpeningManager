@@ -9,6 +9,7 @@ using ExtensibleOpeningManager.Tools.Instances;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Controll;
+using ExtensibleOpeningManager.Matrix;
 
 namespace ExtensibleOpeningManager.Common
 {
@@ -44,21 +45,15 @@ namespace ExtensibleOpeningManager.Common
         {
             get
             {
-                if (WallStatus != WallStatus.Ok || GotWarnings())
+                if (HasUnfoundSubElements() || WallStatus == WallStatus.NotFound || Status == Status.Null)
                 {
                     return VisibleStatus.Alert;
                 }
-                else
+                if (HasUncommitedSubElements() || this.ToString() != SavedData || Status != Status.Applied || WallStatus == WallStatus.NotCommited)
                 {
-                    if (Status == Status.Applied)
-                    {
-                        return VisibleStatus.Ok;
-                    }
-                    else
-                    {
-                        return VisibleStatus.Warning;
-                    }
+                    return VisibleStatus.Warning;
                 }
+                return VisibleStatus.Ok;
             }
         }
         public List<ExtensibleComment> AllComments
@@ -132,7 +127,7 @@ namespace ExtensibleOpeningManager.Common
                     double offsetUp = Instance.LookupParameter(Variables.parameter_offset_up).AsDouble();
                     double offsetDown = Instance.LookupParameter(Variables.parameter_offset_down).AsDouble();
                     try { Instance.Symbol = Instance.Document.GetElement(new ElementId(int.Parse(values[4]))) as FamilySymbol; }
-                    catch (Exception) { }
+                    catch (Exception e) { PrintError(e); }
                     Instance.Document.Regenerate();
                     Instance.LookupParameter(Variables.parameter_offset_up).Set(offsetUp);
                     Instance.LookupParameter(Variables.parameter_offset_down).Set(offsetDown);
@@ -144,9 +139,10 @@ namespace ExtensibleOpeningManager.Common
                     XYZ currentLocation = (Instance.Location as LocationPoint).Point;
                     XYZ lastLocation = ExtensibleConverter.ConvertToPoint(values[2]);
                     XYZ lastOrientation = ExtensibleConverter.ConvertToPoint(values[3]);
-                    ElementTransformUtils.MoveElement(Instance.Document, Instance.Id, new XYZ(lastLocation.X - currentLocation.X, lastLocation.Y - currentLocation.Y, lastLocation.Z - currentLocation.Z));
                     Instance.Document.Regenerate();
                     ElementTransformUtils.RotateElement(Instance.Document, Instance.Id, Line.CreateBound(currentLocation, new XYZ(currentLocation.X, currentLocation.Y, currentLocation.Z + 1)), GetAngle(Instance, lastOrientation));
+                    Instance.Document.Regenerate();
+                    ElementTransformUtils.MoveElement(Instance.Document, Instance.Id, new XYZ(lastLocation.X - currentLocation.X, lastLocation.Y - currentLocation.Y, lastLocation.Z - currentLocation.Z));
                     Instance.Document.Regenerate();
                     Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).Set(double.Parse(values[9]));
 
@@ -196,31 +192,39 @@ namespace ExtensibleOpeningManager.Common
         }
         public bool IsAbleToUpdate()
         {
-            if (Wall != null && !HasUnfoundSubElements() && WallStatus != WallStatus.NotFound)
+            try
             {
-                List<Intersection> intersections = new List<Intersection>();
-                foreach (ExtensibleSubElement subElement in SubElements)
+                if (Wall != null && !HasUnfoundSubElements() && WallStatus != WallStatus.NotFound)
                 {
-                    Intersection i = new Intersection(subElement.Element, IntersectionTools.GetIntersectionSolid(Wall.Solid, subElement.Solid));
-                    if (!i.IsValid)
+                    List<Intersection> intersections = new List<Intersection>();
+                    foreach (ExtensibleSubElement subElement in SubElements)
                     {
-                        return false;
+                        Intersection i = new Intersection(subElement.Element, IntersectionTools.GetIntersectionSolid(Wall.Solid, subElement.Solid));
+                        if (!i.IsValid)
+                        {
+                            return false;
+                        }
+                        intersections.Add(i);
                     }
-                    intersections.Add(i);
+                    PlaceParameters parameters = new PlaceParameters(Wall, intersections, Instance.Document);
+                    if (ExtensibleConverter.ConvertDouble(parameters.Position.X) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.X) ||
+                        ExtensibleConverter.ConvertDouble(parameters.Position.Y) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.Y) ||
+                        !(parameters.GetAngle(Instance) == 0 || parameters.GetAngle(Instance) == Math.PI) ||
+                        Math.Round(parameters.Elevation, Variables.round_value) != Math.Round(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble(), Variables.round_value) ||
+                        Math.Round(parameters.Width, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_width).AsDouble(), Variables.round_value) ||
+                        Math.Round(parameters.Height, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_height).AsDouble(), Variables.round_value) ||
+                        parameters.Level.Id.IntegerValue != Instance.LevelId.IntegerValue ||
+                        Math.Round(parameters.Thickness, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_thickness).AsDouble(), Variables.round_value))
+                    {
+                        return true;
+                    }
                 }
-                PlaceParameters parameters = new PlaceParameters(Wall, intersections, Instance.Document);
-                if (parameters.Position.Equals((Instance.Location as LocationPoint).Point) ||
-                    Math.Round(parameters.GetAngle(Instance), 5) != 0 ||
-                    Math.Round(parameters.Elevation, 5) != Math.Round(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble(), 5) ||
-                    Math.Round(parameters.Width, 5) != Math.Round(Instance.LookupParameter(Variables.parameter_width).AsDouble(), 5) ||
-                    Math.Round(parameters.Height, 5) != Math.Round(Instance.LookupParameter(Variables.parameter_height).AsDouble(), 5) ||
-                    parameters.Level.Id.IntegerValue != Instance.LevelId.IntegerValue ||
-                    Math.Round(parameters.Thickness, 5) != Math.Round(Instance.LookupParameter(Variables.parameter_thickness).AsDouble(), 5))
-                {
-                    return true;
-                }
+                return false;
             }
-            return false;
+            catch (Exception)
+            {
+                return false;
+            }
         }
         public bool HasUncommitedSubElements()
         {
@@ -312,25 +316,30 @@ namespace ExtensibleOpeningManager.Common
         }
         public override string ToString()
         {
+            return string.Join(Variables.separator_element, new string[]
+                { Instance.Id.ToString(),
+                Status.ToString(),
+                ExtensibleConverter.ConvertLocation(Instance.Location),
+                ExtensibleConverter.ConvertPoint(Instance.FacingOrientation),
+                Instance.Symbol.Id.ToString(),
+                ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_height).AsDouble()),
+                ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_offset_bounds).AsDouble()),
+                ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_thickness).AsDouble()),
+                ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_width).AsDouble()),
+                ExtensibleConverter.ConvertDouble(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble()),
+                Instance.LevelId.ToString()});
+        }
+        public void SetHashValue()
+        {
             try
             {
-                return string.Join(Variables.separator_element, new string[]
-                    { Instance.Id.ToString(),
-                    Status.ToString(),
-                    ExtensibleConverter.ConvertLocation(Instance.Location),
-                    ExtensibleConverter.ConvertPoint(Instance.FacingOrientation),
-                    Instance.Symbol.Id.ToString(),
-                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_height).AsDouble()),
-                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_offset_bounds).AsDouble()),
-                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_thickness).AsDouble()),
-                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_width).AsDouble()),
-                    ExtensibleConverter.ConvertDouble(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble()),
-                    Instance.LevelId.ToString()});
+                if (WorksharingUtils.GetWorksharingTooltipInfo(Instance.Document, Instance.Id).Owner == "" || WorksharingUtils.GetWorksharingTooltipInfo(Instance.Document, Instance.Id).Owner == Instance.Document.Application.Username)
+                {
+                    string code = string.Format("{0}_{1}", Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+                    ExtensibleController.Write(Instance, ExtensibleParameter.Document, code);
+                }
             }
-            catch (Exception)
-            {
-                return Variables.empty;
-            }
+            catch (Exception e) { PrintError(e); }
         }
         private ExtensibleElement(FamilyInstance instance)
         {
@@ -340,34 +349,11 @@ namespace ExtensibleOpeningManager.Common
             Wall = null;
             SubElements = new List<ExtensibleSubElement>();
             Comments = new List<ExtensibleComment>();
-            SavedData = Variables.empty;
-            foreach (ViewDetailLevel dl in new ViewDetailLevel[] { ViewDetailLevel.Coarse, ViewDetailLevel.Fine, ViewDetailLevel.Medium })
+            SavedData = string.Empty;
+            Solid = MatrixElement.GetSolidOfElement(instance);
+            try 
             {
-                try
-                {
-                    foreach (GeometryObject geometry in instance.get_Geometry(new Options() { DetailLevel = ViewDetailLevel.Fine, IncludeNonVisibleObjects = true }))
-                    {
-                        if (geometry.GetType() == typeof(Solid))
-                        {
-                            if (Solid == null)
-                            {
-                                Solid = geometry as Solid;
-                            }
-                            else
-                            {
-                                if (Solid.Volume < (geometry as Solid).Volume)
-                                {
-                                    Solid = geometry as Solid;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception) { }
-            }
-            try
-            {
-                if (ExtensibleController.Read(Instance, ExtensibleParameter.Instance) != "" && ExtensibleController.Read(Instance, ExtensibleParameter.Instance) != Variables.empty)
+                if (ExtensibleController.Read(Instance, ExtensibleParameter.Instance) != "" && ExtensibleController.Read(Instance, ExtensibleParameter.Instance) != string.Empty)
                 {
                     string[] values = ExtensibleController.Read(Instance, ExtensibleParameter.Instance).Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries);
                     if (values.Count() == 11)
@@ -375,7 +361,7 @@ namespace ExtensibleOpeningManager.Common
                         if (values[0] == Instance.Id.ToString())
                         {
                             Status status;
-                            Enum.TryParse(values[1], out status); 
+                            Enum.TryParse(values[1], out status);
                             if (status != Status.Null) { Status = status; }
                             Wall = SE_LinkedWall.TryParse(Instance.Document, ExtensibleController.Read(Instance, ExtensibleParameter.Wall));
                             SavedData = ExtensibleController.Read(Instance, ExtensibleParameter.Instance);
@@ -389,7 +375,7 @@ namespace ExtensibleOpeningManager.Common
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception e) { PrintError(e); }
         }
     }
 }

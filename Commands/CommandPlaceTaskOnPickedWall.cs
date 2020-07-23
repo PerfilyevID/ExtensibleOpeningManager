@@ -20,7 +20,7 @@ namespace ExtensibleOpeningManager.Commands
             List<Intersection> context = matrix.GetContext(wall);
             foreach (Intersection intersection in context)
             {
-                if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection))
+                if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection, wall))
                 {
                     continue;
                 }

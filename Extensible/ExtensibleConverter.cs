@@ -8,7 +8,7 @@ namespace ExtensibleOpeningManager.Extensible
     {
         public static string ConvertDouble(double d)
         {
-            return Math.Round(d, 5).ToString();
+            return Math.Round(d, Variables.round_value).ToString();
         }
         public static string ConvertPoint(XYZ point)
         {
@@ -41,11 +41,12 @@ namespace ExtensibleOpeningManager.Extensible
                 {
                     return ConvertPoint((loc as LocationPoint).Point);
                 }
-                return Variables.empty;
+                return string.Empty;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return Variables.empty;
+                PrintError(e);
+                return string.Empty;
             }
         }
     }

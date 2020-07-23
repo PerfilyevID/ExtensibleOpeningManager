@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using ExtensibleOpeningManager;
 using ExtensibleOpeningManager.Commands;
+using ExtensibleOpeningManager.Common.MonitorElements;
 using ExtensibleOpeningManager.Controll;
 using ExtensibleOpeningManager.Forms;
 using ExtensibleOpeningManager.Source;
@@ -65,7 +66,13 @@ namespace DockableDialog.Forms
 
         private void OnItemDoubleClick(object sender, MouseButtonEventArgs e)
         {
-
+            TreeViewItem item = sender as TreeViewItem;
+            if (item == null) { return; }
+            MonitorElement moniterElement = item.DataContext as MonitorElement;
+            if (moniterElement == null) { return; }
+            if (moniterElement.Element == null) { return; }
+            if (moniterElement.Element.Solid == null) { return; }
+            ModuleData.CommandQueue.Enqueue(new CommandZoomElement(moniterElement.Element));
         }
 
         private void OnBtnApprove(object sender, RoutedEventArgs e)
@@ -160,22 +167,22 @@ namespace DockableDialog.Forms
 
         private void OnBtnLoopDeny(object sender, RoutedEventArgs e)
         {
-
+            UiController.CurrentController.LoopController.Reject();
         }
 
         private void OnBtnLoopApply(object sender, RoutedEventArgs e)
         {
-
+            UiController.CurrentController.LoopController.Apply();
         }
 
         private void OnBtnLoopNext(object sender, RoutedEventArgs e)
         {
-
+            UiController.CurrentController.LoopController.Next();
         }
 
         private void OnBtnLoopSkip(object sender, RoutedEventArgs e)
         {
-
+            UiController.CurrentController.LoopController.Skip();
         }
 
         private void OnBtnPlaceOnSelected(object sender, RoutedEventArgs e)
@@ -218,6 +225,11 @@ namespace DockableDialog.Forms
                 }
             }
             catch (Exception e) { PrintError(e); }
+        }
+
+        private void OnSubItemRemoveBtnClick(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -87,10 +87,10 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             }
             return solid;
         }
-        private static void CreateSolid(Document doc, Solid solid)
+        public void CreateSolid(Document doc)
         {
             List<GeometryObject> geom = new List<GeometryObject>();
-            geom.Add(solid);
+            geom.Add(Solid);
             IList<GeometryObject> igeom = geom;
             DirectShape shape = DirectShape.CreateElement(doc, new ElementId(-2001140));
             shape.SetShape(igeom);

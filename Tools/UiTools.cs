@@ -4,6 +4,7 @@ using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Filters;
 using static ExtensibleOpeningManager.Common.Collections;
+using static KPLN_Loader.Output.Output;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,11 @@ namespace ExtensibleOpeningManager.Tools
                         return null;
                 }
             }
-            catch (Exception) { return null; }
+            catch (Exception e) 
+            {
+                PrintError(e);
+                return null;
+            }
             switch (options)
             {
                 case PickOptions.Local:
@@ -62,7 +67,11 @@ namespace ExtensibleOpeningManager.Tools
                             return null;
                     }
                 }
-                catch (Exception) { return null; }
+                catch (Exception e) 
+                {
+                    PrintError(e);
+                    return null;
+                }
             }
             else
             {
@@ -80,7 +89,11 @@ namespace ExtensibleOpeningManager.Tools
                             return null;
                     }
                 }
-                catch (Exception) { return null; }
+                catch (Exception e)
+                {
+                    PrintError(e);
+                    return null;
+                }
             }
             switch (options)
             {
@@ -115,7 +128,11 @@ namespace ExtensibleOpeningManager.Tools
                             return new List<ExtensibleSubElement>(); ;
                     }
                 }
-                catch (Exception) { return new List<ExtensibleSubElement>(); }
+                catch (Exception e)
+                {
+                    PrintError(e);
+                    return new List<ExtensibleSubElement>();
+                }
             }
             else
             {
@@ -133,7 +150,11 @@ namespace ExtensibleOpeningManager.Tools
                             return new List<ExtensibleSubElement>();
                     }
                 }
-                catch (Exception) { return new List<ExtensibleSubElement>(); }
+                catch (Exception e) 
+                {
+                    PrintError(e);
+                    return new List<ExtensibleSubElement>();
+                }
             }
             switch (options)
             {
@@ -154,19 +175,22 @@ namespace ExtensibleOpeningManager.Tools
                     return new List<ExtensibleSubElement>();
             }
         }
-        public static View Get3DView(UIDocument uidoc)
+        public static View Get3DView(Document doc)
         {
-            foreach (Autodesk.Revit.DB.View view in new FilteredElementCollector(uidoc.Document).OfClass(typeof(Autodesk.Revit.DB.View)).WhereElementIsNotElementType())
+            foreach (Autodesk.Revit.DB.View view in new FilteredElementCollector(doc).OfClass(typeof(Autodesk.Revit.DB.View)).WhereElementIsNotElementType())
             {
                 try
                 {
-                    ViewFamilyType viewFamilyType = uidoc.Document.GetElement(view.GetTypeId()) as ViewFamilyType;
+                    ViewFamilyType viewFamilyType = doc.GetElement(view.GetTypeId()) as ViewFamilyType;
                     if (view.get_Parameter(BuiltInParameter.VIEW_NAME).AsString() == Variables.default3dViewName && viewFamilyType.ViewFamily == ViewFamily.ThreeDimensional)
                     {
                         return view;
                     }
                 }
-                catch (Exception) { }
+                catch (Exception e) 
+                {
+                    PrintError(e);
+                }
             }
             return null;
         }
@@ -189,14 +213,15 @@ namespace ExtensibleOpeningManager.Tools
                                     BuiltInCategory.OST_PipeFitting};
         public static void ActivateView(View view, UIDocument uidoc)
         {
-            try { uidoc.RequestViewChange(view); }
-            catch (Exception) { }
+            uidoc.RequestViewChange(view);
             uidoc.Document.Regenerate();
         }
         public static void ZoomElement(BoundingBoxXYZ box, XYZ centroid, UIDocument uidoc)
         {
             try
             {
+                XYZ offsetMin = new XYZ(-5, -5, -2);
+                XYZ offsetMax = new XYZ(5, 5, 1);
                 View3D activeView = uidoc.ActiveView as View3D;
                 ViewFamily activeViewFamily = ViewFamily.Invalid;
                 try
@@ -204,7 +229,7 @@ namespace ExtensibleOpeningManager.Tools
                     ViewFamilyType viewFamilyType = uidoc.Document.GetElement(activeView.GetTypeId()) as ViewFamilyType;
                     activeViewFamily = viewFamilyType.ViewFamily;
                 }
-                catch (Exception) { }
+                catch (Exception e) { PrintError(e); }
                 if (activeViewFamily == ViewFamily.ThreeDimensional)
                 {
                     activeView.SetSectionBox(box);
@@ -223,7 +248,7 @@ namespace ExtensibleOpeningManager.Tools
                     return;
                 }
             }
-            catch (Exception) { }
+            catch (Exception e) { PrintError(e); }
         }
         private static XYZ VectorFromHorizVertAngles(double angleHorizD, double angleVertD)
         {
@@ -266,7 +291,7 @@ namespace ExtensibleOpeningManager.Tools
                                     settings.SetDetailLevel(ViewDetailLevel.Fine);
                                     newView.SetCategoryOverrides(cat.Id, settings);
                                 }
-                                catch (Exception) { }
+                                catch (Exception e) { PrintError(e); }
                             }
                             foreach (BuiltInCategory category in CategoryListEnvironment)
                             {
@@ -278,14 +303,14 @@ namespace ExtensibleOpeningManager.Tools
                                     settings.SetSurfaceTransparency(30);
                                     newView.SetCategoryOverrides(cat.Id, settings);
                                 }
-                                catch (Exception) { }
+                                catch (Exception e) { PrintError(e); }
                             }
                             return;
                         }
-                        catch (Exception) { }
+                        catch (Exception e) { PrintError(e); }
                     }
                 }
-                catch (Exception) { }
+                catch (Exception e) { PrintError(e); }
             }
         }
     }

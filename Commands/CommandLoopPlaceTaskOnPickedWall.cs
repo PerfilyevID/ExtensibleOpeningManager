@@ -17,19 +17,18 @@ namespace ExtensibleOpeningManager.Commands
 {
     public class CommandLoopPlaceTaskOnPickedWall : IExecutableCommand
     {
-        public CommandLoopPlaceTaskOnPickedWall(SE_LinkedWall wall, Matrix<Element> matrix)
+        public CommandLoopPlaceTaskOnPickedWall(SE_LinkedWall wall)
         {
             Wall = wall;
-            Matrix = matrix;
         }
-        private SE_LinkedWall Wall { get; set; }
-        private Matrix<Element> Matrix { get; set; }
+        SE_LinkedWall Wall { get; set; }
         public Result Execute(UIApplication app)
         {
-            List<Intersection> context = Matrix.GetContext(Wall);
+            Matrix.Matrix<Element> matrix = new Matrix.Matrix<Element>(CollectorTools.GetMepElements(app.ActiveUIDocument.Document));
+            List<Intersection> context = matrix.GetContext(Wall);
             foreach (Intersection intersection in context)
             {
-                if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection))
+                if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection, Wall))
                 {
                     continue;
                 }
@@ -39,6 +38,7 @@ namespace ExtensibleOpeningManager.Commands
                 element.Reject();
                 element.AddComment(Variables.msg_created);
                 element.Approve();
+                UiController.GetControllerByDocument(app.ActiveUIDocument.Document).LoopController.CreatedElements.Add(element);
             }
             return Result.Succeeded;
         }

@@ -65,11 +65,17 @@
     <Compile Include="Commands\CommandApplySubElements.cs" />
     <Compile Include="Commands\CommandApplyWall.cs" />
     <Compile Include="Commands\CommandGroupInstances.cs" />
+    <Compile Include="Commands\CommandLoopApprove.cs" />
+    <Compile Include="Commands\CommandLoopReject.cs" />
+    <Compile Include="Commands\CommandLoopSkip.cs" />
+    <Compile Include="Commands\CommandShowPane.cs" />
+    <Compile Include="Commands\CommandHidePane.cs" />
     <Compile Include="Commands\CommandLoopPlaceTaskOnPickedWall.cs" />
     <Compile Include="Commands\CommandPlaceOpeningByOpening.cs" />
     <Compile Include="Commands\CommandPlaceOpeningByTask.cs" />
     <Compile Include="Commands\CommandPlaceTaskOnPickedWall.cs" />
     <Compile Include="Commands\CommandReject.cs" />
+    <Compile Include="Commands\CommandRemove.cs" />
     <Compile Include="Commands\CommandRemoveComment.cs" />
     <Compile Include="Commands\CommandRemoveSubElement.cs" />
     <Compile Include="Commands\CommandReset.cs" />

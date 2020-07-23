@@ -4,6 +4,8 @@ namespace ExtensibleOpeningManager
 {
     public static class Variables
     {
+        public static readonly int round_value = 4;
+
         public static readonly string empty = "";
 
         public static readonly string default3dViewName = "SYS_DEFAULT_EOM";

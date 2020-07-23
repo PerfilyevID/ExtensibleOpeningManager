@@ -82,6 +82,7 @@ namespace ExtensibleOpeningManager.Tools
             instance.LookupParameter(Variables.parameter_offset_bounds).Set(parameters.Offset);
             doc.Regenerate();
             instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).Set(parameters.Elevation);
+            doc.Regenerate();
             return instance;
         }
         public static FamilySymbol GetCreationSymbol(Document doc, SymbolType type, string subType)

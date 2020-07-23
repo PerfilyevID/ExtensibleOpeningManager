@@ -40,7 +40,7 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
                     break;
                 case WallStatus.NotCommited:
                     Source = new Source.Source(Collections.ImageMonitor.Element_Unapproved);
-                    ToolTip = "Найдены неутвержденные изменения";
+                    ToolTip = "Неутвержденные изменения";
                     Id = -1;
                     LinkId = -1;
                     Name = string.Format("Стена: {1}: <{0}>", wall.Wall.Name, wall.Wall.Id.ToString());
@@ -60,7 +60,7 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
                     break;
                 case Collections.SubStatus.Changed:
                     Source = new Source.Source(Collections.ImageMonitor.Element_Unapproved);
-                    ToolTip = "Есть неутвержденные изменения";
+                    ToolTip = "Неутвержденные изменения";
                     break;
                 case Collections.SubStatus.NotFound:
                     Source = new Source.Source(Collections.ImageMonitor.Element_Errored);

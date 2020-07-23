@@ -36,7 +36,7 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
                     Source = new Source.Source(ImageMonitor.Warning);
                     break;
                 default:
-                    Header = Variables.empty;
+                    Header = string.Empty;
                     break;
             }
             foreach (ExtensibleElement element in elements)
@@ -100,7 +100,10 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
                 Collection.Add(new MonitorElement(element) { IsExpanded = isExpanded });
             }
             Count = Collection.Count.ToString();
-            CollectionViewSource.GetDefaultView(DockablePreferences.Page.monitorView.ItemsSource).Refresh();
+            if (DockablePreferences.Page.monitorView.ItemsSource != null)
+            {
+                CollectionViewSource.GetDefaultView(DockablePreferences.Page.monitorView.ItemsSource).Refresh();
+            }
         }
     }
 }

@@ -30,7 +30,7 @@ namespace ExtensibleOpeningManager.Tools
                 {
                     instances.Add(e as RevitLinkInstance);
                 }
-                catch (Exception) { }
+                catch (Exception ex) { PrintError(ex); }
             }
             return instances;
         }
@@ -53,7 +53,7 @@ namespace ExtensibleOpeningManager.Tools
                     {
                         instances.Add(e);
                     }
-                    catch (Exception) { }
+                    catch (Exception ex) { PrintError(ex); }
                 }
             }
             return instances;
@@ -82,7 +82,7 @@ namespace ExtensibleOpeningManager.Tools
                         continue;
                     }
                 }
-                catch (Exception) { }
+                catch (Exception ex) { PrintError(ex); }
             }
             return instances;
         }
@@ -98,7 +98,7 @@ namespace ExtensibleOpeningManager.Tools
                         instances.Add(e as Wall);
                     }
                 }
-                catch (Exception) { }
+                catch (Exception ex) { PrintError(ex); }
             }
             return instances;
         }
@@ -114,7 +114,7 @@ namespace ExtensibleOpeningManager.Tools
                         instances.Add(new SE_LinkedWall(instance, e as Wall));
                     }
                 }
-                catch (Exception) { }
+                catch (Exception ex) { PrintError(ex); }
             }
             return instances;
         }
@@ -127,7 +127,7 @@ namespace ExtensibleOpeningManager.Tools
                 {
                     instances.Add(e as Level);
                 }
-                catch (Exception) { }
+                catch (Exception ex) { PrintError(ex); }
             }
             return instances;
         }

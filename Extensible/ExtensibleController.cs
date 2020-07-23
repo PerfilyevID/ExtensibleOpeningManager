@@ -16,11 +16,7 @@ namespace ExtensibleOpeningManager.Extensible
                 Entity entity = instance.GetEntity(GetCurrentSchema());
                 return entity.Get<string>(ExtensibleParameter_String[(int)parameter]);
             }
-            catch (Exception)
-            {
-                return Variables.empty;
-            }
-            
+            catch (Exception) { return string.Empty; }
         }
         public static void Write(FamilyInstance instance, ExtensibleParameter parameter, string value)
         {

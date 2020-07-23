@@ -59,7 +59,7 @@ namespace ExtensibleOpeningManager.Common
         /// <returns></returns>
         public UIElement GetUiElement()
         {
-            string departmentText = Variables.empty;
+            string departmentText = string.Empty;
             SQLUserInfo user = KPLN_Loader.Preferences.SQLiteDataBase.GetUser(User);
             SolidColorBrush bgColor = new SolidColorBrush(Color.FromArgb(255, 200, 200, 200));
             SolidColorBrush fgColor = new SolidColorBrush(Color.FromArgb(255, 115, 115, 115));

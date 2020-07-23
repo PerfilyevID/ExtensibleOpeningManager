@@ -3,6 +3,7 @@ using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Controll;
 using KPLN_Loader.Common;
 using System;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Commands
 {
@@ -23,8 +24,8 @@ namespace ExtensibleOpeningManager.Commands
                 UiController controller = UiController.GetControllerByDocument(Element.Instance.Document);
                 controller.UpdateComments(controller.Selection[0].AllComments);
             }
-            catch (Exception)
-            { }
+            catch (Exception e)
+            { PrintError(e); }
             return Result.Succeeded;
         }
     }

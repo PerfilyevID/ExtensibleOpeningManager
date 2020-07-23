@@ -43,21 +43,15 @@ namespace ExtensibleOpeningManager.Tools
                 }
                 return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                PrintError(e);
                 return false;
             }
         }
         public static Solid GetIntersectionSolid(Solid solidA, Solid solidB)
         {
-            try
-            {
-                return BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
         }
     }
 }

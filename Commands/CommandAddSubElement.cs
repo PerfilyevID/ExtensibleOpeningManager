@@ -3,6 +3,7 @@ using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Tools;
 using KPLN_Loader.Common;
 using System;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Commands
 {
@@ -28,8 +29,9 @@ namespace ExtensibleOpeningManager.Commands
                     return Result.Succeeded;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                PrintError(e);
                 return Result.Failed;
             }
         }

@@ -3,6 +3,7 @@ using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Matrix;
 using System;
 using System.Collections.Generic;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
 {
@@ -15,13 +16,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 return new List<ExtensibleComment>();
             }
         }
-        public override ElementId LinkId
-        {
-            get
-            {
-                return ElementId.InvalidElementId;
-            }
-        }
+        public override ElementId LinkId { get; protected set; }
         public override string ToString()
         {
             try
@@ -36,9 +31,17 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                     ExtensibleConverter.ConvertDouble(Solid.SurfaceArea),
                     Element.LevelId.ToString()});
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return Variables.empty;
+                PrintError(e);
+                if (Value != null)
+                { 
+                    return Value; 
+                }
+                else
+                { 
+                    return string.Empty; 
+                }
             }
         }
         public override Collections.SubStatus Status
@@ -55,11 +58,19 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 }
                 else
                 {
-                    if (ExtensibleTools.GetSubElementMeta(Parent.Instance, this) != this.ToString())
+                    try
                     {
-                        return Collections.SubStatus.Changed;
+                        if (ExtensibleTools.GetSubElementMeta(Parent.Instance, this) != this.ToString())
+                        {
+                            return Collections.SubStatus.Changed;
+                        }
+                        return Collections.SubStatus.Applied;
                     }
-                    return Collections.SubStatus.Applied;
+                    catch (Exception)
+                    {
+                        return Collections.SubStatus.NotFound;
+                    }
+
                 }
             }
         }
@@ -69,13 +80,27 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Document linkedDocument = linkInstance.GetLinkDocument();
             Transform transform = linkInstance.GetTotalTransform();
             Element = linkedDocument.GetElement(reference.LinkedElementId) as Element;
+            Id = Element.Id.IntegerValue;
             Solid = SolidUtils.CreateTransformed(MatrixElement.GetSolidOfElement(Element), transform);
+            LinkId = linkInstance.Id;
+        }
+        private string Value { get; set; }
+        public SE_LinkedElement(string value)
+        {
+            Id = int.Parse(value.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries)[0], System.Globalization.NumberStyles.Integer);
+            Element = null;
+            Solid = null;
+            Value = value;
+            Value = this.ToString();
         }
         public SE_LinkedElement(RevitLinkInstance linkInstance, Element element)
         {
+            Id = element.Id.IntegerValue;
             Transform transform = linkInstance.GetTotalTransform();
             Element = element;
             Solid = SolidUtils.CreateTransformed(MatrixElement.GetSolidOfElement(Element), transform);
+            LinkId = linkInstance.Id;
+            Value = this.ToString();
         }
     }
 }

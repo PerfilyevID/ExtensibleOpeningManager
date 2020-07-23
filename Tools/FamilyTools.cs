@@ -52,7 +52,7 @@ namespace ExtensibleOpeningManager.Tools
                 doc.LoadFamily(string.Format(@"{0}\Source\RevitData\{1}.rfa", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).ToString(), familyName));
                 doc.Regenerate();
             }
-            catch (Exception) { }
+            catch (Exception e) { PrintError(e); }
             foreach (Element element in new FilteredElementCollector(doc).OfClass(typeof(FamilySymbol)).OfCategory(BuiltInCategory.OST_MechanicalEquipment))
             {
                 FamilySymbol searchSymbol = element as FamilySymbol;

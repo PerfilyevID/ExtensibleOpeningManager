@@ -8,6 +8,18 @@ namespace ExtensibleOpeningManager.Source
     {
         public string Value { get; }
         private static string AssemblyPath = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName;
+        public Source(Icon icon)
+        {
+            switch (icon)
+            {
+                case Icon.OpenManager:
+                    Value = Path.Combine(AssemblyPath, @"Source\icon_manager.png");
+                    break;
+                case Icon.Settings:
+                    Value = Path.Combine(AssemblyPath, @"Source\icon_setup.png");
+                    break;
+            }
+        }
         public Source(ImageButton image)
         {
             switch (image)

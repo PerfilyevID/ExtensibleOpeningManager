@@ -36,11 +36,18 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                     ExtensibleConverter.ConvertDouble(Solid.SurfaceArea),
                     Element.LevelId.ToString()});
             }
-            catch (Exception)
+            catch(Exception)
             {
-                return Variables.empty;
-            }
+                if (Value != null)
+                {
+                    return Value;
+                }
+                else
+                {
+                    return string.Empty;
 
+                }
+            }
         }
         public override Collections.SubStatus Status
         {
@@ -56,16 +63,32 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 }
                 else
                 {
-                    if (ExtensibleTools.GetSubElementMeta(Parent.Instance, this).ToString() != this.ToString())
+                    try
                     {
-                        return Collections.SubStatus.Changed;
+                        if (ExtensibleTools.GetSubElementMeta(Parent.Instance, this).ToString() != this.ToString())
+                        {
+                            return Collections.SubStatus.Changed;
+                        }
+                        return Collections.SubStatus.Applied;
                     }
-                    return Collections.SubStatus.Applied;
+                    catch (Exception)
+                    {
+                        return Collections.SubStatus.NotFound;
+                    }
                 }
             }
         }
+        private string Value { get; set; }
+        public SE_LocalElement(string value)
+        {
+            Id = int.Parse(value.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries)[1], System.Globalization.NumberStyles.Integer);
+            Element = null;
+            Solid = null;
+            Value = value;
+        }
         public SE_LocalElement(Element element)
         {
+            Id = element.Id.IntegerValue;
             Element = element;
             try
             {
@@ -81,7 +104,8 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 }
                 Solid = MatrixElement.GetSolidOfElement(element);
             }
-            catch (Exception) { }
+            catch (Exception e) { PrintError(e); }
+            Value = this.ToString();
         }
     }
 }
