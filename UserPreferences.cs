@@ -4,7 +4,7 @@ namespace ExtensibleOpeningManager
 {
     public static class UserPreferences
     {
-        public static readonly Department Department = Department.MEP;
+        public static readonly Department Department = Department.AR;
         public static string SubDepartment = "ОВ";
         public static bool PlaceOnArchitecturalWalls = true;
         public static bool PlaceOnStructuralWalls = true;

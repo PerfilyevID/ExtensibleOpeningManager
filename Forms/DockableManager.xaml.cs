@@ -193,6 +193,10 @@ namespace DockableDialog.Forms
             {
                 ModuleData.CommandQueue.Enqueue(new CommandPlaceTaskOnPickedWall());
             }
+            if (UserPreferences.Department == ExtensibleOpeningManager.Common.Collections.Department.AR)
+            {
+                ModuleData.CommandQueue.Enqueue(new CommandPlaceOpeningByTask());
+            }
         }
 
         private void OnBtnAddComment(object sender, RoutedEventArgs e)

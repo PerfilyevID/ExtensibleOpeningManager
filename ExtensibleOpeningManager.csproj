@@ -165,22 +165,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\RevitData\199_AR_Отверстие_Гильза_Стены.rfa">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Source\RevitData\199_AR_Отверстие_Отверстие_Стены.rfa">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Source\RevitData\199_KR_Отверстие_Гильза_Стены.rfa">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Source\RevitData\199_KR_Отверстие_Отверстие_Стены.rfa">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Source\RevitData\501_MEP_Задание_Гильза_Стены.rfa">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Source\RevitData\501_MEP_Задание_Отверстие_Стены.rfa">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

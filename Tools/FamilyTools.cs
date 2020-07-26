@@ -44,30 +44,39 @@ namespace ExtensibleOpeningManager.Tools
                 if (searchSymbol.FamilyName == familyName && searchSymbol.Name == symbolName)
                 {
                     searchSymbol.Activate();
+                    Print("Найден с первого раза", KPLN_Loader.Preferences.MessageType.Error);
                     return searchSymbol;
                 }
             }
             try
             {
+                Print("Загрузка...", KPLN_Loader.Preferences.MessageType.Error);
                 doc.LoadFamily(string.Format(@"{0}\Source\RevitData\{1}.rfa", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).ToString(), familyName));
                 doc.Regenerate();
             }
-            catch (Exception e) { PrintError(e); }
+            catch (Exception e)
+            { PrintError(e); }
             foreach (Element element in new FilteredElementCollector(doc).OfClass(typeof(FamilySymbol)).OfCategory(BuiltInCategory.OST_MechanicalEquipment))
             {
                 FamilySymbol searchSymbol = element as FamilySymbol;
                 if (searchSymbol.FamilyName == familyName && searchSymbol.Name == symbolName)
                 {
                     searchSymbol.Activate();
+                    Print("Найден!", KPLN_Loader.Preferences.MessageType.Error);
                     return searchSymbol;
                 }
             }
             foreach (Element element in new FilteredElementCollector(doc).OfClass(typeof(FamilySymbol)).OfCategory(BuiltInCategory.OST_MechanicalEquipment))
             {
                 FamilySymbol searchSymbol = element as FamilySymbol;
-                searchSymbol.Activate();
-                return searchSymbol;
+                if (searchSymbol.FamilyName == familyName)
+                {
+                    searchSymbol.Activate();
+                    Print("Найден по имени семейства", KPLN_Loader.Preferences.MessageType.Error);
+                    return searchSymbol;
+                }
             }
+            Print("Null", KPLN_Loader.Preferences.MessageType.Error);
             return null;
         }
     }
