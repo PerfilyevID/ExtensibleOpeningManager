@@ -117,7 +117,6 @@ namespace ExtensibleOpeningManager
             UIApplication uiapp = sender as UIApplication;
             UIControlledApplication controlledApplication = sender as UIControlledApplication;
             bool documentHasBeenModified = false;
-            UiController.GetControllerByDocument(args.GetDocument()).UpdateRevitLinkInstances();
             if (args.GetDeletedElementIds().Count != 0)
             {
                 if (UiController.GetControllerByDocument(args.GetDocument()).ElementsInLinksCollection(args.GetDeletedElementIds()))
@@ -140,7 +139,6 @@ namespace ExtensibleOpeningManager
                 {
                     UiController.GetControllerByDocument(args.GetDocument()).UpdateAllElements();
                     DockablePreferences.Page.UpdateItemscontroll();
-                    return;
                 }
                 if (UiController.GetControllerByDocument(args.GetDocument()).ElementsInExtensibleCollection(args.GetModifiedElementIds()))
                 {
@@ -149,14 +147,21 @@ namespace ExtensibleOpeningManager
                 }
             }
             if (documentHasBeenModified) { DockablePreferences.Page.UpdateItemscontroll(); }
+            UiController.GetControllerByDocument(args.GetDocument()).UpdateRevitLinkInstances();
         }
         public static void OnViewActivated(object sender, ViewActivatedEventArgs args)
         {
-            if (!args.Document.IsFamilyDocument)
-            { 
-                UiController.SetActiveDocument(args.Document);
-                UiController.CurrentController.UpdateEnability();
+            try
+            {
+                if (!args.Document.IsFamilyDocument)
+                {
+
+                    UiController.SetActiveDocument(args.CurrentActiveView.Document);
+                    UiController.CurrentController.UpdateEnability();
+                }
             }
+            catch (Exception e)
+            { PrintError(e); }
         }
         private void AddPushButtonData(string name, string text, string description, string className, RibbonPanel panel, Source.Source imageSource, string url = @"https://kpln.kdb24.ru/article/76440/")
         {

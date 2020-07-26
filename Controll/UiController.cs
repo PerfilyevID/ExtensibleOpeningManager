@@ -46,14 +46,14 @@ namespace ExtensibleOpeningManager.Controll
         {
             foreach (UiController controller in Controllers)
             {
-                if (doc.IsWorkshared)
+                if (doc.IsWorkshared && controller.Document.IsWorkshared)
                 {
                     if (doc.GetWorksharingCentralModelPath().CentralServerPath == controller.Document.GetWorksharingCentralModelPath().CentralServerPath)
                     {
                         return controller;
                     }
                 }
-                else
+                if (!doc.IsWorkshared && !controller.Document.IsWorkshared)
                 {
                     if (doc.PathName == controller.Document.PathName)
                     {
@@ -379,7 +379,11 @@ namespace ExtensibleOpeningManager.Controll
             if (Selection.Count == 1)
             {
                 DockablePreferences.Page.SubItemsControll.ItemsSource = null;
-                DockablePreferences.Page.SubItemsControll.ItemsSource = GetMonitorElement(Selection[0]).Collection;
+                try
+                {
+                    DockablePreferences.Page.SubItemsControll.ItemsSource = GetMonitorElement(Selection[0]).Collection;
+                }
+                catch (Exception) { }
             }
             else
             {

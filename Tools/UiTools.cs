@@ -30,9 +30,8 @@ namespace ExtensibleOpeningManager.Tools
                         return null;
                 }
             }
-            catch (Exception e) 
+            catch (Exception) 
             {
-                PrintError(e);
                 return null;
             }
             switch (options)
@@ -67,9 +66,8 @@ namespace ExtensibleOpeningManager.Tools
                             return null;
                     }
                 }
-                catch (Exception e) 
+                catch (Exception) 
                 {
-                    PrintError(e);
                     return null;
                 }
             }
@@ -89,9 +87,8 @@ namespace ExtensibleOpeningManager.Tools
                             return null;
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    PrintError(e);
                     return null;
                 }
             }
@@ -128,9 +125,8 @@ namespace ExtensibleOpeningManager.Tools
                             return new List<ExtensibleSubElement>(); ;
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    PrintError(e);
                     return new List<ExtensibleSubElement>();
                 }
             }
@@ -150,9 +146,8 @@ namespace ExtensibleOpeningManager.Tools
                             return new List<ExtensibleSubElement>();
                     }
                 }
-                catch (Exception e) 
+                catch (Exception) 
                 {
-                    PrintError(e);
                     return new List<ExtensibleSubElement>();
                 }
             }
@@ -303,14 +298,14 @@ namespace ExtensibleOpeningManager.Tools
                                     settings.SetSurfaceTransparency(30);
                                     newView.SetCategoryOverrides(cat.Id, settings);
                                 }
-                                catch (Exception e) { PrintError(e); }
+                                catch (Exception) { }
                             }
                             return;
                         }
-                        catch (Exception e) { PrintError(e); }
+                        catch (Exception) { }
                     }
                 }
-                catch (Exception e) { PrintError(e); }
+                catch (Exception) { }
             }
         }
     }

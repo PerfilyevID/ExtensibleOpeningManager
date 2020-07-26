@@ -93,6 +93,7 @@
     <Compile Include="Common\ExtensibleSubElements\SE_LinkedInstance.cs" />
     <Compile Include="Common\ExtensibleSubElements\SE_LinkedWall.cs" />
     <Compile Include="Common\ExtensibleSubElements\SE_LocalElement.cs" />
+    <Compile Include="Common\MonitorElements\MonitorAction.cs" />
     <Compile Include="Common\MonitorElements\MonitorCollection.cs" />
     <Compile Include="Common\MonitorElements\MonitorElement.cs" />
     <Compile Include="Common\MonitorElements\MonitorGroup.cs" />

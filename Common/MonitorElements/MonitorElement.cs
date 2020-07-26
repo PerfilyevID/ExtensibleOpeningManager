@@ -52,16 +52,16 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
             Collection = new ObservableCollection<MonitorSubElement>();
             Id = element.Id;
             Name = string.Format("{0}: {1} [{2}.rfa]", element.Id, element.Instance.Symbol.Name, element.Instance.Symbol.FamilyName);
-            Collection.Add(new MonitorSubElement(element.Wall, element.WallStatus));
+            Collection.Add(new MonitorSubElement(element.Wall, element.WallStatus, this));
             if (element.SubElements.Count == 0)
             {
-                Collection.Add(new MonitorSubElement());
+                Collection.Add(new MonitorSubElement(this));
             }
             else
             {
                 foreach (ExtensibleSubElement subElement in element.SubElements)
                 {
-                    Collection.Add(new MonitorSubElement(subElement));
+                    Collection.Add(new MonitorSubElement(subElement, this));
                 }
             }
         }

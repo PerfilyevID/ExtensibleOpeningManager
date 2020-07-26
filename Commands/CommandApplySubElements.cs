@@ -13,8 +13,15 @@ namespace ExtensibleOpeningManager.Commands
         private ExtensibleElement Element { get; }
         public Result Execute(UIApplication app)
         {
-            Element.ApplySubElements();
-            return Result.Succeeded;
+            try
+            {
+                Element.ApplySubElements();
+                return Result.Succeeded;
+            }
+            catch (System.Exception)
+            {
+                return Result.Failed;
+            }
         }
     }
 }

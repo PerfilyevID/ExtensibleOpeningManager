@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Commands
 {
@@ -24,23 +25,30 @@ namespace ExtensibleOpeningManager.Commands
         SE_LinkedWall Wall { get; set; }
         public Result Execute(UIApplication app)
         {
-            Matrix.Matrix<Element> matrix = new Matrix.Matrix<Element>(CollectorTools.GetMepElements(app.ActiveUIDocument.Document));
-            List<Intersection> context = matrix.GetContext(Wall);
-            foreach (Intersection intersection in context)
+            try
             {
-                if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection, Wall))
+                Matrix.Matrix<Element> matrix = new Matrix.Matrix<Element>(CollectorTools.GetMepElements(app.ActiveUIDocument.Document));
+                List<Intersection> context = matrix.GetContext(Wall);
+                foreach (Intersection intersection in context)
                 {
-                    continue;
+                    if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection, Wall))
+                    {
+                        continue;
+                    }
+                    ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(Wall, intersection, app.ActiveUIDocument.Document));
+                    element.SetWall(Wall);
+                    element.AddSubElement(new SE_LocalElement(intersection.Element));
+                    element.Reject();
+                    element.AddComment(Variables.msg_created);
+                    element.Approve();
+                    UiController.GetControllerByDocument(app.ActiveUIDocument.Document).LoopController.CreatedElements.Add(element);
                 }
-                ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(Wall, intersection, app.ActiveUIDocument.Document));
-                element.SetWall(Wall);
-                element.AddSubElement(new SE_LocalElement(intersection.Element));
-                element.Reject();
-                element.AddComment(Variables.msg_created);
-                element.Approve();
-                UiController.GetControllerByDocument(app.ActiveUIDocument.Document).LoopController.CreatedElements.Add(element);
+                return Result.Succeeded;
             }
-            return Result.Succeeded;
+            catch (Exception)
+            {
+                return Result.Failed;
+            }
         }
     }
 }

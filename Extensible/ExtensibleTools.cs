@@ -86,7 +86,7 @@ namespace ExtensibleOpeningManager.Extensible
             List<string> notRemovedElements = new List<string>();
             foreach (string c in ExtensibleController.Read(instance, ExtensibleParameter.SubElementsCollection).Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries))
             {
-                string[] parts = c.Split(new string[] { Variables.separator_sub_sub_element }, StringSplitOptions.None);
+                string[] parts = c.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.None);
                 if (subElement.GetType() == typeof(SE_LinkedElement) || subElement.GetType() == typeof(SE_LinkedInstance))
                 {
                     if (parts[1] == subElement.Element.Id.ToString() && parts[2] == subElement.LinkId.ToString())

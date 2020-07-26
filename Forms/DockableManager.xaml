@@ -144,7 +144,7 @@
                                             </Grid.ColumnDefinitions>
                                             <Image Grid.Column="0" Source="{Binding Source.Value}" Height="15" Width="15" HorizontalAlignment="Left" ToolTip="{Binding ToolTip}" VerticalAlignment="Top"/>
                                             <TextBlock Grid.Column="1" Margin="2,0,2,0" Text="{Binding Name}" ToolTip="{Binding ToolTip}" TextWrapping="Wrap"/>
-                                            <Button Grid.Column="2"  Content="✖" FontSize="8" Width="15" ToolTip="Разорвать связь" Height="15" Background="White" BorderBrush="Red" HorizontalAlignment="Right" Foreground="Red" VerticalAlignment="Top" Click="OnSubItemRemoveBtnClick"/>
+                                            <Button Grid.Column="2"  Content="{Binding Action.ButtonText}" FontSize="8" Width="15" ToolTip="{Binding Action.ToolTip}" Height="15" Background="White" BorderBrush="{Binding Action.Color}" HorizontalAlignment="Right" Foreground="{Binding Action.Color}" VerticalAlignment="Top" Click="OnSubItemRemoveBtnClick"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

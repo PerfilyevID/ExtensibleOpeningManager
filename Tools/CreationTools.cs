@@ -85,6 +85,29 @@ namespace ExtensibleOpeningManager.Tools
             doc.Regenerate();
             return instance;
         }
+        private static FamilyInstance CreateFamilyInstance(SE_LinkedWall wall, PlaceParameters parameters, Document doc, SymbolType type, string subType = null)
+        {
+            FamilyInstance instance = doc.Create.NewFamilyInstance(parameters.Position, GetCreationSymbol(doc, type, subType), wall.Wall, parameters.Level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+            doc.Regenerate();
+            ElementTransformUtils.RotateElement(doc, instance.Id, Line.CreateBound(parameters.Position, new XYZ(parameters.Position.X, parameters.Position.Y, parameters.Position.Z + 1)), parameters.GetAngle(instance));
+            instance.LookupParameter(Variables.parameter_height).Set(parameters.Height);
+            instance.LookupParameter(Variables.parameter_width).Set(parameters.Width);
+            if (UserPreferences.Department == Department.MEP)
+            {
+                instance.LookupParameter(Variables.parameter_thickness).Set(parameters.Thickness);
+            }
+            double offsetUp = parameters.OffsetUp;
+            if (offsetUp < 0) { offsetUp = 0; }
+            double offsetDown = parameters.OffsetDown;
+            if (offsetDown < 0) { offsetDown = 0; }
+            instance.LookupParameter(Variables.parameter_offset_up).Set(offsetUp);
+            instance.LookupParameter(Variables.parameter_offset_down).Set(offsetDown);
+            instance.LookupParameter(Variables.parameter_offset_bounds).Set(parameters.Offset);
+            doc.Regenerate();
+            instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).Set(parameters.Elevation);
+            doc.Regenerate();
+            return instance;
+        }
         public static FamilySymbol GetCreationSymbol(Document doc, SymbolType type, string subType)
         {
             switch (UserPreferences.Department)

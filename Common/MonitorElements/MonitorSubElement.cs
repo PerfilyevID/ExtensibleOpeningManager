@@ -1,27 +1,37 @@
 ﻿using Autodesk.Revit.DB;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
+using System.Drawing;
 using static ExtensibleOpeningManager.Common.Collections;
 
 namespace ExtensibleOpeningManager.Common.MonitorElements
 {
     public class MonitorSubElement
     {
+        public MonitorElement Parent { get; set; }
         public string Name { get; }
         public string ToolTip { get; }
         public int Id { get; }
         public int LinkId { get; }
         public Source.Source Source { get; }
         public bool IsExpanded { get; set; }
-        public MonitorSubElement()
+        public object Object { get; set; }
+        public MonitorAction Action { get; set; }
+        public MonitorSubElement(MonitorElement parent)
         {
+            Parent = parent;
+            Action = new MonitorAction("✖", "Разорвать связь", Brushes.Gray);
+            Object = null;
             Source = new Source.Source(Collections.ImageMonitor.Element_Errored);
             ToolTip = "Отсутствуют субэлементы";
             Id = -1;
             LinkId = -1;
             Name = "<Пусто>";
         }
-        public MonitorSubElement(SE_LinkedWall wall, WallStatus status)
+        public MonitorSubElement(SE_LinkedWall wall, WallStatus status, MonitorElement parent)
         {
+            Parent = parent;
+            Action = new MonitorAction("◥", "Задать новую связь", Brushes.Black);
+            Object = wall;
             switch (status)
             {
                 case WallStatus.Ok:
@@ -48,10 +58,12 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
                 default:
                     break;
             }
-
         }
-        public MonitorSubElement(ExtensibleSubElement subElement)
+        public MonitorSubElement(ExtensibleSubElement subElement, MonitorElement parent)
         {
+            Parent = parent;
+            Action = new MonitorAction("✖", "Разорвать связь", Brushes.Black);
+            Object = subElement;
             switch (subElement.Status)
             {
                 case Collections.SubStatus.Applied:

@@ -39,7 +39,12 @@ namespace ExtensibleOpeningManager.Matrix
                     el = new MatrixElement(i as SE_LinkedWall);
                     detected = true;
                 }
-                if(!detected)
+                if (!detected && i.GetType() == typeof(Wall))
+                {
+                    el = new MatrixElement(i as Wall);
+                    detected = true;
+                }
+                if (!detected)
                 {
                     el = new MatrixElement(i as Element);
                     detected = true;
@@ -69,29 +74,21 @@ namespace ExtensibleOpeningManager.Matrix
             }
             Container.Optimize();
         }
-        public List<Intersection> GetContext(ExtensibleSubElement element)
+        public List<SE_LinkedWall> GetContext(ExtensibleSubElement element)
         {
-            return GetBySolidIntersection(new MatrixElement(element));
+            return Container.GetWallsBySolidIntersection(new MatrixElement(element));
         }
-        public List<Intersection> GetContext(SE_LinkedWall wall)
+        public List<Intersection> GetContext(SE_LinkedWall element)
         {
-            return GetBySolidIntersection(new MatrixElement(wall));
+            return Container.GetBySolidIntersection(new MatrixElement(element));
         }
         public List<Intersection> GetContext(ExtensibleElement element)
         {
-            return GetBySolidIntersection(new MatrixElement(element));
+            return Container.GetBySolidIntersection(new MatrixElement(element));
         }
         private MatrixContainer Container { get; }
         private List<MatrixElement> Elements = new List<MatrixElement>();
         private BoundingBoxXYZ BoundingBox { get; }
-        public List<MatrixElement> GetByBoundingBoxIntersection(MatrixElement element)
-        {
-            return Container.GetByBoundingBoxIntersection(element);
-        }
-        public List<Intersection> GetBySolidIntersection(MatrixElement element)
-        {
-            return Container.GetBySolidIntersection(element);
-        }
 
     }
 }

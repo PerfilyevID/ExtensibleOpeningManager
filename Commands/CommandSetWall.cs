@@ -29,9 +29,8 @@ namespace ExtensibleOpeningManager.Commands
                     return Result.Succeeded;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                PrintError(e);
                 return Result.Failed;
             }
         }

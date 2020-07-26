@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Tools.Instances;
 using System;
@@ -134,6 +135,21 @@ namespace ExtensibleOpeningManager.Matrix
                 }
             }
             return elements;
+        }
+        public List<SE_LinkedWall> GetWallsBySolidIntersection(MatrixElement element)
+        {
+            List<SE_LinkedWall> walls = new List<SE_LinkedWall>();
+            foreach (MatrixElement e in GetByBoundingBoxIntersection(element))
+            {
+                if (IntersectionTools.IntersectsSolid(e.Solid, element.Solid))
+                {
+                    if(e.Element.GetType() == typeof(Wall))
+                    {
+                        walls.Add(new SE_LinkedWall(e.Element as Wall));
+                    }
+                }
+            }
+            return walls;
         }
         public void Add(MatrixElement element)
         {

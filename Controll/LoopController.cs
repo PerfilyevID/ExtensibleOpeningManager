@@ -25,7 +25,11 @@ namespace ExtensibleOpeningManager.Controll
         public LoopController(Document doc)
         {
             IsActive = false;
-            Matrix = new Matrix<Element>(CollectorTools.GetMepElements(doc));
+            try
+            {
+                Matrix = new Matrix<Element>(CollectorTools.GetMepElements(doc));
+            }
+            catch (Exception) { }
             Document = doc;
         }
         public void Prepare(List<RevitLinkInstance> revitLinks)

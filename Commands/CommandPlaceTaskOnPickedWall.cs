@@ -15,23 +15,31 @@ namespace ExtensibleOpeningManager.Commands
     {
         public Result Execute(UIApplication app)
         {
-            SE_LinkedWall wall = UiTools.PickWall(app, Collections.PickOptions.References);
-            Matrix.Matrix<Element> matrix = new Matrix.Matrix<Element>(CollectorTools.GetMepElements(app.ActiveUIDocument.Document));
-            List<Intersection> context = matrix.GetContext(wall);
-            foreach (Intersection intersection in context)
+            try
             {
-                if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection, wall))
+                SE_LinkedWall wall = UiTools.PickWall(app, Collections.PickOptions.References);
+                Matrix.Matrix<Element> matrix = new Matrix.Matrix<Element>(CollectorTools.GetMepElements(app.ActiveUIDocument.Document));
+                List<Intersection> context = matrix.GetContext(wall);
+                foreach (Intersection intersection in context)
                 {
-                    continue;
+                    if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection, wall))
+                    {
+                        continue;
+                    }
+                    ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, intersection, app.ActiveUIDocument.Document));
+                    element.SetWall(wall);
+                    element.AddSubElement(new SE_LocalElement(intersection.Element));
+                    element.Reject();
+                    element.AddComment(Variables.msg_created);
+                    element.Approve();
                 }
-                ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, intersection, app.ActiveUIDocument.Document));
-                element.SetWall(wall);
-                element.AddSubElement(new SE_LocalElement(intersection.Element));
-                element.Reject();
-                element.AddComment(Variables.msg_created);
-                element.Approve();
+                return Result.Succeeded;
             }
-            return Result.Succeeded;
+            catch (System.Exception)
+            {
+                return Result.Failed;
+            }
+
         }
     }
 }

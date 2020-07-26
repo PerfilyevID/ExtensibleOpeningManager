@@ -99,6 +99,35 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
         public ElementId LinkId { get; set; }
         public Solid Solid { get; set; }
         public Wall Wall { get; set; }
+        public bool SavedAsConcrete { get; set; }
+        public bool IsConcreteTask
+        {
+            get 
+            {
+                if (Wall == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    try
+                    {
+                        if (Wall.Name.StartsWith("00"))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
         public Transform Transform { get; set; }
         public BoundingBoxXYZ BoundingBox { get; set; }
         public override string ToString()
@@ -121,11 +150,18 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                                 ExtensibleConverter.ConvertDouble(area), 
                                 ExtensibleConverter.ConvertDouble(volume), 
                                 Wall.LevelId.ToString(),
-                                ExtensibleConverter.ConvertPoint(Solid.ComputeCentroid())});
+                                ExtensibleConverter.ConvertPoint(Solid.ComputeCentroid())},
+                                IsConcreteTask.ToString());
         }
         public static SE_LinkedWall TryParse(Document doc, string value)
         {
             string[] values = value.Split(new string[] { Variables.separator_element }, StringSplitOptions.None);
+            bool savedAsConcrete = false;
+            try
+            { 
+                bool.TryParse(values[8], out savedAsConcrete);
+            }
+            catch (Exception) { }
             ElementId linkId = new ElementId(int.Parse(values[1]));
             RevitLinkInstance link = CollectorTools.GetRevitLinkById(linkId, doc);
             Wall wall = null;
@@ -138,20 +174,24 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 {
                     wall = wallElement as Wall;
                     solid = GetCorrectSolid(wall);
-
                 }
             }
             else
             {
                 if (link != null)
                 {
-                    ElementId wallId = new ElementId(int.Parse(values[2]));
-                    Element wallElement = link.GetLinkDocument().GetElement(wallId);
-                    if (wallElement != null && wallElement.GetType() == typeof(Wall))
+                    try
                     {
-                        wall = wallElement as Wall;
-                        solid = GetCorrectSolid(wall, link.GetTransform());
+                        ElementId wallId = new ElementId(int.Parse(values[2]));
+                        Element wallElement = link.GetLinkDocument().GetElement(wallId);
+                        if (wallElement != null && wallElement.GetType() == typeof(Wall))
+                        {
+                            wall = wallElement as Wall;
+                            solid = GetCorrectSolid(wall, link.GetTransform());
+                        }
                     }
+                    catch (Exception)
+                    { }
                 }
             }
             if (wall != null)
@@ -159,7 +199,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 BoundingBoxXYZ BoundingBox = new BoundingBoxXYZ();
                 BoundingBox.Max = solid.GetBoundingBox().Max + solid.ComputeCentroid();
                 BoundingBox.Min = solid.GetBoundingBox().Min + solid.ComputeCentroid();
-                return new SE_LinkedWall() { Wall = wall, Solid = solid, Document = link.GetLinkDocument(), LinkId = linkId, Transform = link.GetTransform(), BoundingBox = BoundingBox };
+                return new SE_LinkedWall() { Wall = wall, SavedAsConcrete = savedAsConcrete, Solid = solid, Document = link.GetLinkDocument(), LinkId = linkId, Transform = link.GetTransform(), BoundingBox = BoundingBox };
             }
             else
             { 

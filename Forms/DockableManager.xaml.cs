@@ -2,6 +2,8 @@
 using Autodesk.Revit.UI;
 using ExtensibleOpeningManager;
 using ExtensibleOpeningManager.Commands;
+using ExtensibleOpeningManager.Common;
+using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Common.MonitorElements;
 using ExtensibleOpeningManager.Controll;
 using ExtensibleOpeningManager.Forms;
@@ -229,7 +231,16 @@ namespace DockableDialog.Forms
 
         private void OnSubItemRemoveBtnClick(object sender, RoutedEventArgs e)
         {
-
+            object storedObject = ((sender as Button).DataContext as MonitorSubElement).Object;
+            if (storedObject.GetType() == typeof(SE_LocalElement) || storedObject.GetType() == typeof(SE_LinkedElement) || storedObject.GetType() == typeof(SE_LinkedInstance))
+            {
+                ExtensibleSubElement subElement = storedObject as ExtensibleSubElement;
+                ModuleData.CommandQueue.Enqueue(new CommandRemoveSubElement(subElement.Parent.Instance, subElement));
+            }
+            if (storedObject.GetType() == typeof(SE_LinkedWall))
+            {
+                ModuleData.CommandQueue.Enqueue(new CommandSetWall(((sender as Button).DataContext as MonitorSubElement).Parent.Element));
+            }
         }
     }
 }
