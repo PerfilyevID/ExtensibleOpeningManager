@@ -44,13 +44,11 @@ namespace ExtensibleOpeningManager.Tools
                 if (searchSymbol.FamilyName == familyName && searchSymbol.Name == symbolName)
                 {
                     searchSymbol.Activate();
-                    Print("Найден с первого раза", KPLN_Loader.Preferences.MessageType.Error);
                     return searchSymbol;
                 }
             }
             try
             {
-                Print("Загрузка...", KPLN_Loader.Preferences.MessageType.Error);
                 doc.LoadFamily(string.Format(@"{0}\Source\RevitData\{1}.rfa", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).ToString(), familyName));
                 doc.Regenerate();
             }
@@ -62,7 +60,6 @@ namespace ExtensibleOpeningManager.Tools
                 if (searchSymbol.FamilyName == familyName && searchSymbol.Name == symbolName)
                 {
                     searchSymbol.Activate();
-                    Print("Найден!", KPLN_Loader.Preferences.MessageType.Error);
                     return searchSymbol;
                 }
             }
@@ -72,11 +69,9 @@ namespace ExtensibleOpeningManager.Tools
                 if (searchSymbol.FamilyName == familyName)
                 {
                     searchSymbol.Activate();
-                    Print("Найден по имени семейства", KPLN_Loader.Preferences.MessageType.Error);
                     return searchSymbol;
                 }
             }
-            Print("Null", KPLN_Loader.Preferences.MessageType.Error);
             return null;
         }
     }

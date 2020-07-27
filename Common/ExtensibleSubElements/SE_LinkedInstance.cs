@@ -46,7 +46,6 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                     return string.Empty;
                 }
             }
-
         }
         public override Collections.SubStatus Status
         {
@@ -80,7 +79,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
         private string Value { get; set; }
         public SE_LinkedInstance(string value)
         {
-            Id = int.Parse(value.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries)[0], System.Globalization.NumberStyles.Integer);
+            Id = int.Parse(value.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries)[1], System.Globalization.NumberStyles.Integer);
             Element = null;
             Solid = null;
             Value = value;

@@ -57,11 +57,11 @@ namespace ExtensibleOpeningManager.Matrix
             if (element.GetType() == typeof(FamilyInstance))
             {
                 FamilyInstance instance = element as FamilyInstance;
-                geometryElement = instance.get_Geometry(new Options() { IncludeNonVisibleObjects = true, DetailLevel = ViewDetailLevel.Fine, ComputeReferences = true });
+                geometryElement = instance.get_Geometry(new Options() { IncludeNonVisibleObjects = false, DetailLevel = ViewDetailLevel.Undefined, ComputeReferences = false });
             }
             else
             {
-                geometryElement = element.get_Geometry(new Options() { IncludeNonVisibleObjects = false, DetailLevel = ViewDetailLevel.Fine });
+                geometryElement = element.get_Geometry(new Options() { IncludeNonVisibleObjects = false, DetailLevel = ViewDetailLevel.Undefined, ComputeReferences = true });
             }
             foreach (GeometryObject obj in geometryElement)
             {

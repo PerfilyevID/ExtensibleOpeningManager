@@ -181,7 +181,7 @@ namespace ExtensibleOpeningManager
                 dockablePaneProviderData.FrameworkElement = DockablePreferences.Page;
                 dockablePaneProviderData.InitialState = new DockablePaneState();
                 dockablePaneProviderData.InitialState.DockPosition = DockPosition.Tabbed;
-                dockablePaneProviderData.InitialState.MinimumWidth = 200;
+                dockablePaneProviderData.InitialState.MinimumWidth = 400;
                 dockablePaneProviderData.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser;
                 application.RegisterDockablePane(new DockablePaneId(DockablePreferences.PageGuid), "Мониторинг : Отверстия", DockablePreferences.Page as IDockablePaneProvider);
             }

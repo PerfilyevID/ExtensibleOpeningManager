@@ -116,6 +116,8 @@ namespace ExtensibleOpeningManager.Extensible
         public static List<ExtensibleComment> GetSubElementComments(ExtensibleSubElement element)
         {
             List<ExtensibleComment> comments = new List<ExtensibleComment>();
+            if (element.Element == null || element.Status == SubStatus.NotFound)
+            { return comments; }
             if (element.Element.GetType() != typeof(FamilyInstance)) { return comments; }
             foreach (ExtensibleComment comment in ExtensibleComment.TryParseCollection(ExtensibleController.Read(element.Element as FamilyInstance, ExtensibleParameter.CommentsCollection)))
             {

@@ -183,7 +183,7 @@
                     <TextBlock Text="⌨ История" FontWeight="Medium" Margin="0,3,0,0" Grid.Row="3" MinWidth="2"/>
                     <Rectangle x:Name="RR"  Grid.Row="3" Margin="0,20,0,80" RadiusX="2" RadiusY="2" Fill="White" Stroke="#FF707070"/>
                     <ScrollViewer x:Name="svComments"  Grid.Row="3" Margin="1,21,1,81" VerticalScrollBarVisibility= "Auto">
-                        <StackPanel x:Name="chatPanel" CanVerticallyScroll="True"/>
+                        <StackPanel x:Name="chatPanel" CanVerticallyScroll="True" Margin="5"/>
                     </ScrollViewer>
                     <TextBox TextWrapping="Wrap" x:Name="tbMessage" Grid.Row="3" Height="45" VerticalAlignment="Bottom" Margin="0,0,0,28" Background="White" HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" SpellCheck.IsEnabled="True" BorderBrush="#FF707070"/>
                     <Button Grid.Row="3" Content="Добавить комментарий >>" x:Name="btnChatMessage" Height="22" VerticalAlignment="Bottom" Margin="0,0,0,0" Background="White" Click="OnBtnAddComment"/>

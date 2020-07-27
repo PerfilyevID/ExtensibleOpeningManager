@@ -40,9 +40,11 @@ namespace ExtensibleOpeningManager.Tools.Instances
             double MinZ = 999;
             List<XYZ> points = new List<XYZ>();
             List<XYZ> projectedPoints = new List<XYZ>();
+            List<Solid> geometry = new List<Solid>() { intersection.Solid };
             foreach (Edge edge in intersection.Solid.Edges)
             {
                 Curve curve = edge.AsCurve();
+                points.Add(curve.GetEndPoint(0));
                 points.Add(curve.GetEndPoint(1));
             }
             if (wall.LinkId != ElementId.InvalidElementId)
@@ -97,28 +99,28 @@ namespace ExtensibleOpeningManager.Tools.Instances
                 }
             }
             Position = GetCentroid(new List<BoundingBoxXYZ>() { intersection.BoundingBox });
-            Width = Math.Round(LongestLine.Length, Variables.round_value);
-            Height = Math.Round(Math.Abs(MaxZ - MinZ), Variables.round_value);
-            Thickness = Math.Round(wall.Wall.Width, Variables.round_value);
-            Offset = Math.Round(UserPreferences.DefaultOffset / 304.8, Variables.round_value);
-            if (Position.Z - wall.BoundingBox.Min.Z > 0)
+            Width = Math.Round(LongestLine.Length, Variables.round_system_value);
+            Height = GetCompoundHeight(geometry);
+            Thickness = Math.Round(wall.Wall.Width, Variables.round_system_value);
+            Offset = Math.Round(UserPreferences.DefaultOffset / 304.8, Variables.round_system_value);
+            if (Position.Z - wall.BoundingBox.Min.Z - Height / 2 > 0)
             {
-                OffsetDown = Math.Round(Position.Z - wall.BoundingBox.Min.Z - Height / 2, Variables.round_value);
+                Math.Round(OffsetDown = Position.Z - wall.BoundingBox.Min.Z - Height / 2, Variables.round_system_value);
             }
             else
             { 
                 OffsetDown = 0;
             }
-            if (wall.BoundingBox.Max.Z - Position.Z > 0)
+            if (wall.BoundingBox.Max.Z - Position.Z - Height / 2 > 0)
             {
-                OffsetUp = Math.Round(wall.BoundingBox.Max.Z - Position.Z - Height / 2, Variables.round_value);
+                Math.Round(OffsetUp = wall.BoundingBox.Max.Z - Position.Z - Height / 2, Variables.round_system_value);
             }
             else
             {
                 OffsetUp = 0;
             }
             Level = GetNearestLevel(doc, wall.Wall.Document.GetElement(wall.Wall.LevelId) as Level);
-            Elevation = Math.Round(Position.Z - Level.Elevation - Height/2, Variables.round_value);
+            Elevation = Math.Round(Position.Z - Level.Elevation - Height / 2, Variables.round_system_value);
     }
         public PlaceParameters(SE_LinkedWall wall, List<Intersection> intersection, Document doc)
         {
@@ -128,14 +130,16 @@ namespace ExtensibleOpeningManager.Tools.Instances
             List<XYZ> points = new List<XYZ>();
             List<XYZ> projectedPoints = new List<XYZ>();
             List<BoundingBoxXYZ> boxes = new List<BoundingBoxXYZ>();
+            List<Solid> geometry = new List<Solid>();
             foreach (Intersection i in intersection)
             {
+                geometry.Add(i.Solid);
                 boxes.Add(i.BoundingBox);
                 foreach (Edge edge in i.Solid.Edges)
                 {
                     Curve curve = edge.AsCurve();
-                    points.Add(curve.GetEndPoint(1));
                     points.Add(curve.GetEndPoint(0));
+                    points.Add(curve.GetEndPoint(1));
                 }
             }
             if (wall.LinkId != ElementId.InvalidElementId)
@@ -202,42 +206,29 @@ namespace ExtensibleOpeningManager.Tools.Instances
                 }
             }
             Position = GetCentroid(boxes);
-            Width = Math.Round(LongestLine.Length, Variables.round_value);
-            Height = Math.Round(Math.Abs(MaxZ - MinZ), Variables.round_value);
-            Thickness = Math.Round(wall.Wall.Width, Variables.round_value);
-            Offset = Math.Round(UserPreferences.DefaultOffset / 304.8, Variables.round_value);
-            if (Position.Z - wall.BoundingBox.Min.Z > 0)
+            Width = Math.Round(LongestLine.Length, Variables.round_system_value);
+            Height = Math.Round(GetCompoundHeight(geometry), Variables.round_system_value);
+            Thickness = Math.Round(wall.Wall.Width, Variables.round_system_value);
+            Offset = Math.Round(UserPreferences.DefaultOffset / 304.8, Variables.round_system_value);
+            if (Position.Z - wall.BoundingBox.Min.Z - Height / 2 > 0)
             {
-                OffsetDown = Math.Round(Position.Z - wall.BoundingBox.Min.Z - Height / 2, Variables.round_value);
+
+                OffsetDown = Math.Round(Position.Z - wall.BoundingBox.Min.Z - Height / 2, Variables.round_system_value);
             }
             else
             {
                 OffsetDown = 0;
             }
-            if (wall.BoundingBox.Max.Z - Position.Z > 0)
+            if (wall.BoundingBox.Max.Z - Position.Z - Height / 2 > 0)
             {
-                OffsetUp = Math.Round(wall.BoundingBox.Max.Z - Position.Z - Height / 2, Variables.round_value);
+                OffsetUp = Math.Round(wall.BoundingBox.Max.Z - Position.Z - Height / 2, Variables.round_system_value);
             }
             else
             {
                 OffsetUp = 0;
             }
             Level = GetNearestLevel(doc, wall.Wall.Document.GetElement(wall.Wall.LevelId) as Level);
-            Elevation = Math.Round(Position.Z - Level.Elevation - Height / 2, Variables.round_value);
-        }
-        public PlaceParameters(SE_LinkedInstance instance, Document doc)
-        {
-            RevitLinkInstance link = CollectorTools.GetRevitLinkById(instance.LinkId, doc);
-            FamilyInstance familyInstance = instance.Element as FamilyInstance;
-            Position = instance.Solid.ComputeCentroid();
-            Width = familyInstance.LookupParameter(Variables.parameter_width).AsDouble();
-            Height = familyInstance.LookupParameter(Variables.parameter_height).AsDouble();
-            Thickness = familyInstance.LookupParameter(Variables.parameter_thickness).AsDouble();
-            Offset = familyInstance.LookupParameter(Variables.parameter_offset_bounds).AsDouble();
-            Level = GetNearestLevel(doc, link.Document.GetElement(familyInstance.LevelId) as Level);
-            Elevation = Position.Z - Level.Elevation - link.GetTransform().BasisZ.Z;
-            OffsetDown = familyInstance.LookupParameter(Variables.parameter_offset_down).AsDouble();
-            OffsetUp = familyInstance.LookupParameter(Variables.parameter_offset_up).AsDouble();
+            Elevation = Math.Round(Position.Z - Level.Elevation - Height / 2, Variables.round_system_value);
         }
         private XYZ GetCentroid(List<BoundingBoxXYZ> boxes)
         {
@@ -256,7 +247,7 @@ namespace ExtensibleOpeningManager.Tools.Instances
                 if (min_Y > box.Min.Y) { min_Y = box.Min.Y; }
                 if (min_Z > box.Min.Z) { min_Z = box.Min.Z; }
             }
-            return new XYZ(Math.Round((max_X + min_X) / 2, Variables.round_value), Math.Round((max_Y + min_Y) / 2, Variables.round_value), Math.Round((max_Z + min_Z) / 2, Variables.round_value));
+            return new XYZ((max_X + min_X) / 2, (max_Y + min_Y) / 2, (max_Z + min_Z) / 2);
         }
         private Level GetNearestLevel(Document doc, Level level)
         {
@@ -286,6 +277,26 @@ namespace ExtensibleOpeningManager.Tools.Instances
         public static double ConvertToRadians(double angle)
         {
             return (Math.PI / 180) * angle;
+        }
+        public static double GetCompoundHeight(List<Solid> geometry)
+        {
+            double min = 999;
+            double max = -999;
+            foreach (Solid solid in geometry)
+            {
+                double mi = solid.GetBoundingBox().Min.Z + solid.ComputeCentroid().Z;
+                if (mi < min || min == 999)
+                {
+                    min = mi;
+                }
+                double ma = solid.GetBoundingBox().Max.Z + solid.ComputeCentroid().Z;
+                if (ma > max || max == -999)
+                {
+                    max = ma;
+                }
+            }
+            double result = max - min;
+            return result;
         }
     }
 }

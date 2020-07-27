@@ -100,7 +100,14 @@ namespace ExtensibleOpeningManager.Tools
                     RevitLinkInstance linkInstance = uiapp.ActiveUIDocument.Document.GetElement(reference) as RevitLinkInstance;
                     Document linkedDocument = linkInstance.GetLinkDocument();
                     Element linkedInstance = linkedDocument.GetElement(reference.LinkedElementId);
-                    return new SE_LinkedElement(linkInstance, linkedInstance);
+                    if (typeOptions == PickTypeOptions.Element)
+                    {
+                        return new SE_LinkedElement(linkInstance, linkedInstance);
+                    }
+                    else
+                    {
+                        return new SE_LinkedInstance(linkInstance, linkedInstance);
+                    }
                 default:
                     return null;
             }

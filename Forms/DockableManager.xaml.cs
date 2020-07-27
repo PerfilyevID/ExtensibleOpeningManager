@@ -66,15 +66,22 @@ namespace DockableDialog.Forms
             CollectionViewSource.GetDefaultView(monitorView.ItemsSource).Refresh();
         }
 
-        private void OnItemDoubleClick(object sender, MouseButtonEventArgs e)
+        private void OnItemDoubleClick(object sender, MouseButtonEventArgs args)
         {
-            TreeViewItem item = sender as TreeViewItem;
-            if (item == null) { return; }
-            MonitorElement moniterElement = item.DataContext as MonitorElement;
-            if (moniterElement == null) { return; }
-            if (moniterElement.Element == null) { return; }
-            if (moniterElement.Element.Solid == null) { return; }
-            ModuleData.CommandQueue.Enqueue(new CommandZoomElement(moniterElement.Element));
+            try
+            {
+                TreeViewItem item = sender as TreeViewItem;
+                if (item == null) { return; }
+                MonitorElement moniterElement = item.DataContext as MonitorElement;
+                if (moniterElement == null) { return; }
+                if (moniterElement.Element == null) { return; }
+                if (moniterElement.Element.Solid == null) { return; }
+                ModuleData.CommandQueue.Enqueue(new CommandZoomElement(moniterElement.Element));
+            }
+            catch (Exception e)
+            {
+                PrintError(e);
+            }
         }
 
         private void OnBtnApprove(object sender, RoutedEventArgs e)

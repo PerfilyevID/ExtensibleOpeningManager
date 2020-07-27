@@ -45,6 +45,7 @@ namespace ExtensibleOpeningManager.Commands
         {
             try
             {
+                Print("+", KPLN_Loader.Preferences.MessageType.System_OK);
                 /*
                 if (UiTools.Get3DView(app.ActiveUIDocument.Document) == null)
                 { UiTools.Create3DView(app.ActiveUIDocument.Document); }

@@ -82,7 +82,7 @@ namespace ExtensibleOpeningManager.Common
                     break;
             }
             Grid grid = new Grid();
-            if (user.SystemName == KPLN_Loader.Preferences.User.SystemName)
+            if (user.SystemName == KPLN_Loader.Preferences.User.SystemName && UserPreferences.Department == Department)
             {
                 grid.Margin = new Thickness() { Left = 0, Top = 0, Right = 35, Bottom = 5 };
             }
@@ -117,7 +117,7 @@ namespace ExtensibleOpeningManager.Common
             spBody.Children.Add(sp);
             spBody.Children.Add(tbMessage);
             spControlls.Children.Add(tbSysUser);
-            if (Parent != null && user.SystemName == KPLN_Loader.Preferences.User.SystemName && Message != Variables.msg_created && Message != Variables.msg_approved && Message != Variables.msg_rejected)
+            if (UserPreferences.Department == Department && Parent != null && user.SystemName == KPLN_Loader.Preferences.User.SystemName && Message != Variables.msg_created && Message != Variables.msg_approved && Message != Variables.msg_rejected)
             { spControlls.Children.Add(btnClose); }
             grid.Children.Add(rectangle);
             grid.Children.Add(spControlls);

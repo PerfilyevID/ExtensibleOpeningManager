@@ -18,7 +18,6 @@ namespace ExtensibleOpeningManager.Common
         public int Id { get; set; }
         public List<ExtensibleSubElement> SubElements { get; set; }
         public SE_LinkedWall Wall { get; set; }
-        public ElementId WallLinkId { get; set; }
         public Solid Solid {get; set;}
         public FamilyInstance Instance { get; set; }
         public Status Status { get; set; }
@@ -98,7 +97,7 @@ namespace ExtensibleOpeningManager.Common
         {
             ExtensibleTools.RemoveComment(Instance, comment);
             Comments.Remove(comment);
-            UiController.CurrentController.UpdateComments(Comments);
+            UiController.CurrentController.UpdateComments(AllComments);
         }
         public void Remove()
         {
@@ -165,29 +164,68 @@ namespace ExtensibleOpeningManager.Common
                     intersections.Add(new Intersection(subElement.Element, s));
                 }
             }
-            PlaceParameters placeParameters = new PlaceParameters(Wall, intersections, Instance.Document);
-            try
+            bool isRoundNotMEP = false;
+            if (SubElements.Count == 1)
             {
-                Instance.LookupParameter(Variables.parameter_height).Set(placeParameters.Height);
-                Instance.LookupParameter(Variables.parameter_thickness).Set(placeParameters.Thickness);
-                Instance.LookupParameter(Variables.parameter_width).Set(placeParameters.Width);
-                Instance.LookupParameter(Variables.parameter_offset_down).Set(placeParameters.OffsetDown);
-                Instance.LookupParameter(Variables.parameter_offset_up).Set(placeParameters.OffsetUp);
-                Instance.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM).Set(placeParameters.Level.Id);
-                XYZ currentLocation = (Instance.Location as LocationPoint).Point;
-                XYZ currentOrientation = Instance.FacingOrientation;
-                XYZ lastLocation = placeParameters.Position;
-                double currentAngle = (180 / Math.PI) * Math.Atan2(currentOrientation.X, currentOrientation.Y);
-                double trueAngle = currentAngle - placeParameters.GetAngle(Instance);
-                double angle = (180 / Math.PI) * trueAngle;
-                ElementTransformUtils.RotateElement(Instance.Document, Instance.Id, Line.CreateBound(currentLocation, new XYZ(currentLocation.X, currentLocation.Y, currentLocation.Z + 1)), placeParameters.GetAngle(Instance));
-                ElementTransformUtils.MoveElement(Instance.Document, Instance.Id, new XYZ(lastLocation.X - currentLocation.X, lastLocation.Y - currentLocation.Y, lastLocation.Z - currentLocation.Z));
-                Instance.Document.Regenerate();
-                Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).Set(placeParameters.Elevation);
+                if (SubElements[0].GetType() == typeof(SE_LinkedInstance))
+                {
+                    if ((SubElements[0].Element as FamilyInstance).Symbol.FamilyName == Variables.family_mep_round)
+                    {
+                        isRoundNotMEP = true;
+                    }
+                }
             }
-            catch (Exception e)
+            if (!isRoundNotMEP)
             {
-                PrintError(e);
+                PlaceParameters placeParameters = new PlaceParameters(Wall, intersections, Instance.Document);
+                try
+                {
+                    Instance.LookupParameter(Variables.parameter_height).Set(placeParameters.Height);
+                    Instance.LookupParameter(Variables.parameter_thickness).Set(placeParameters.Thickness);
+                    Instance.LookupParameter(Variables.parameter_width).Set(placeParameters.Width);
+                    Instance.LookupParameter(Variables.parameter_offset_down).Set(placeParameters.OffsetDown);
+                    Instance.LookupParameter(Variables.parameter_offset_up).Set(placeParameters.OffsetUp);
+                    try
+                    {
+                        Instance.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM).Set(placeParameters.Level.Id);
+                    }
+                    catch (Exception) { }
+                    XYZ currentLocation = (Instance.Location as LocationPoint).Point;
+                    XYZ currentOrientation = Instance.FacingOrientation;
+                    XYZ lastLocation = placeParameters.Position;
+                    double currentAngle = (180 / Math.PI) * Math.Atan2(currentOrientation.X, currentOrientation.Y);
+                    double trueAngle = currentAngle - placeParameters.GetAngle(Instance);
+                    double angle = (180 / Math.PI) * trueAngle;
+                    ElementTransformUtils.RotateElement(Instance.Document, Instance.Id, Line.CreateBound(currentLocation, new XYZ(currentLocation.X, currentLocation.Y, currentLocation.Z + 1)), placeParameters.GetAngle(Instance));
+                    ElementTransformUtils.MoveElement(Instance.Document, Instance.Id, new XYZ(lastLocation.X - currentLocation.X, lastLocation.Y - currentLocation.Y, lastLocation.Z - currentLocation.Z));
+                    Instance.Document.Regenerate();
+                    Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).Set(placeParameters.Elevation);
+                }
+                catch (Exception e)
+                {
+                    PrintError(e);
+                }
+            }
+            else 
+            {
+                Intersection intersect = new Intersection(SubElements[0].Element, SubElements[0].Solid);
+                PlaceParameters placeParameters = new PlaceParameters(Wall, intersect, Instance.Document);
+                try
+                {
+                    Instance.LookupParameter(Variables.parameter_height).Set(placeParameters.Height);
+                    Instance.LookupParameter(Variables.parameter_thickness).Set(placeParameters.Thickness);
+                    Instance.LookupParameter(Variables.parameter_offset_down).Set(placeParameters.OffsetDown - placeParameters.Height / 2);
+                    Instance.LookupParameter(Variables.parameter_offset_up).Set(placeParameters.OffsetUp - placeParameters.Height / 2);
+                    XYZ currentLocation = (Instance.Location as LocationPoint).Point;
+                    XYZ lastLocation = placeParameters.Position;
+                    ElementTransformUtils.MoveElement(Instance.Document, Instance.Id, new XYZ(lastLocation.X - currentLocation.X, lastLocation.Y - currentLocation.Y, 0));
+                    Instance.Document.Regenerate();
+                    Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).Set(placeParameters.Elevation);
+                }
+                catch (Exception e)
+                {
+                    PrintError(e);
+                }
             }
         }
         public bool IsAbleToUpdate()
@@ -196,6 +234,7 @@ namespace ExtensibleOpeningManager.Common
             {
                 if (Wall != null && !HasUnfoundSubElements() && WallStatus != WallStatus.NotFound)
                 {
+                    bool isRound = false;
                     List<Intersection> intersections = new List<Intersection>();
                     foreach (ExtensibleSubElement subElement in SubElements)
                     {
@@ -206,18 +245,74 @@ namespace ExtensibleOpeningManager.Common
                         }
                         intersections.Add(i);
                     }
-                    PlaceParameters parameters = new PlaceParameters(Wall, intersections, Instance.Document);
-                    if (ExtensibleConverter.ConvertDouble(parameters.Position.X) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.X) ||
-                        ExtensibleConverter.ConvertDouble(parameters.Position.Y) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.Y) ||
-                        !(parameters.GetAngle(Instance) == 0 || parameters.GetAngle(Instance) == Math.PI) ||
-                        Math.Round(parameters.Elevation, Variables.round_value) != Math.Round(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble(), Variables.round_value) ||
-                        Math.Round(parameters.Width, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_width).AsDouble(), Variables.round_value) ||
-                        Math.Round(parameters.Height, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_height).AsDouble(), Variables.round_value) ||
-                        parameters.Level.Id.IntegerValue != Instance.LevelId.IntegerValue ||
-                        Math.Round(parameters.Thickness, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_thickness).AsDouble(), Variables.round_value))
+                    PlaceParameters parameters;
+                    if (UserPreferences.Department == Department.MEP)
                     {
-                        return true;
+                        parameters = new PlaceParameters(Wall, intersections, Instance.Document);
                     }
+                    else
+                    {
+                        
+                        if (SubElements[0].GetType() == typeof(SE_LinkedInstance))
+                        {
+                            string fam = (SubElements[0].Element as FamilyInstance).Symbol.FamilyName;
+                            if (fam == Variables.family_mep_round)
+                            { isRound = true; }
+                        }
+                        if (SubElements.Count == 1 || isRound)
+                        {
+                            Intersection i = new Intersection(SubElements[0].Element, SubElements[0].Solid);
+                            parameters = new PlaceParameters(Wall, i, Instance.Document);
+                        }
+                        else
+                        {
+                            parameters = new PlaceParameters(Wall, intersections, Instance.Document);
+                        }
+                    }
+                    if (UserPreferences.Department == Department.MEP)
+                    {
+                        if (ExtensibleConverter.ConvertDouble(parameters.Position.X) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.X) ||
+                            ExtensibleConverter.ConvertDouble(parameters.Position.Y) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.Y) ||
+                            !(parameters.GetAngle(Instance) == 0 || parameters.GetAngle(Instance) == Math.PI) ||
+                            Math.Round(parameters.Elevation, Variables.round_value) != Math.Round(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble(), Variables.round_value) ||
+                            Math.Round(parameters.Width, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_width).AsDouble(), Variables.round_value) ||
+                            Math.Round(parameters.Height, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_height).AsDouble(), Variables.round_value) ||
+                            parameters.Level.Id.IntegerValue != Instance.LevelId.IntegerValue ||
+                            Math.Round(parameters.Thickness, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_thickness).AsDouble(), Variables.round_value))
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        if (isRound)
+                        {
+                            if (ExtensibleConverter.ConvertDouble(parameters.Position.X) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.X) ||
+                                ExtensibleConverter.ConvertDouble(parameters.Position.Y) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.Y) ||
+                                Math.Round(parameters.Elevation, Variables.round_value) != Math.Round(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble(), Variables.round_value) ||
+                                Math.Round(Math.Max(parameters.Height, parameters.Width), Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_height).AsDouble(), Variables.round_value) ||
+                                parameters.Level.Id.IntegerValue != Instance.LevelId.IntegerValue ||
+                                Math.Round(parameters.Thickness, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_thickness).AsDouble(), Variables.round_value))
+                            {
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            if (ExtensibleConverter.ConvertDouble(parameters.Position.X) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.X) ||
+                                ExtensibleConverter.ConvertDouble(parameters.Position.Y) != ExtensibleConverter.ConvertDouble((Instance.Location as LocationPoint).Point.Y) ||
+                                Math.Round(parameters.Elevation, Variables.round_value) != Math.Round(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble(), Variables.round_value) ||
+                                Math.Round(parameters.Width, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_width).AsDouble(), Variables.round_value) ||
+                                Math.Round(parameters.Height, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_height).AsDouble(), Variables.round_value) ||
+                                parameters.Level.Id.IntegerValue != Instance.LevelId.IntegerValue ||
+                                Math.Round(parameters.Thickness, Variables.round_value) != Math.Round(Instance.LookupParameter(Variables.parameter_thickness).AsDouble(), Variables.round_value))
+                            {
+                                return true;
+                            }
+                        }
+
+                    }
+
                 }
                 return false;
             }
@@ -282,7 +377,7 @@ namespace ExtensibleOpeningManager.Common
         }
         public void ApplyWall()
         {
-            ExtensibleController.Write(this.Instance, Collections.ExtensibleParameter.Wall, string.Join(Variables.separator_sub_element, new string[] { Wall.Wall.Id.ToString(), WallLinkId.ToString(), Wall.ToString()}));
+            ExtensibleController.Write(this.Instance, Collections.ExtensibleParameter.Wall, Wall.ToString());
         }
         public void SwapType()
         {

@@ -4,7 +4,8 @@ namespace ExtensibleOpeningManager
 {
     public static class Variables
     {
-        public static readonly int round_value = 4;
+        public static readonly int round_value = 1;
+        public static readonly int round_system_value = 7;
 
         public static readonly string empty = "";
 

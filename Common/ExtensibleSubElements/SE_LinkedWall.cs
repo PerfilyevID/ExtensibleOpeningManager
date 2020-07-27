@@ -17,35 +17,13 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
         public SE_LinkedWall(Wall wall)
         {
             Document = wall.Document;
-            LinkId = ElementId.InvalidElementId;
+            LinkId = new ElementId(-1);
             Wall = wall;
             Transform = null;
             Solid = GetCorrectSolid(Wall, Transform);
             BoundingBox = new BoundingBoxXYZ();
             BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
             BoundingBox.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid();
-        }
-        private static CurveLoop GetLongestLoop(IList<CurveLoop> loops)
-        {
-            double width = 0;
-            double height = 0;
-            CurveLoop l = null;
-            foreach (CurveLoop loop in loops)
-            {
-                if (l == null)
-                {
-                    width = loop.GetRectangularWidth(loop.GetPlane());
-                    height = loop.GetRectangularHeight(loop.GetPlane());
-                    l = loop;
-                }
-                if (width < loop.GetRectangularWidth(loop.GetPlane()) && height < loop.GetRectangularHeight(loop.GetPlane()))
-                {
-                    width = loop.GetRectangularWidth(loop.GetPlane());
-                    height = loop.GetRectangularHeight(loop.GetPlane());
-                    l = loop;
-                }
-            }
-            return l;
         }
         public SE_LinkedWall(RevitLinkInstance revitLinkInstance, Wall wall)
         {
@@ -132,38 +110,34 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
         public BoundingBoxXYZ BoundingBox { get; set; }
         public override string ToString()
         {
-            double area = 0;
-            double volume = 0;
-            foreach (var i in Wall.get_Geometry(new Options() { DetailLevel = ViewDetailLevel.Coarse }))
-            {
-                if (i.GetType() == typeof(Solid))
-                {
-                    area += (i as Solid).SurfaceArea;
-                    volume += (i as Solid).Volume;
-                }
-            }
+            double area = Solid.SurfaceArea;
+            double volume = Solid.Volume;
             return string.Join(Variables.separator_element, new string[]
                                 { ExtensibleConverter.ConvertLocation(Wall.Location),
                                 LinkId.ToString(),
                                 Wall.Id.ToString(),
-                                Wall.GetTypeId().ToString(), 
-                                ExtensibleConverter.ConvertDouble(area), 
-                                ExtensibleConverter.ConvertDouble(volume), 
+                                Wall.GetTypeId().ToString(),
+                                ExtensibleConverter.ConvertDouble(area),
+                                ExtensibleConverter.ConvertDouble(volume),
                                 Wall.LevelId.ToString(),
-                                ExtensibleConverter.ConvertPoint(Solid.ComputeCentroid())},
-                                IsConcreteTask.ToString());
+                                ExtensibleConverter.ConvertPoint(Solid.ComputeCentroid()),
+                                IsConcreteTask.ToString()});
         }
         public static SE_LinkedWall TryParse(Document doc, string value)
         {
             string[] values = value.Split(new string[] { Variables.separator_element }, StringSplitOptions.None);
             bool savedAsConcrete = false;
             try
-            { 
-                bool.TryParse(values[8], out savedAsConcrete);
+            {
+                savedAsConcrete = values[8] == true.ToString();
             }
             catch (Exception) { }
-            ElementId linkId = new ElementId(int.Parse(values[1]));
-            RevitLinkInstance link = CollectorTools.GetRevitLinkById(linkId, doc);
+            ElementId linkId = new ElementId(int.Parse(values[1], System.Globalization.NumberStyles.Integer));
+            RevitLinkInstance link = null;
+            if (linkId.IntegerValue != -1)
+            {
+                link = CollectorTools.GetRevitLinkById(linkId, doc);
+            }
             Wall wall = null;
             Solid solid = null;
             if (linkId.IntegerValue == -1)
@@ -199,7 +173,9 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 BoundingBoxXYZ BoundingBox = new BoundingBoxXYZ();
                 BoundingBox.Max = solid.GetBoundingBox().Max + solid.ComputeCentroid();
                 BoundingBox.Min = solid.GetBoundingBox().Min + solid.ComputeCentroid();
-                return new SE_LinkedWall() { Wall = wall, SavedAsConcrete = savedAsConcrete, Solid = solid, Document = link.GetLinkDocument(), LinkId = linkId, Transform = link.GetTransform(), BoundingBox = BoundingBox };
+                Transform transform = null;
+                if (link != null) { transform = link.GetTransform(); }
+                return new SE_LinkedWall() { Wall = wall, SavedAsConcrete = savedAsConcrete, Solid = solid, Document = wall.Document, LinkId = linkId, Transform = transform, BoundingBox = BoundingBox };
             }
             else
             { 
