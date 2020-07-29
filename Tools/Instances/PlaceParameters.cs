@@ -45,7 +45,7 @@ namespace ExtensibleOpeningManager.Tools.Instances
             {
                 Curve curve = edge.AsCurve();
                 points.Add(curve.GetEndPoint(0));
-                points.Add(curve.GetEndPoint(1));
+                //points.Add(curve.GetEndPoint(1));
             }
             if (wall.LinkId != ElementId.InvalidElementId)
             {
@@ -139,7 +139,7 @@ namespace ExtensibleOpeningManager.Tools.Instances
                 {
                     Curve curve = edge.AsCurve();
                     points.Add(curve.GetEndPoint(0));
-                    points.Add(curve.GetEndPoint(1));
+                    //points.Add(curve.GetEndPoint(1));
                 }
             }
             if (wall.LinkId != ElementId.InvalidElementId)

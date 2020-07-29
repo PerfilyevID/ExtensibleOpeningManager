@@ -1,7 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using ExtensibleOpeningManager.Common;
+using ExtensibleOpeningManager.Controll;
 using KPLN_Loader.Common;
+using System.Collections.Generic;
 using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Commands
@@ -20,6 +22,8 @@ namespace ExtensibleOpeningManager.Commands
             try
             {
                 Element.RemoveSubElement(SubElement);
+                UiController.GetControllerByDocument(app.ActiveUIDocument.Document).OnManualElementChanged(Element.Id);
+                ModuleData.CommandQueue.Enqueue(new CommandSetSelection());
                 return Result.Succeeded;
             }
             catch (System.Exception e)

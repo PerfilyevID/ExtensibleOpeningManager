@@ -234,6 +234,34 @@ namespace ExtensibleOpeningManager.Controll
             }
             return false;
         }
+        public bool OpeningExist(ExtensibleSubElement subElement, SE_LinkedWall wall)
+        {
+            foreach (ExtensibleElement element in Elements)
+            {
+                try
+                {
+                    if (element.Wall.Wall.Id.IntegerValue == wall.Wall.Id.IntegerValue)
+                    {
+                        foreach (ExtensibleSubElement s in element.SubElements)
+                        {
+                            try
+                            {
+                                if (s.GetType() == typeof(SE_LinkedInstance))
+                                {
+                                    if (s.Id == subElement.Id)
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                            catch (Exception e) { PrintError(e); }
+                        }
+                    }
+                }
+                catch (Exception e) { PrintError(e); }
+            }
+            return false;
+        }
         public void SetSelection(ICollection<ElementId> elements)
         {
             try
@@ -401,59 +429,93 @@ namespace ExtensibleOpeningManager.Controll
                         DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.btnPlaceOnSelectedTask.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.btnPlaceOnSelectedTask2.Visibility = System.Windows.Visibility.Visible;
                         break;
                     case Collections.Department.KR:
                         DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.btnPlaceOnSelectedTask.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.btnPlaceOnSelectedTask2.Visibility = System.Windows.Visibility.Visible;
                         break;
                     case Collections.Department.MEP:
                         DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Collapsed;
+                        DockablePreferences.Page.btnPlaceOnSelectedTask.Visibility = System.Windows.Visibility.Collapsed;
+                        DockablePreferences.Page.btnPlaceOnSelectedTask2.Visibility = System.Windows.Visibility.Collapsed;
                         break;
                     default:
                         break;
                 }
-                if (LoopController.IsActive)
+                if (UserPreferences.Department == Collections.Department.MEP)
                 {
-                    DockablePreferences.Page.btnLoop.IsEnabled = false;
-                    DockablePreferences.Page.btnLoop2.IsEnabled = false;
-                    if (LoopController.CreatedElements.Count != 0)
+                    DockablePreferences.Page.btnLoop.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.btnLoop2.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.btnLoopApply.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.btnLoopDeny.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.btnLoopNext.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.btnLoopSkip.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.btnLoopApply2.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.btnLoopDeny2.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.btnLoopNext2.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.btnLoopSkip2.Visibility = System.Windows.Visibility.Visible;
+                    DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Visible;
+                    if (LoopController.IsActive)
                     {
-                        DockablePreferences.Page.btnLoopApply.IsEnabled = true;
-                        DockablePreferences.Page.btnLoopDeny.IsEnabled = true; 
-                        DockablePreferences.Page.btnLoopSkip.IsEnabled = true;
-                        DockablePreferences.Page.btnLoopApply2.IsEnabled = true;
-                        DockablePreferences.Page.btnLoopDeny2.IsEnabled = true;                        
-                        DockablePreferences.Page.btnLoopSkip2.IsEnabled = true;
+                        DockablePreferences.Page.btnLoop.IsEnabled = false;
+                        DockablePreferences.Page.btnLoop2.IsEnabled = false;
+                        if (LoopController.CreatedElements.Count != 0)
+                        {
+                            DockablePreferences.Page.btnLoopApply.IsEnabled = true;
+                            DockablePreferences.Page.btnLoopDeny.IsEnabled = true;
+                            DockablePreferences.Page.btnLoopSkip.IsEnabled = true;
+                            DockablePreferences.Page.btnLoopApply2.IsEnabled = true;
+                            DockablePreferences.Page.btnLoopDeny2.IsEnabled = true;
+                            DockablePreferences.Page.btnLoopSkip2.IsEnabled = true;
+                        }
+                        else
+                        {
+                            DockablePreferences.Page.btnLoopApply.IsEnabled = false;
+                            DockablePreferences.Page.btnLoopDeny.IsEnabled = false;
+                            DockablePreferences.Page.btnLoopSkip.IsEnabled = false;
+                            DockablePreferences.Page.btnLoopApply2.IsEnabled = false;
+                            DockablePreferences.Page.btnLoopDeny2.IsEnabled = false;
+                            DockablePreferences.Page.btnLoopSkip2.IsEnabled = false;
+                        }
+                        DockablePreferences.Page.btnLoopNext.IsEnabled = true;
+                        DockablePreferences.Page.btnLoopNext2.IsEnabled = true;
                     }
                     else
                     {
+                        DockablePreferences.Page.btnLoop.IsEnabled = true;
+                        DockablePreferences.Page.btnLoop2.IsEnabled = true;
                         DockablePreferences.Page.btnLoopApply.IsEnabled = false;
                         DockablePreferences.Page.btnLoopDeny.IsEnabled = false;
+                        DockablePreferences.Page.btnLoopNext.IsEnabled = false;
                         DockablePreferences.Page.btnLoopSkip.IsEnabled = false;
                         DockablePreferences.Page.btnLoopApply2.IsEnabled = false;
                         DockablePreferences.Page.btnLoopDeny2.IsEnabled = false;
+                        DockablePreferences.Page.btnLoopNext2.IsEnabled = false;
                         DockablePreferences.Page.btnLoopSkip2.IsEnabled = false;
                     }
-                    DockablePreferences.Page.btnLoopNext.IsEnabled = true;
-                    DockablePreferences.Page.btnLoopNext2.IsEnabled = true;
                 }
                 else
                 {
-                    DockablePreferences.Page.btnLoop.IsEnabled = true;
-                    DockablePreferences.Page.btnLoop2.IsEnabled = true;
-                    DockablePreferences.Page.btnLoopApply.IsEnabled = false;
-                    DockablePreferences.Page.btnLoopDeny.IsEnabled = false;
-                    DockablePreferences.Page.btnLoopNext.IsEnabled = false;
-                    DockablePreferences.Page.btnLoopSkip.IsEnabled = false;
-                    DockablePreferences.Page.btnLoopApply2.IsEnabled = false;
-                    DockablePreferences.Page.btnLoopDeny2.IsEnabled = false;
-                    DockablePreferences.Page.btnLoopNext2.IsEnabled = false;
-                    DockablePreferences.Page.btnLoopSkip2.IsEnabled = false;
+                    DockablePreferences.Page.btnLoop.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.btnLoop2.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.btnLoopApply.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.btnLoopDeny.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.btnLoopNext.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.btnLoopSkip.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.btnLoopApply2.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.btnLoopDeny2.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.btnLoopNext2.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.btnLoopSkip2.Visibility = System.Windows.Visibility.Collapsed;
+                    DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Collapsed;
                 }
                 if (Selection.Count == 0) { return; }
                 UpdateSubMonitor();
@@ -559,7 +621,7 @@ namespace ExtensibleOpeningManager.Controll
                 {
                     DockablePreferences.Page.btnSetWall.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isSingleSelection && !isMultipleSubelements)
+                if (isSingleSelection && !isMultipleSubelements && UserPreferences.Department == Collections.Department.MEP)
                 {
                     DockablePreferences.Page.btnSwap.Visibility = System.Windows.Visibility.Visible;
                 }
@@ -573,6 +635,36 @@ namespace ExtensibleOpeningManager.Controll
                 }
             }
             catch (Exception) { }
+        }
+        public void OnManualElementChanged(int id)
+        {
+            try
+            {
+                ICollection<ElementId> ids = new List<ElementId>() { new ElementId(id) };
+                OnElementsChanged(ids);
+                UpdateEnability();
+            }
+            catch (System.Exception) { }
+        }
+        public void OnManualElementChanged(Element element)
+        {
+            try
+            {
+                ICollection<ElementId> ids = new List<ElementId>() { element.Id };
+                OnElementsChanged(ids);
+                UpdateEnability();
+            }
+            catch (System.Exception) { }
+        }
+        public void OnManualElementChanged(ElementId id)
+        {
+            try
+            {
+                ICollection<ElementId> ids = new List<ElementId>() { id };
+                OnElementsChanged(ids);
+                UpdateEnability();
+            }
+            catch (System.Exception) { }
         }
         public void OnElementsCreated(ICollection<ElementId> elements)
         {

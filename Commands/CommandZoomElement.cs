@@ -45,15 +45,6 @@ namespace ExtensibleOpeningManager.Commands
         {
             try
             {
-                Print("+", KPLN_Loader.Preferences.MessageType.System_OK);
-                /*
-                if (UiTools.Get3DView(app.ActiveUIDocument.Document) == null)
-                { UiTools.Create3DView(app.ActiveUIDocument.Document); }
-                if (UiTools.Get3DView(app.ActiveUIDocument.Document) != null)
-                {
-                    UiTools.ActivateView(UiTools.Get3DView(app.ActiveUIDocument.Document), app.ActiveUIDocument);
-                }
-                */
                 UiTools.ZoomElement(Box, Solid.ComputeCentroid(), app.ActiveUIDocument);
                 return Result.Succeeded;
             }

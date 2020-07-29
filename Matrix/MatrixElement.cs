@@ -14,8 +14,10 @@ namespace ExtensibleOpeningManager.Matrix
         public XYZ Centroid { get; }
         public BoundingBoxXYZ BoundingBox { get; }
         public Solid IntersectionSolid { get; set; }
+        public object Object { get; set; }
         public MatrixElement(ExtensibleElement element)
         {
+            Object = element;
             Solid = element.Solid;
             Element = element.Instance;
             Centroid = Solid.ComputeCentroid();
@@ -28,6 +30,7 @@ namespace ExtensibleOpeningManager.Matrix
         }
         public MatrixElement(ExtensibleSubElement element)
         {
+            Object = element;
             Solid = element.Solid;
             Element = element.Element;
             Centroid = Solid.ComputeCentroid();
@@ -40,6 +43,7 @@ namespace ExtensibleOpeningManager.Matrix
         }
         public MatrixElement(SE_LinkedWall element)
         {
+            Object = element;
             Solid = element.Solid;
             Element = element.Wall;
             Centroid = Solid.ComputeCentroid();

@@ -18,8 +18,17 @@ namespace ExtensibleOpeningManager.Commands
             try
             {
                 SE_LinkedWall wall = UiTools.PickWall(app, Collections.PickOptions.References);
-                Matrix.Matrix<Element> matrix = new Matrix.Matrix<Element>(CollectorTools.GetMepElements(app.ActiveUIDocument.Document));
-                List<Intersection> context = matrix.GetContext(wall);
+                Matrix.Matrix<Element> matrix;
+                List<Intersection> context;
+                try
+                {
+                    matrix = new Matrix.Matrix<Element>(CollectorTools.GetMepElements(app.ActiveUIDocument.Document));
+                    context = matrix.GetContext(wall);
+                }
+                catch (System.Exception)
+                {
+                    return Result.Failed;
+                }
                 foreach (Intersection intersection in context)
                 {
                     if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection, wall))

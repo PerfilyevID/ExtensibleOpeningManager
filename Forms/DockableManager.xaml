@@ -16,6 +16,8 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnPlaceOnSelected2" Background="White" Content="Расставить на выбранной" Margin="0,0,0,0" Click="OnBtnPlaceOnSelected"/>
+                    <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnPlaceOnSelectedTask2" Content="Расставить по заданию" Margin="0,25,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnSelected"/>
+
                     <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnLoop2" Content="Расставить по пересечениям" Margin="0,25,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnLoop"/>
                     <Grid VerticalAlignment="Top" Grid.Row="0"  x:Name="gridLoopButtons2" Margin="0,45,0,-7" Height="42">
                         <Grid.ColumnDefinitions>
@@ -144,7 +146,7 @@
                                             </Grid.ColumnDefinitions>
                                             <Image Grid.Column="0" Source="{Binding Source.Value}" Height="15" Width="15" HorizontalAlignment="Left" ToolTip="{Binding ToolTip}" VerticalAlignment="Top"/>
                                             <TextBlock Grid.Column="1" Margin="2,0,2,0" Text="{Binding Name}" ToolTip="{Binding ToolTip}" TextWrapping="Wrap"/>
-                                            <Button Grid.Column="2"  Content="{Binding Action.ButtonText}" FontSize="8" Width="15" ToolTip="{Binding Action.ToolTip}" Height="15" Background="White" BorderBrush="{Binding Action.Color}" HorizontalAlignment="Right" Foreground="{Binding Action.Color}" VerticalAlignment="Top" Click="OnSubItemRemoveBtnClick"/>
+                                            <Button Grid.Column="2" IsEnabled="{Binding IsEnabled, Mode=TwoWay}" Content="{Binding Action.ButtonText}" FontSize="8" Width="15" ToolTip="{Binding Action.ToolTip}" Height="15" Background="White" BorderBrush="{Binding Action.Color}" HorizontalAlignment="Right" Foreground="{Binding Action.Color}" VerticalAlignment="Top" Click="OnSubItemRemoveBtnClick"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -178,7 +180,8 @@
                             <Button x:Name="btnLoopSkip" Grid.Column="3" Content="Пропустить" Margin="5,5,0,0" ToolTip="Удалить созданные элементы и перейти к следующему шагу" Background="White" Click="OnBtnLoopSkip"/>
                         </Grid>
                         <Separator Margin="0,10,0,5"/>
-                        <Button x:Name="btnPlaceOnSelected" Content="Расставить на выбранной" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnSelected"/>
+                        <Button x:Name="btnPlaceOnSelected" Content="Расставить на стене" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnSelected"/>
+                        <Button x:Name="btnPlaceOnSelectedTask" Content="Расставить по заданию" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnSelected"/>
                     </StackPanel>
                     <TextBlock Text="⌨ История" FontWeight="Medium" Margin="0,3,0,0" Grid.Row="3" MinWidth="2"/>
                     <Rectangle x:Name="RR"  Grid.Row="3" Margin="0,20,0,80" RadiusX="2" RadiusY="2" Fill="White" Stroke="#FF707070"/>

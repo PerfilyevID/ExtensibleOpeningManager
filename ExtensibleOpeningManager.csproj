@@ -64,6 +64,8 @@
     <Compile Include="Commands\CommandApprove.cs" />
     <Compile Include="Commands\CommandApplySubElements.cs" />
     <Compile Include="Commands\CommandApplyWall.cs" />
+    <Compile Include="Commands\CommandPlaceOpeningByTaskOnPickedWall.cs" />
+    <Compile Include="Commands\CommandSetSelection.cs" />
     <Compile Include="Commands\CommandGroupInstances.cs" />
     <Compile Include="Commands\CommandLoopApprove.cs" />
     <Compile Include="Commands\CommandLoopReject.cs" />
@@ -120,6 +122,9 @@
     <Compile Include="Forms\OffsetPicker.xaml.cs">
       <DependentUpon>OffsetPicker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Preferences.xaml.cs">
+      <DependentUpon>Preferences.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Progress_Single.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -155,6 +160,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Forms\OffsetPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\Preferences.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -11,7 +11,7 @@ namespace ExtensibleOpeningManager
         public static double MinInstanceWidth = 10;
         public static double MaxInstanceWidth = 10;
         public static double MinWallWidth = 80;
-        public static double DefaultOffset = 50;
+        public static double DefaultOffset = 25;
         public static void TryLoadParameters()
         {
             return;

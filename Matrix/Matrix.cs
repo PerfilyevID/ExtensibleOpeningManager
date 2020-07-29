@@ -74,6 +74,10 @@ namespace ExtensibleOpeningManager.Matrix
             }
             Container.Optimize();
         }
+        public List<ExtensibleSubElement> GetSubElements(SE_LinkedWall element)
+        {
+            return Container.GetSubElementsBySolidIntersection(new MatrixElement(element));
+        }
         public List<SE_LinkedWall> GetContext(ExtensibleSubElement element)
         {
             return Container.GetWallsBySolidIntersection(new MatrixElement(element));

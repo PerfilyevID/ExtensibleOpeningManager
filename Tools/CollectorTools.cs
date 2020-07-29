@@ -86,6 +86,23 @@ namespace ExtensibleOpeningManager.Tools
             }
             return instances;
         }
+        public static List<ExtensibleSubElement> GetMepSubInstances(Document doc)
+        {
+            List<ExtensibleSubElement> instances = new List<ExtensibleSubElement>();
+            List<RevitLinkInstance> links = GetRevitLinks(doc);
+            foreach (RevitLinkInstance link in links)
+            {
+                foreach (Element e in new FilteredElementCollector(doc).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElements())
+                {
+                    FamilyInstance instance = e as FamilyInstance;
+                    if (instance.Symbol.FamilyName == Variables.family_mep_round || instance.Symbol.FamilyName == Variables.family_mep_square)
+                    {
+                        instances.Add(new SE_LinkedInstance(link, instance));
+                    }
+                }
+            }
+            return instances;
+        }
         public static List<Wall> GetWalls(Document doc)
         {
             List<Wall> instances = new List<Wall>();

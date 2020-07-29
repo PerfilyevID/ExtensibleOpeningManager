@@ -32,7 +32,8 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                     ExtensibleConverter.ConvertDouble(Element.LookupParameter(Variables.parameter_thickness).AsDouble()),
                     ExtensibleConverter.ConvertDouble(Element.LookupParameter(Variables.parameter_width).AsDouble()),
                     ExtensibleConverter.ConvertPoint((Element as FamilyInstance).FacingOrientation),
-                    Element.LevelId.ToString()});
+                    Element.LevelId.ToString(),
+                    Guid});
             }
             catch (Exception e)
             {
@@ -77,6 +78,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             }
         }
         private string Value { get; set; }
+        private string Guid { get; set; }
         public SE_LinkedInstance(string value)
         {
             Id = int.Parse(value.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries)[1], System.Globalization.NumberStyles.Integer);
@@ -109,6 +111,14 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                     }
                 }
             }
+            try
+            {
+                Guid = ExtensibleController.Read(Element as FamilyInstance, Collections.ExtensibleParameter.Document);
+            }
+            catch (Exception)
+            {
+                Guid = "-";
+            }
             LinkId = linkInstance.Id;
             Value = this.ToString();
         }
@@ -139,6 +149,14 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 }
             }
             catch (Exception e) { PrintError(e); }
+            try
+            {
+                Guid = ExtensibleController.Read(Element as FamilyInstance, Collections.ExtensibleParameter.Document);
+            }
+            catch (Exception)
+            {
+                Guid = "-";
+            }
             Value = this.ToString();
         }
     }

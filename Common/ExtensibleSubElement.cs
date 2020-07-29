@@ -4,6 +4,7 @@ using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Tools;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using static ExtensibleOpeningManager.Common.Collections;
 using static KPLN_Loader.Output.Output;
 
@@ -22,9 +23,9 @@ namespace ExtensibleOpeningManager.Common
         {
             Parent = element;
         }
-        public static List<ExtensibleSubElement> TryParseCollection(ExtensibleElement element, string value)
+        public static ObservableCollection<ExtensibleSubElement> TryParseCollection(ExtensibleElement element, string value)
         {
-            List<ExtensibleSubElement> subElements = new List<ExtensibleSubElement>();
+            ObservableCollection<ExtensibleSubElement> subElements = new ObservableCollection<ExtensibleSubElement>();
             foreach (string part in value.Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries))
             {
                 string[] parts = part.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries);

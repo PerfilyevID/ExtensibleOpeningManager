@@ -252,6 +252,8 @@ namespace DockableDialog.Forms
             {
                 ModuleData.CommandQueue.Enqueue(new CommandSetWall(((sender as Button).DataContext as MonitorSubElement).Parent.Element));
             }
+
+            
         }
     }
 }

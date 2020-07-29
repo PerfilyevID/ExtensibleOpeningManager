@@ -10,13 +10,14 @@ using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Controll;
 using ExtensibleOpeningManager.Matrix;
+using System.Collections.ObjectModel;
 
 namespace ExtensibleOpeningManager.Common
 {
     public class ExtensibleElement
     {
         public int Id { get; set; }
-        public List<ExtensibleSubElement> SubElements { get; set; }
+        public ObservableCollection<ExtensibleSubElement> SubElements { get; set; }
         public SE_LinkedWall Wall { get; set; }
         public Solid Solid {get; set;}
         public FamilyInstance Instance { get; set; }
@@ -341,6 +342,25 @@ namespace ExtensibleOpeningManager.Common
         }
         public void Apply()
         {
+            if (Status == Status.Null)
+            {
+                try
+                {
+                    ApplySubElements();
+                }
+                catch (Exception)
+                {
+                    ExtensibleController.Write(Instance, ExtensibleParameter.SubElementsCollection, string.Empty);
+                }
+                try
+                {
+                    ApplyWall();
+                }
+                catch (Exception)
+                {
+                    ExtensibleController.Write(Instance, ExtensibleParameter.Wall, string.Empty);
+                }
+            }
             ExtensibleTools.SetStatus(Instance, Collections.Status.Applied);
             Status = Status.Applied;
             Approve();
@@ -377,7 +397,14 @@ namespace ExtensibleOpeningManager.Common
         }
         public void ApplyWall()
         {
-            ExtensibleController.Write(this.Instance, Collections.ExtensibleParameter.Wall, Wall.ToString());
+            try
+            {
+                ExtensibleController.Write(this.Instance, Collections.ExtensibleParameter.Wall, Wall.ToString());
+            }
+            catch (Exception)
+            {
+                ExtensibleController.Write(this.Instance, Collections.ExtensibleParameter.Wall, string.Empty);
+            }
         }
         public void SwapType()
         {
@@ -442,7 +469,7 @@ namespace ExtensibleOpeningManager.Common
             Instance = instance;
             Status = Status.Null;
             Wall = null;
-            SubElements = new List<ExtensibleSubElement>();
+            SubElements = new ObservableCollection<ExtensibleSubElement>();
             Comments = new List<ExtensibleComment>();
             SavedData = string.Empty;
             Solid = MatrixElement.GetSolidOfElement(instance);
@@ -458,7 +485,14 @@ namespace ExtensibleOpeningManager.Common
                             Status status;
                             Enum.TryParse(values[1], out status);
                             if (status != Status.Null) { Status = status; }
-                            Wall = SE_LinkedWall.TryParse(Instance.Document, ExtensibleController.Read(Instance, ExtensibleParameter.Wall));
+                            try
+                            {
+                                Wall = SE_LinkedWall.TryParse(Instance.Document, ExtensibleController.Read(Instance, ExtensibleParameter.Wall));
+                            }
+                            catch (Exception)
+                            {
+                                Wall = null;
+                            }
                             SavedData = ExtensibleController.Read(Instance, ExtensibleParameter.Instance);
                             Comments = ExtensibleComment.TryParseCollection(ExtensibleController.Read(Instance, ExtensibleParameter.CommentsCollection), this);
                             SubElements = ExtensibleSubElement.TryParseCollection(this, ExtensibleController.Read(Instance, ExtensibleParameter.SubElementsCollection));

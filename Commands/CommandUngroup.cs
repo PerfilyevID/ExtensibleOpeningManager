@@ -5,6 +5,7 @@ using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Tools;
 using KPLN_Loader.Common;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace ExtensibleOpeningManager.Commands
 {
@@ -19,7 +20,7 @@ namespace ExtensibleOpeningManager.Commands
         private SE_LinkedWall Wall { get; }
         public Result Execute(UIApplication app)
         {
-            List<ExtensibleSubElement> SubElements = Element.SubElements;
+            ObservableCollection<ExtensibleSubElement> SubElements = Element.SubElements;
             Element.Remove();
             app.ActiveUIDocument.Document.Regenerate();
             foreach (ExtensibleSubElement subElement in SubElements)

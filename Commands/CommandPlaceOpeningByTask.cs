@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
+using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Tools.Instances;
 using KPLN_Loader.Common;
@@ -26,23 +27,29 @@ namespace ExtensibleOpeningManager.Commands
                 {
                     walls.Add(new SE_LinkedWall(wall));
                 }
-                Matrix.Matrix<SE_LinkedWall> matrix = new Matrix.Matrix<SE_LinkedWall>(walls);
-                List<SE_LinkedWall> context = matrix.GetContext(task);
-                if (context.Count == 1)
+                Matrix.Matrix<SE_LinkedWall> matrix;
+                List<SE_LinkedWall> context;
+                try
                 {
-                    SE_LinkedWall wall = context[0];
-                    ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, task, app.ActiveUIDocument.Document));
-                    element.SetWall(wall);
-                    element.AddSubElement(task);
-                    element.Reject();
-                    element.AddComment(Variables.msg_created);
-                    element.Approve();
+                    matrix = new Matrix.Matrix<SE_LinkedWall>(walls);
+                    context = matrix.GetContext(task);
                 }
-                if (context.Count > 1)
+                catch (Exception)
                 {
-                    SE_LinkedWall wall = context[0];
-                    ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, task, app.ActiveUIDocument.Document));
-                    element.SetWall(wall);
+                    return Result.Failed;
+                }
+                SE_LinkedWall targetWall = null;
+                try
+                {
+                    targetWall = SE_LinkedWall.GetLinkedWallById(context, int.Parse(ExtensibleController.Read(task.Element as FamilyInstance, Collections.ExtensibleParameter.Wall).Split(new string[] {Variables.separator_element }, StringSplitOptions.None)[2], System.Globalization.NumberStyles.Integer));
+                }
+                catch (Exception) { targetWall = null; }
+                bool condition_AR = (UserPreferences.PlaceOnArchitecturalWalls && !targetWall.Wall.Name.StartsWith("00"));
+                bool condition_KR = (UserPreferences.PlaceOnStructuralWalls && targetWall.Wall.Name.StartsWith("00"));
+                if (targetWall != null && (condition_AR || condition_KR))
+                {
+                    ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(targetWall, task, app.ActiveUIDocument.Document));
+                    element.SetWall(targetWall);
                     element.AddSubElement(task);
                     element.Reject();
                     element.AddComment(Variables.msg_created);

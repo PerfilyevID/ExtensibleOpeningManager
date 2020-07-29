@@ -42,7 +42,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             IList<Reference> sideFaces = HostObjectUtils.GetSideFaces(wall, ShellLayerType.Exterior);
             Element e2 = wall.Document.GetElement(sideFaces[0]);
             Face face = e2.GetGeometryObjectFromReference(sideFaces[0]) as Face;
-            XYZ normal = face.ComputeNormal(new UV(0, 0));
+            XYZ normal = face.ComputeNormal(new UV(0.5, 0.5));
             IList<CurveLoop> loops = face.GetEdgesAsCurveLoops();
             foreach (CurveLoop loop in loops)
             {
@@ -122,6 +122,17 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                                 Wall.LevelId.ToString(),
                                 ExtensibleConverter.ConvertPoint(Solid.ComputeCentroid()),
                                 IsConcreteTask.ToString()});
+        }
+        public static SE_LinkedWall GetLinkedWallById(List<SE_LinkedWall> context, int targetWall)
+        {
+            foreach (SE_LinkedWall wall in context)
+            {
+                if (wall.Wall.Id.IntegerValue == targetWall)
+                {
+                    return wall;
+                }
+            }
+            return null;
         }
         public static SE_LinkedWall TryParse(Document doc, string value)
         {

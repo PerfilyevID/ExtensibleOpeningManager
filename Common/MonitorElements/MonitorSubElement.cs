@@ -14,10 +14,13 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
         public int LinkId { get; }
         public Source.Source Source { get; }
         public bool IsExpanded { get; set; }
+
+        public bool IsEnabled { get; set; }
         public object Object { get; set; }
         public MonitorAction Action { get; set; }
         public MonitorSubElement(MonitorElement parent)
         {
+            IsEnabled = false;
             Parent = parent;
             Action = new MonitorAction("✖", "Разорвать связь", Brushes.Gray);
             Object = null;
@@ -29,6 +32,10 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
         }
         public MonitorSubElement(SE_LinkedWall wall, WallStatus status, MonitorElement parent)
         {
+            if (UserPreferences.Department == Department.MEP)
+            { IsEnabled = true; }
+            else
+            { IsEnabled = false; }
             Parent = parent;
             Action = new MonitorAction("◥", "Задать новую связь", Brushes.Black);
             Object = wall;
@@ -61,6 +68,7 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
         }
         public MonitorSubElement(ExtensibleSubElement subElement, MonitorElement parent)
         {
+            IsEnabled = true;
             Parent = parent;
             Action = new MonitorAction("✖", "Разорвать связь", Brushes.Black);
             Object = subElement;
