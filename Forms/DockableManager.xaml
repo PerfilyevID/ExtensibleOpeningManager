@@ -15,8 +15,8 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnPlaceOnSelected2" Background="White" Content="Расставить на выбранной" Margin="0,0,0,0" Click="OnBtnPlaceOnSelected"/>
-                    <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnPlaceOnSelectedTask2" Content="Расставить по заданию" Margin="0,25,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnSelected"/>
+                    <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnPlaceOnSelected2" Background="White" Content="Создать по стене" Margin="0,0,0,0" ToolTip="Расставить элементы на основе выбранной стены" Click="OnBtnPlaceOnSelected"/>
+                    <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnPlaceOnSelectedTask2" Content="Создать по заданию" Margin="0,25,0,0" ToolTip="Расставить отверстия на основе выбранного задания" Background="White" Click="OnBtnPlaceOnSelectedTask"/>
 
                     <Button VerticalAlignment="Top" Grid.Row="0" Height="20" x:Name="btnLoop2" Content="Расставить по пересечениям" Margin="0,25,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnLoop"/>
                     <Grid VerticalAlignment="Top" Grid.Row="0"  x:Name="gridLoopButtons2" Margin="0,45,0,-7" Height="42">
@@ -132,7 +132,7 @@
                             <Image Source="{Binding Value}"/>
                         </Button>
                     </WrapPanel>
-                    <Label Grid.Row="1" Content="Субэлементы:" Margin="-5,0,0,0"/>
+                    <Label Grid.Row="1" Content="Основа:" Margin="-5,0,0,0"/>
                     <Grid Grid.Row="1" MinHeight="80" Height="Auto" MaxHeight="140">
                         <ScrollViewer  x:Name="svSubElements" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Margin="0,25,0,0" VerticalScrollBarVisibility="Auto" Background="White">
                             <ItemsControl x:Name="SubItemsControll">
@@ -154,14 +154,14 @@
                         </ScrollViewer>
                     </Grid>
                     <StackPanel Orientation="Vertical" Grid.Row="2">
-                        <Label Content="Выберите свой раздел:" Margin="-5,0,0,0"/>
+                        <Label x:Name="lblDepartmentHeader" Content="Выберите свой раздел:" Margin="-5,0,0,0"/>
                         <ComboBox x:Name="cbxDepartment" Margin="0,-3,0,0" Background="White" SelectedIndex="0" SelectionChanged="OnSubDepartmentChanged">
                             <TextBlock Text="ОВ"/>
                             <TextBlock Text="ВК"/>
                             <TextBlock Text="СС"/>
                             <TextBlock Text="ЭОМ"/>
                         </ComboBox>
-                        <Separator Margin="0,10,0,5"/>
+                        <Separator Name="sepDep" Margin="0,10,0,5"/>
                         <Button x:Name="btnPlaceKR" Content="Расставить/обновить по КР" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnKR"/>
                         <Button x:Name="btnPlaceAR" Content="Расставить/обновить по АР" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnAR"/>
                         <Button x:Name="btnPlaceMEP" Content="Расставить/обновить по ИС" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnMEP"/>
@@ -180,8 +180,8 @@
                             <Button x:Name="btnLoopSkip" Grid.Column="3" Content="Пропустить" Margin="5,5,0,0" ToolTip="Удалить созданные элементы и перейти к следующему шагу" Background="White" Click="OnBtnLoopSkip"/>
                         </Grid>
                         <Separator Margin="0,10,0,5"/>
-                        <Button x:Name="btnPlaceOnSelected" Content="Расставить на стене" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnSelected"/>
-                        <Button x:Name="btnPlaceOnSelectedTask" Content="Расставить по заданию" Margin="0,5,0,0" ToolTip="Расставить задания на выбранной стене" Background="White" Click="OnBtnPlaceOnSelected"/>
+                        <Button x:Name="btnPlaceOnSelected" Content="Создать по стене" Margin="0,5,0,0" ToolTip="Расставить элементы на основе выбранной стены" Background="White" Click="OnBtnPlaceOnSelected"/>
+                        <Button x:Name="btnPlaceOnSelectedTask" Content="Создать по заданию" Margin="0,5,0,0" ToolTip="Расставить отверстия на основе выбранного задания" Background="White" Click="OnBtnPlaceOnSelectedTask"/>
                     </StackPanel>
                     <TextBlock Text="⌨ История" FontWeight="Medium" Margin="0,3,0,0" Grid.Row="3" MinWidth="2"/>
                     <Rectangle x:Name="RR"  Grid.Row="3" Margin="0,20,0,80" RadiusX="2" RadiusY="2" Fill="White" Stroke="#FF707070"/>

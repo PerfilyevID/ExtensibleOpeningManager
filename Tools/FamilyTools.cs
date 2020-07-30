@@ -49,7 +49,7 @@ namespace ExtensibleOpeningManager.Tools
             }
             try
             {
-                doc.LoadFamily(string.Format(@"{0}\Source\RevitData\{1}.rfa", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).ToString(), familyName));
+                doc.LoadFamily(string.Format(@"{0}\Source\RevitData\{1}\{2}.rfa", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).ToString(), ModuleData.RevitVersion, familyName));
                 doc.Regenerate();
             }
             catch (Exception e)

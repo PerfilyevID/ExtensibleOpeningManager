@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Commands
 {
@@ -29,8 +30,9 @@ namespace ExtensibleOpeningManager.Commands
                     matrix = new Matrix.Matrix<ExtensibleSubElement>(CollectorTools.GetMepSubInstances(app.ActiveUIDocument.Document));
                     context = matrix.GetSubElements(wall);
                 }
-                catch (System.Exception)
+                catch (System.Exception e)
                 {
+                    PrintError(e);
                     return Result.Failed;
                 }
                 foreach (ExtensibleSubElement subElement in context)
@@ -41,18 +43,22 @@ namespace ExtensibleOpeningManager.Commands
                     }
                     string[] valueParts = ExtensibleController.Read(subElement.Element as FamilyInstance, Collections.ExtensibleParameter.Wall).Split(new string[] { Variables.separator_element}, StringSplitOptions.None);
                     int wallId = int.Parse(valueParts[2], System.Globalization.NumberStyles.Integer);
-                    if (wallId != wall.Wall.Id.IntegerValue) { continue; }
+                    if (wallId != wall.Wall.Id.IntegerValue)
+                    {
+                        continue;
+                    }
                     ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, subElement, app.ActiveUIDocument.Document));
                     element.SetWall(wall);
-                    element.AddSubElement(new SE_LocalElement(subElement.Element));
+                    element.AddSubElement(subElement);
                     element.Reject();
                     element.AddComment(Variables.msg_created);
                     element.Approve();
                 }
                 return Result.Succeeded;
             }
-            catch (System.Exception)
+            catch (System.Exception e)
             {
+                PrintError(e);
                 return Result.Failed;
             }
 

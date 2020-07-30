@@ -425,6 +425,9 @@ namespace ExtensibleOpeningManager.Controll
                 switch (UserPreferences.Department)
                 {
                     case Collections.Department.AR:
+                        DockablePreferences.Page.cbxDepartment.Visibility = System.Windows.Visibility.Collapsed;
+                        DockablePreferences.Page.lblDepartmentHeader.Visibility = System.Windows.Visibility.Collapsed;
+                        DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Visible;
@@ -433,6 +436,9 @@ namespace ExtensibleOpeningManager.Controll
                         DockablePreferences.Page.btnPlaceOnSelectedTask2.Visibility = System.Windows.Visibility.Visible;
                         break;
                     case Collections.Department.KR:
+                        DockablePreferences.Page.cbxDepartment.Visibility = System.Windows.Visibility.Collapsed;
+                        DockablePreferences.Page.lblDepartmentHeader.Visibility = System.Windows.Visibility.Collapsed;
+                        DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Visible;
@@ -441,6 +447,10 @@ namespace ExtensibleOpeningManager.Controll
                         DockablePreferences.Page.btnPlaceOnSelectedTask2.Visibility = System.Windows.Visibility.Visible;
                         break;
                     case Collections.Department.MEP:
+                        DockablePreferences.Page.cbxDepartment.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.cbxDepartment.Text = UserPreferences.SubDepartment;
+                        DockablePreferences.Page.lblDepartmentHeader.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Collapsed;

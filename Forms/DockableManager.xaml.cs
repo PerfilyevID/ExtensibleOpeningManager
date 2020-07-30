@@ -65,13 +65,12 @@ namespace DockableDialog.Forms
         {
             CollectionViewSource.GetDefaultView(monitorView.ItemsSource).Refresh();
         }
-
         private void OnItemDoubleClick(object sender, MouseButtonEventArgs args)
         {
             try
             {
                 TreeViewItem item = sender as TreeViewItem;
-                if (item == null) { return; }
+                if (item == null){ return; }
                 MonitorElement moniterElement = item.DataContext as MonitorElement;
                 if (moniterElement == null) { return; }
                 if (moniterElement.Element == null) { return; }
@@ -83,82 +82,66 @@ namespace DockableDialog.Forms
                 PrintError(e);
             }
         }
-
         private void OnBtnApprove(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandApprove(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnReject(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandReject(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnSetOffset(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandSetOffset(UiController.CurrentController.Selection));
         }
-
         private void OnBtnGroup(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandGroupInstances(UiController.CurrentController.Selection));
         }
-
         private void OnBtnUngroup(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandUngroup(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnReset(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandReset(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnUpdate(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandUpdate(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnApplySubElements(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandApplySubElements(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnApplyWall(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandApplyWall(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnAddSubElement(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandAddSubElement(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnSetWall(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandSetWall(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnSwap(object sender, RoutedEventArgs e)
         {
             ModuleData.CommandQueue.Enqueue(new CommandSwapType(UiController.CurrentController.Selection[0]));
         }
-
         private void OnBtnPlaceOnKR(object sender, RoutedEventArgs e)
         {
 
         }
-
         private void OnBtnPlaceOnAR(object sender, RoutedEventArgs e)
         {
 
         }
-
         private void OnBtnPlaceOnMEP(object sender, RoutedEventArgs e)
         {
 
         }
-
         private void OnBtnLoop(object sender, RoutedEventArgs e)
         {
             List<RevitLinkInstance> links = CollectorTools.GetRevitLinks(UiController.CurrentController.Document);
@@ -173,27 +156,22 @@ namespace DockableDialog.Forms
             }
             
         }
-
         private void OnBtnLoopDeny(object sender, RoutedEventArgs e)
         {
             UiController.CurrentController.LoopController.Reject();
         }
-
         private void OnBtnLoopApply(object sender, RoutedEventArgs e)
         {
             UiController.CurrentController.LoopController.Apply();
         }
-
         private void OnBtnLoopNext(object sender, RoutedEventArgs e)
         {
             UiController.CurrentController.LoopController.Next();
         }
-
         private void OnBtnLoopSkip(object sender, RoutedEventArgs e)
         {
             UiController.CurrentController.LoopController.Skip();
         }
-
         private void OnBtnPlaceOnSelected(object sender, RoutedEventArgs e)
         {
             if (UserPreferences.Department == ExtensibleOpeningManager.Common.Collections.Department.MEP)
@@ -202,7 +180,7 @@ namespace DockableDialog.Forms
             }
             if (UserPreferences.Department == ExtensibleOpeningManager.Common.Collections.Department.AR)
             {
-                ModuleData.CommandQueue.Enqueue(new CommandPlaceOpeningByTask());
+                ModuleData.CommandQueue.Enqueue(new CommandPlaceOpeningByTaskOnPickedWall());
             }
         }
 
@@ -251,9 +229,12 @@ namespace DockableDialog.Forms
             if (storedObject.GetType() == typeof(SE_LinkedWall))
             {
                 ModuleData.CommandQueue.Enqueue(new CommandSetWall(((sender as Button).DataContext as MonitorSubElement).Parent.Element));
-            }
+            }          
+        }
 
-            
+        private void OnBtnPlaceOnSelectedTask(object sender, RoutedEventArgs e)
+        {
+            ModuleData.CommandQueue.Enqueue(new CommandPlaceOpeningByTask());
         }
     }
 }

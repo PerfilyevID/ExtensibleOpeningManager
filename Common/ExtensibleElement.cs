@@ -135,7 +135,11 @@ namespace ExtensibleOpeningManager.Common
                     Instance.LookupParameter(Variables.parameter_offset_bounds).Set(double.Parse(values[6]));
                     Instance.LookupParameter(Variables.parameter_thickness).Set(double.Parse(values[7]));
                     Instance.LookupParameter(Variables.parameter_width).Set(double.Parse(values[8]));
-                    Instance.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM).Set(new ElementId(int.Parse(values[10])));
+                    try
+                    {
+                        Instance.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM).Set(new ElementId(int.Parse(values[10])));
+                    }
+                    catch (Exception) { }
                     XYZ currentLocation = (Instance.Location as LocationPoint).Point;
                     XYZ lastLocation = ExtensibleConverter.ConvertToPoint(values[2]);
                     XYZ lastOrientation = ExtensibleConverter.ConvertToPoint(values[3]);
@@ -342,26 +346,22 @@ namespace ExtensibleOpeningManager.Common
         }
         public void Apply()
         {
-            if (Status == Status.Null)
+            try
             {
-                try
-                {
-                    ApplySubElements();
-                }
-                catch (Exception)
-                {
-                    ExtensibleController.Write(Instance, ExtensibleParameter.SubElementsCollection, string.Empty);
-                }
-                try
-                {
-                    ApplyWall();
-                }
-                catch (Exception)
-                {
-                    ExtensibleController.Write(Instance, ExtensibleParameter.Wall, string.Empty);
-                }
+                ApplySubElements();
             }
-            ExtensibleTools.SetStatus(Instance, Collections.Status.Applied);
+            catch (Exception)
+            {
+                ExtensibleController.Write(Instance, ExtensibleParameter.SubElementsCollection, string.Empty);
+            }
+            try
+            {
+                ApplyWall();
+            }
+            catch (Exception)
+            {
+                ExtensibleController.Write(Instance, ExtensibleParameter.Wall, string.Empty);
+            }
             Status = Status.Applied;
             Approve();
         }
@@ -472,7 +472,7 @@ namespace ExtensibleOpeningManager.Common
             SubElements = new ObservableCollection<ExtensibleSubElement>();
             Comments = new List<ExtensibleComment>();
             SavedData = string.Empty;
-            Solid = MatrixElement.GetSolidOfElement(instance);
+            Solid = GeometryTools.GetSolidOfElement(instance);
             try 
             {
                 if (ExtensibleController.Read(Instance, ExtensibleParameter.Instance) != "" && ExtensibleController.Read(Instance, ExtensibleParameter.Instance) != string.Empty)

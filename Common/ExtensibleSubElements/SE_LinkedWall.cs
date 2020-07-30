@@ -20,7 +20,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             LinkId = new ElementId(-1);
             Wall = wall;
             Transform = null;
-            Solid = GetCorrectSolid(Wall, Transform);
+            Solid = GeometryTools.GetCorrectSolid(Wall, Transform);
             BoundingBox = new BoundingBoxXYZ();
             BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
             BoundingBox.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid();
@@ -31,39 +31,10 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             LinkId = revitLinkInstance.Id;
             Wall = wall;
             Transform = revitLinkInstance.GetTransform();
-            Solid = GetCorrectSolid(Wall, Transform);
+            Solid = GeometryTools.GetCorrectSolid(Wall, Transform);
             BoundingBox = new BoundingBoxXYZ();
             BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
             BoundingBox.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid();
-        }
-        private static Solid GetCorrectSolid(Wall wall, Transform transform = null)
-        {
-            List<Solid> solids = new List<Solid>();
-            IList<Reference> sideFaces = HostObjectUtils.GetSideFaces(wall, ShellLayerType.Exterior);
-            Element e2 = wall.Document.GetElement(sideFaces[0]);
-            Face face = e2.GetGeometryObjectFromReference(sideFaces[0]) as Face;
-            XYZ normal = face.ComputeNormal(new UV(0.5, 0.5));
-            IList<CurveLoop> loops = face.GetEdgesAsCurveLoops();
-            foreach (CurveLoop loop in loops)
-            {
-                List<CurveLoop> gloops = new List<CurveLoop>();
-                gloops.Add(loop);
-                IList<CurveLoop> iloops = gloops;
-                if (transform != null)
-                {
-                    solids.Add(SolidUtils.CreateTransformed(GeometryCreationUtilities.CreateExtrusionGeometry(iloops, normal.Negate(), wall.Width, new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId)), transform));
-                }
-                else
-                {
-                    solids.Add(GeometryCreationUtilities.CreateExtrusionGeometry(iloops, normal.Negate(), wall.Width, new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId)));
-                }
-            }
-            Solid solid = solids[0];
-            foreach (Solid s in solids)
-            {
-                solid = BooleanOperationsUtils.ExecuteBooleanOperation(solid, s, BooleanOperationsType.Union);
-            }
-            return solid;
         }
         public void CreateSolid(Document doc)
         {
@@ -158,7 +129,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 if (wallElement != null && wallElement.GetType() == typeof(Wall))
                 {
                     wall = wallElement as Wall;
-                    solid = GetCorrectSolid(wall);
+                    solid = GeometryTools.GetCorrectSolid(wall);
                 }
             }
             else
@@ -172,7 +143,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                         if (wallElement != null && wallElement.GetType() == typeof(Wall))
                         {
                             wall = wallElement as Wall;
-                            solid = GetCorrectSolid(wall, link.GetTransform());
+                            solid = GeometryTools.GetCorrectSolid(wall, link.GetTransform());
                         }
                     }
                     catch (Exception)

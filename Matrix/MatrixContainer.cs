@@ -144,10 +144,7 @@ namespace ExtensibleOpeningManager.Matrix
             {
                 if (IntersectionTools.IntersectsSolid(e.Solid, element.Solid))
                 {
-                    if (e.Element.GetType() == typeof(Wall))
-                    {
-                        subElements.Add(e.Object as ExtensibleSubElement);
-                    }
+                    subElements.Add(e.Object as ExtensibleSubElement);
                 }
             }
             return subElements;

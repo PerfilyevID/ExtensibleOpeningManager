@@ -39,6 +39,11 @@ namespace ExtensibleOpeningManager.Matrix
                     el = new MatrixElement(i as SE_LinkedWall);
                     detected = true;
                 }
+                if (!detected && i.GetType() == typeof(SE_LinkedInstance))
+                {
+                    el = new MatrixElement(i as SE_LinkedInstance);
+                    detected = true;
+                }
                 if (!detected && i.GetType() == typeof(Wall))
                 {
                     el = new MatrixElement(i as Wall);

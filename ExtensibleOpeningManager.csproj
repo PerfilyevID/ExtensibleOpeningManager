@@ -146,6 +146,7 @@
     <Compile Include="Tools\CollectorTools.cs" />
     <Compile Include="Tools\CreationTools.cs" />
     <Compile Include="Tools\FamilyTools.cs" />
+    <Compile Include="Tools\GeometryTools.cs" />
     <Compile Include="Tools\Instances\Intersection.cs" />
     <Compile Include="Tools\Instances\PlaceParameters.cs" />
     <Compile Include="Tools\IntersectionTools.cs" />
@@ -171,26 +172,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Source\RevitData\199_AR_Отверстие_Гильза_Стены.rfa">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Source\RevitData\199_AR_Отверстие_Отверстие_Стены.rfa">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Source\RevitData\199_KR_Отверстие_Гильза_Стены.rfa">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Source\RevitData\199_KR_Отверстие_Отверстие_Стены.rfa">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Source\RevitData\501_MEP_Задание_Гильза_Стены.rfa">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Source\RevitData\501_MEP_Задание_Отверстие_Стены.rfa">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Source\Buttons\Approve.png">
@@ -267,6 +248,44 @@
     <EmbeddedResource Include="Forms\Progress_Single.resx">
       <DependentUpon>Progress_Single.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\RevitData\2018\199_AR_Отверстие прямоугольное_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2018\199_AR_Отверстие_Гильза_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2018\199_STR_Отверстие прямоугольное_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2018\199_STR_Отверстие_Гильза_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2018\501_MEP_Задание_Гильза_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2018\501_MEP_Задание_Отверстие прямоугольное_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2020\199_AR_Отверстие прямоугольное_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2020\199_AR_Отверстие_Гильза_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2020\199_STR_Отверстие прямоугольное_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2020\199_STR_Отверстие_Гильза_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2020\501_MEP_Задание_Гильза_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Source\RevitData\2020\501_MEP_Задание_Отверстие прямоугольное_Стены.rfa">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

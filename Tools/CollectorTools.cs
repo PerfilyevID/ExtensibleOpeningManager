@@ -92,7 +92,7 @@ namespace ExtensibleOpeningManager.Tools
             List<RevitLinkInstance> links = GetRevitLinks(doc);
             foreach (RevitLinkInstance link in links)
             {
-                foreach (Element e in new FilteredElementCollector(doc).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElements())
+                foreach (Element e in new FilteredElementCollector(link.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElements())
                 {
                     FamilyInstance instance = e as FamilyInstance;
                     if (instance.Symbol.FamilyName == Variables.family_mep_round || instance.Symbol.FamilyName == Variables.family_mep_square)

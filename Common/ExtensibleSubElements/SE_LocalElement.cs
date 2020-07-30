@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Matrix;
+using ExtensibleOpeningManager.Tools;
 using System;
 using System.Collections.Generic;
 using static KPLN_Loader.Output.Output;
@@ -102,7 +103,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 {
                     geometryElement = element.get_Geometry(new Options() { IncludeNonVisibleObjects = false, DetailLevel = ViewDetailLevel.Fine });
                 }
-                Solid = MatrixElement.GetSolidOfElement(element);
+                Solid = GeometryTools.GetSolidOfElement(element);
             }
             catch (Exception e) { PrintError(e); }
             Value = this.ToString();

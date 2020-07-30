@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Matrix;
+using ExtensibleOpeningManager.Tools;
 using System;
 using System.Collections.Generic;
 using static KPLN_Loader.Output.Output;
@@ -81,7 +82,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Transform transform = linkInstance.GetTotalTransform();
             Element = linkedDocument.GetElement(reference.LinkedElementId) as Element;
             Id = Element.Id.IntegerValue;
-            Solid = SolidUtils.CreateTransformed(MatrixElement.GetSolidOfElement(Element), transform);
+            Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(Element), transform);
             LinkId = linkInstance.Id;
         }
         private string Value { get; set; }
@@ -98,7 +99,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Id = element.Id.IntegerValue;
             Transform transform = linkInstance.GetTotalTransform();
             Element = element;
-            Solid = SolidUtils.CreateTransformed(MatrixElement.GetSolidOfElement(Element), transform);
+            Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(Element), transform);
             LinkId = linkInstance.Id;
             Value = this.ToString();
         }

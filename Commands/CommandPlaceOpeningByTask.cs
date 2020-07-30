@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
+using ExtensibleOpeningManager.Controll;
 using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Tools.Instances;
@@ -23,6 +24,7 @@ namespace ExtensibleOpeningManager.Commands
             {
                 ExtensibleSubElement task = UiTools.PickInstance(app, Collections.PickTypeOptions.Instance, Collections.PickOptions.References);
                 List<SE_LinkedWall> walls = new List<SE_LinkedWall>();
+
                 foreach (Wall wall in CollectorTools.GetWalls(app.ActiveUIDocument.Document))
                 {
                     walls.Add(new SE_LinkedWall(wall));
@@ -44,6 +46,10 @@ namespace ExtensibleOpeningManager.Commands
                     targetWall = SE_LinkedWall.GetLinkedWallById(context, int.Parse(ExtensibleController.Read(task.Element as FamilyInstance, Collections.ExtensibleParameter.Wall).Split(new string[] {Variables.separator_element }, StringSplitOptions.None)[2], System.Globalization.NumberStyles.Integer));
                 }
                 catch (Exception) { targetWall = null; }
+                if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).OpeningExist(task, targetWall))
+                {
+                    return Result.Cancelled;
+                }
                 bool condition_AR = (UserPreferences.PlaceOnArchitecturalWalls && !targetWall.Wall.Name.StartsWith("00"));
                 bool condition_KR = (UserPreferences.PlaceOnStructuralWalls && targetWall.Wall.Name.StartsWith("00"));
                 if (targetWall != null && (condition_AR || condition_KR))
