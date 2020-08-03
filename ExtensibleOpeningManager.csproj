@@ -60,11 +60,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CommandAddComment.cs" />
+    <Compile Include="Commands\CommandAddRemark.cs" />
     <Compile Include="Commands\CommandAddSubElement.cs" />
     <Compile Include="Commands\CommandApprove.cs" />
     <Compile Include="Commands\CommandApplySubElements.cs" />
     <Compile Include="Commands\CommandApplyWall.cs" />
+    <Compile Include="Commands\CommandApproveRemark.cs" />
     <Compile Include="Commands\CommandPlaceOpeningByTaskOnPickedWall.cs" />
+    <Compile Include="Commands\CommandRejectRemark.cs" />
     <Compile Include="Commands\CommandSetSelection.cs" />
     <Compile Include="Commands\CommandGroupInstances.cs" />
     <Compile Include="Commands\CommandLoopApprove.cs" />
@@ -86,10 +89,14 @@
     <Compile Include="Commands\CommandSwapType.cs" />
     <Compile Include="Commands\CommandUngroup.cs" />
     <Compile Include="Commands\CommandUpdate.cs" />
+    <Compile Include="Commands\CommandUpdateAllElements.cs" />
+    <Compile Include="Commands\CommandUpdateComments.cs" />
     <Compile Include="Commands\CommandZoomElement.cs" />
     <Compile Include="Common\Collections.cs" />
     <Compile Include="Common\ExtensibleComment.cs" />
     <Compile Include="Common\ExtensibleElement.cs" />
+    <Compile Include="Common\ExtensibleMessage.cs" />
+    <Compile Include="Common\ExtensibleRemark.cs" />
     <Compile Include="Common\ExtensibleSubElement.cs" />
     <Compile Include="Common\ExtensibleSubElements\SE_LinkedElement.cs" />
     <Compile Include="Common\ExtensibleSubElements\SE_LinkedInstance.cs" />
@@ -131,6 +138,9 @@
     <Compile Include="Forms\Progress_Single.Designer.cs">
       <DependentUpon>Progress_Single.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\RemarkForm.xaml.cs">
+      <DependentUpon>RemarkForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Forms\RevitLinkPicker.xaml.cs">
       <DependentUpon>RevitLinkPicker.xaml</DependentUpon>
     </Compile>
@@ -165,6 +175,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Forms\Preferences.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\RemarkForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -223,6 +237,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Source\Monitor\Icon_Remove.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Monitor\Icon_Request.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Source\Monitor\Icon_Task_Approved.png">

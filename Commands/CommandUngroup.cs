@@ -30,7 +30,7 @@ namespace ExtensibleOpeningManager.Commands
                 element.SetWall(Wall);
                 element.AddSubElement(subElement);
                 element.AddComment(Variables.msg_created);
-                element.Approve();
+                element.Approve(true);
                 element.Reject();
             }
             return Result.Succeeded;

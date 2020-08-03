@@ -14,12 +14,13 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
         public int LinkId { get; }
         public Source.Source Source { get; }
         public bool IsExpanded { get; set; }
-
+        public System.Windows.Visibility Visibility { get; set; }
         public bool IsEnabled { get; set; }
         public object Object { get; set; }
         public MonitorAction Action { get; set; }
         public MonitorSubElement(MonitorElement parent)
         {
+            Visibility = System.Windows.Visibility.Collapsed;
             IsEnabled = false;
             Parent = parent;
             Action = new MonitorAction("✖", "Разорвать связь", Brushes.Gray);
@@ -30,8 +31,35 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
             LinkId = -1;
             Name = "<Пусто>";
         }
+        public MonitorSubElement(MonitorElement parent, ExtensibleRemark remark)
+        {
+            string reqDep = "";
+            switch (remark.Department)
+            {
+                case Department.AR:
+                    reqDep = "АР";
+                    break;
+                case Department.KR:
+                    reqDep = "КР";
+                    break;
+                case Department.MEP:
+                    reqDep = "ИС";
+                    break;
+            }
+            Visibility = System.Windows.Visibility.Collapsed;
+            IsEnabled = false;
+            Parent = parent;
+            Action = new MonitorAction("✖", "Разорвать связь", Brushes.Gray);
+            Object = null;
+            Source = new Source.Source(Collections.ImageMonitor.Request);
+            ToolTip = string.Format("{0}\n{1}", remark.Time.ToString("G"), remark.Message);
+            Id = -1;
+            LinkId = -1;
+            Name = string.Format("Замечание от [{0}]: «{1}»", reqDep, remark.Header);
+        }
         public MonitorSubElement(SE_LinkedWall wall, WallStatus status, MonitorElement parent)
         {
+            Visibility = System.Windows.Visibility.Collapsed;
             if (UserPreferences.Department == Department.MEP)
             { IsEnabled = true; }
             else
@@ -75,18 +103,25 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
             switch (subElement.Status)
             {
                 case Collections.SubStatus.Applied:
+                    if (subElement.GetType() == typeof(SE_LinkedInstance)) { Visibility = System.Windows.Visibility.Visible; }
+                    else { Visibility = System.Windows.Visibility.Collapsed; }
                     Source = new Source.Source(Collections.ImageMonitor.Element_Approved);
                     ToolTip = "Утвержден";
                     break;
                 case Collections.SubStatus.Changed:
+                    if (subElement.GetType() == typeof(SE_LinkedInstance)) { Visibility = System.Windows.Visibility.Visible; }
+                    else { Visibility = System.Windows.Visibility.Collapsed; }
                     Source = new Source.Source(Collections.ImageMonitor.Element_Unapproved);
                     ToolTip = "Неутвержденные изменения";
                     break;
                 case Collections.SubStatus.NotFound:
+                    Visibility = System.Windows.Visibility.Collapsed;
                     Source = new Source.Source(Collections.ImageMonitor.Element_Errored);
                     ToolTip = "Элемент или его документ не найден";
                     break;
                 case Collections.SubStatus.Rejected:
+                    if (subElement.GetType() == typeof(SE_LinkedInstance)) { Visibility = System.Windows.Visibility.Visible; }
+                    else { Visibility = System.Windows.Visibility.Collapsed; }
                     Source = new Source.Source(Collections.ImageMonitor.Element_Unapproved);
                     ToolTip = "Элемент не одобрен";
                     break;

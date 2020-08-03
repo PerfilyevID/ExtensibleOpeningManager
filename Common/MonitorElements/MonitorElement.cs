@@ -30,7 +30,7 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
             }
             else
             {
-                if (element.HasUncommitedSubElements() || element.ToString() != element.SavedData || element.Status != Status.Applied || element.WallStatus == WallStatus.NotCommited)
+                if (element.HasUncommitedSubElements() || element.ToString() != element.SavedData || element.Status != Status.Applied || element.WallStatus == WallStatus.NotCommited || element.ActiveRemarks.Count != 0)
                 {
                     Source = new Source.Source(Collections.ImageMonitor.Warning);
                     if (element.Status != Status.Applied)
@@ -63,6 +63,10 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
                 {
                     Collection.Add(new MonitorSubElement(subElement, this));
                 }
+            }
+            foreach (ExtensibleRemark rmrk in element.ActiveRemarks)
+            {
+                Collection.Add(new MonitorSubElement(this, rmrk));
             }
         }
     }

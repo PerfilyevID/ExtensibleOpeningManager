@@ -11,6 +11,7 @@ using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Controll;
 using ExtensibleOpeningManager.Matrix;
 using System.Collections.ObjectModel;
+using ExtensibleOpeningManager.Commands;
 
 namespace ExtensibleOpeningManager.Common
 {
@@ -18,6 +19,7 @@ namespace ExtensibleOpeningManager.Common
     {
         public int Id { get; set; }
         public ObservableCollection<ExtensibleSubElement> SubElements { get; set; }
+        public ObservableCollection<ExtensibleSubElement> UpperElements { get; set; }
         public SE_LinkedWall Wall { get; set; }
         public Solid Solid {get; set;}
         public FamilyInstance Instance { get; set; }
@@ -49,33 +51,194 @@ namespace ExtensibleOpeningManager.Common
                 {
                     return VisibleStatus.Alert;
                 }
-                if (HasUncommitedSubElements() || this.ToString() != SavedData || Status != Status.Applied || WallStatus == WallStatus.NotCommited)
+                if (HasUncommitedSubElements() || this.ToString() != SavedData || Status != Status.Applied || WallStatus == WallStatus.NotCommited || ActiveRemarks.Count != 0)
                 {
                     return VisibleStatus.Warning;
                 }
                 return VisibleStatus.Ok;
             }
         }
-        public List<ExtensibleComment> AllComments
+        public List<ExtensibleRemark> ActiveRemarks = new List<ExtensibleRemark>();
+        public List<ExtensibleRemark> AllRemarks
         {
             get
             {
-                List<ExtensibleComment> comments = new List<ExtensibleComment>();
-                foreach (ExtensibleComment comment in Comments)
+                List<ExtensibleRemark> remarks = new List<ExtensibleRemark>();
+                string Guid = string.Empty;
+                try
                 {
-                    comments.Add(comment);
+                    Guid = ExtensibleController.Read(Instance, ExtensibleParameter.Document);
                 }
-                foreach (ExtensibleSubElement subElement in SubElements)
+                catch (Exception) { }
+                if (Guid != string.Empty)
                 {
-                    foreach (ExtensibleComment comment in subElement.Comments)
+                    List<ExtensibleRemark> localRemarks = new List<ExtensibleRemark>();
+                    List<ExtensibleRemark> linkedRemarks = new List<ExtensibleRemark>();
+                    foreach (ExtensibleRemark remark in Remarks)
+                    {
+                        localRemarks.Add(remark);
+                    }
+                    foreach (ExtensibleSubElement subElement in SubElements)
+                    {
+                        if (subElement.GetType() == typeof(SE_LinkedInstance))
+                        {
+                            foreach (ExtensibleRemark remark in (subElement as SE_LinkedInstance).GetRemarks(this))
+                            {
+                                linkedRemarks.Add(remark);
+                            }
+                        }
+                    }
+                    foreach (ExtensibleSubElement upperElement in UiController.GetControllerByDocument(Instance.Document).UpperElements)
+                    {
+                        if (upperElement.GetType() == typeof(SE_LinkedInstance))
+                        {
+                            string value = ExtensibleController.Read(upperElement.Element as FamilyInstance, ExtensibleParameter.SubElementsCollection);
+                            string[] parts = value.Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (string part in parts)
+                            {
+                                string[] subparts = part.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.None);
+                                if (subparts[12] == Guid)
+                                {
+                                    foreach (ExtensibleRemark remark in (upperElement as SE_LinkedInstance).GetRemarks(this))
+                                    {
+                                        linkedRemarks.Add(remark);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    foreach (ExtensibleRemark linkedRemark in linkedRemarks)
+                    {
+                        if (Guid != linkedRemark._GUID_HOST)
+                        {
+                            continue;
+                        }
+                        if (linkedRemark.Type == RemarkType.Request)
+                        {
+                            bool found = false;
+                            foreach (ExtensibleRemark localRemark in localRemarks)
+                            {
+                                if (localRemark.Type != RemarkType.Request)
+                                {
+                                    if (linkedRemark._GUID_THIS_INSTANCE == localRemark._GUID_REQUEST_INSTANCE)
+                                    {
+                                        localRemark.Request = linkedRemark;
+                                        remarks.Add(localRemark);
+                                        found = true;
+                                    }
+                                }
+                            }
+                            if (!found)
+                            {
+                                remarks.Add(linkedRemark);
+                            }
+                        }
+                    }
+                    foreach (ExtensibleRemark localRemark in localRemarks)
+                    {
+                        if (localRemark.Type == RemarkType.Request)
+                        {
+                            bool found = false;
+                            foreach (ExtensibleRemark linkedRemark in linkedRemarks)
+                            {
+                                if (linkedRemark.Type != RemarkType.Request)
+                                {
+                                    if (localRemark._GUID_THIS_INSTANCE == linkedRemark._GUID_REQUEST_INSTANCE)
+                                    {
+                                        linkedRemark.Request = localRemark;
+                                        remarks.Add(linkedRemark);
+                                        found = true;
+                                    }
+                                }
+                            }
+                            if (!found)
+                            {
+                                remarks.Add(localRemark);
+                            }
+                        }
+                    }
+                }
+                return remarks;
+            }
+        }
+        private List<ExtensibleMessage> RemoveMessageAndGetList(ExtensibleMessage message, List<ExtensibleMessage> messages)
+        {
+            List<ExtensibleMessage> savedMessages = new List<ExtensibleMessage>();
+            foreach (ExtensibleMessage msg in messages)
+            {
+                if (msg.ToString() != message.ToString())
+                {
+                    savedMessages.Add(msg);
+                }
+            }
+            return savedMessages;
+        }
+        public List<ExtensibleMessage> AllComments
+        {
+            get
+            {
+                try
+                {
+                    string Guid = string.Empty;
+                    try
+                    {
+                        Guid = ExtensibleController.Read(Instance, ExtensibleParameter.Document);
+                    }
+                    catch (Exception e) { PrintError(e); }
+                    List<ExtensibleMessage> comments = new List<ExtensibleMessage>();
+                    foreach (ExtensibleComment comment in Comments)
                     {
                         comments.Add(comment);
                     }
+                    foreach (ExtensibleSubElement subElement in SubElements)
+                    {
+                        foreach (ExtensibleComment comment in subElement.Comments)
+                        {
+                            comments.Add(comment);
+                        }
+                    }
+                    if (Guid != string.Empty)
+                    {
+                        try
+                        {
+                            foreach (ExtensibleSubElement upperElement in UiController.CurrentController.UpperElements)
+                            {
+                                string value = ExtensibleController.Read(upperElement.Element as FamilyInstance, ExtensibleParameter.SubElementsCollection);
+                                string[] parts = value.Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (string part in parts)
+                                {
+                                    string[] subparts = part.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries);
+                                    if (subparts[12] == Guid)
+                                    {
+                                        foreach (ExtensibleComment comment in upperElement.Comments)
+                                        {
+                                            comments.Add(comment);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception) { }
+                    }
+                    try
+                    {
+                        foreach (ExtensibleRemark remark in AllRemarks)
+                        {
+                            comments.Add(remark);
+                        }
+                    }
+                    catch (Exception e) { PrintError(e); }
+                    return comments.OrderBy(o => o.Time).ToList();
                 }
-                return comments.OrderBy(o => o.Time).ToList();
+                catch (Exception e)
+                {
+                    PrintError(e);
+                    return new List<ExtensibleMessage>();
+                }
             }
         }
-        public List<ExtensibleComment> Comments { get; set; }
+        public List<ExtensibleMessage> Comments { get; set; }
+        public List<ExtensibleMessage> Remarks { get; set; }
         public string SavedData { get; set; }
         public bool GotWarnings()
         {
@@ -93,12 +256,40 @@ namespace ExtensibleOpeningManager.Common
             ExtensibleComment comment = new ExtensibleComment(message, this);
             Comments.Add(comment);
             ExtensibleTools.AddComment(Instance, comment);
+            ModuleData.CommandQueue.Enqueue(new CommandUpdateComments(this));
         }
         public void RemoveComment(ExtensibleComment comment)
         {
             ExtensibleTools.RemoveComment(Instance, comment);
-            Comments.Remove(comment);
-            UiController.CurrentController.UpdateComments(AllComments);
+            Comments = RemoveMessageAndGetList(comment, Comments);
+            ModuleData.CommandQueue.Enqueue(new CommandUpdateComments(this));
+        }
+        public void AddRemark(string header, string message, RemarkType type, SE_LinkedInstance subElement)
+        {
+            ExtensibleRemark remark = new ExtensibleRemark(header, message, this, subElement);
+            Remarks.Add(remark);
+            ExtensibleTools.AddRemark(Instance, remark);
+            ModuleData.CommandQueue.Enqueue(new CommandUpdateComments(this));
+        }
+        public void RemoveRemark(ExtensibleRemark remark)
+        {
+            ExtensibleTools.RemoveRemark(Instance, remark);
+            Remarks = RemoveMessageAndGetList(remark, Remarks);
+            ModuleData.CommandQueue.Enqueue(new CommandUpdateComments(this));
+        }
+        public void ApproveRemark(string header, string message, ExtensibleRemark remark)
+        {
+            ExtensibleRemark approveRemark = new ExtensibleRemark(header, message, this, remark, RemarkType.Answer_Ok);
+            Remarks.Add(approveRemark);
+            ExtensibleTools.AddRemark(Instance, approveRemark);
+            ModuleData.CommandQueue.Enqueue(new CommandUpdateComments(this));
+        }
+        public void RejectRemark(string header, string message, ExtensibleRemark remark)
+        {
+            ExtensibleRemark approveRemark = new ExtensibleRemark(header, message, this, remark, RemarkType.Answer_No);
+            Remarks.Add(approveRemark);
+            ExtensibleTools.AddRemark(Instance, approveRemark);
+            ModuleData.CommandQueue.Enqueue(new CommandUpdateComments(this));
         }
         public void Remove()
         {
@@ -134,7 +325,11 @@ namespace ExtensibleOpeningManager.Common
                     Instance.LookupParameter(Variables.parameter_height).Set(double.Parse(values[5]));
                     Instance.LookupParameter(Variables.parameter_offset_bounds).Set(double.Parse(values[6]));
                     Instance.LookupParameter(Variables.parameter_thickness).Set(double.Parse(values[7]));
-                    Instance.LookupParameter(Variables.parameter_width).Set(double.Parse(values[8]));
+                    try
+                    {
+                        Instance.LookupParameter(Variables.parameter_width).Set(double.Parse(values[8]));
+                    }
+                    catch (Exception) { }
                     try
                     {
                         Instance.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM).Set(new ElementId(int.Parse(values[10])));
@@ -339,6 +534,7 @@ namespace ExtensibleOpeningManager.Common
         {
             foreach (ExtensibleSubElement subElement in SubElements)
             {
+                
                 if (subElement.Status == SubStatus.NotFound)
                 { return true; }
             }
@@ -346,6 +542,7 @@ namespace ExtensibleOpeningManager.Common
         }
         public void Apply()
         {
+            bool overrideGuid = Status == Status.Null;
             try
             {
                 ApplySubElements();
@@ -363,11 +560,11 @@ namespace ExtensibleOpeningManager.Common
                 ExtensibleController.Write(Instance, ExtensibleParameter.Wall, string.Empty);
             }
             Status = Status.Applied;
-            Approve();
+            Approve(overrideGuid);
         }
-        public void Approve()
+        public void Approve(bool overrideGuid)
         {
-            ExtensibleTools.ApplyInstance(this);
+            ExtensibleTools.ApplyInstance(this, overrideGuid);
             SavedData = this.ToString();
         }
         public void Reject()
@@ -463,6 +660,25 @@ namespace ExtensibleOpeningManager.Common
             }
             catch (Exception e) { PrintError(e); }
         }
+        private void UpdateActiveRemarks()
+        {
+            try
+            {
+                if (UiController.CurrentController != null)
+                {
+                    ActiveRemarks.Clear();
+                    foreach (ExtensibleMessage msg in AllRemarks)
+                    {
+                        ExtensibleRemark rmrk = msg as ExtensibleRemark;
+                        if (rmrk.Type == RemarkType.Request)
+                        {
+                            ActiveRemarks.Add(rmrk);
+                        }
+                    }
+                }
+            }
+            catch (Exception e) { PrintError(e); }
+        }
         private ExtensibleElement(FamilyInstance instance)
         {
             Id = instance.Id.IntegerValue;
@@ -470,7 +686,8 @@ namespace ExtensibleOpeningManager.Common
             Status = Status.Null;
             Wall = null;
             SubElements = new ObservableCollection<ExtensibleSubElement>();
-            Comments = new List<ExtensibleComment>();
+            Comments = new List<ExtensibleMessage>();
+            Remarks = new List<ExtensibleMessage>();
             SavedData = string.Empty;
             Solid = GeometryTools.GetSolidOfElement(instance);
             try 
@@ -495,16 +712,19 @@ namespace ExtensibleOpeningManager.Common
                             }
                             SavedData = ExtensibleController.Read(Instance, ExtensibleParameter.Instance);
                             Comments = ExtensibleComment.TryParseCollection(ExtensibleController.Read(Instance, ExtensibleParameter.CommentsCollection), this);
+                            Remarks = ExtensibleRemark.TryParseCollection(ExtensibleController.Read(Instance, ExtensibleParameter.CommentsCollection), this);
                             SubElements = ExtensibleSubElement.TryParseCollection(this, ExtensibleController.Read(Instance, ExtensibleParameter.SubElementsCollection));
                             if (this.ToString() != ExtensibleController.Read(Instance, ExtensibleParameter.Instance))
                             {
                                 status = Status.Rejected;
                             }
+                            UpdateActiveRemarks();
                         }
                     }
                 }
             }
             catch (Exception e) { PrintError(e); }
+            
         }
     }
 }

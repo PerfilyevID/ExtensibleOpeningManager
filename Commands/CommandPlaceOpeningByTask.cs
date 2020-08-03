@@ -59,7 +59,7 @@ namespace ExtensibleOpeningManager.Commands
                     element.AddSubElement(task);
                     element.Reject();
                     element.AddComment(Variables.msg_created);
-                    element.Approve();
+                    element.Approve(true);
                 }
                 return Result.Succeeded;
             }

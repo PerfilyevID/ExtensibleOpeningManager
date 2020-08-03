@@ -40,7 +40,7 @@ namespace ExtensibleOpeningManager.Commands
                     element.AddSubElement(new SE_LocalElement(intersection.Element));
                     element.Reject();
                     element.AddComment(Variables.msg_created);
-                    element.Approve();
+                    element.Approve(true);
                     UiController.GetControllerByDocument(app.ActiveUIDocument.Document).LoopController.CreatedElements.Add(element);
                 }
                 return Result.Succeeded;

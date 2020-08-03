@@ -121,6 +121,7 @@ namespace ExtensibleOpeningManager
             {
                 if (UiController.GetControllerByDocument(args.GetDocument()).ElementsInLinksCollection(args.GetDeletedElementIds()))
                 {
+                    UiController.GetControllerByDocument(args.GetDocument()).UpdateUpperElements();
                     UiController.GetControllerByDocument(args.GetDocument()).UpdateAllElements();
                     DockablePreferences.Page.UpdateItemscontroll();
                     return;
@@ -137,6 +138,7 @@ namespace ExtensibleOpeningManager
             {
                 if (UiController.GetControllerByDocument(args.GetDocument()).ElementsInLinksCollection(args.GetModifiedElementIds()))
                 {
+                    UiController.GetControllerByDocument(args.GetDocument()).UpdateUpperElements();
                     UiController.GetControllerByDocument(args.GetDocument()).UpdateAllElements();
                     DockablePreferences.Page.UpdateItemscontroll();
                 }

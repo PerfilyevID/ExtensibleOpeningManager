@@ -30,9 +30,8 @@ namespace ExtensibleOpeningManager.Commands
                     matrix = new Matrix.Matrix<ExtensibleSubElement>(CollectorTools.GetMepSubInstances(app.ActiveUIDocument.Document));
                     context = matrix.GetSubElements(wall);
                 }
-                catch (System.Exception e)
+                catch (System.Exception)
                 {
-                    PrintError(e);
                     return Result.Failed;
                 }
                 foreach (ExtensibleSubElement subElement in context)
@@ -52,7 +51,7 @@ namespace ExtensibleOpeningManager.Commands
                     element.AddSubElement(subElement);
                     element.Reject();
                     element.AddComment(Variables.msg_created);
-                    element.Approve();
+                    element.Approve(true);
                 }
                 return Result.Succeeded;
             }

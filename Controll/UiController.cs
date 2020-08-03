@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
+using ExtensibleOpeningManager.Commands;
 using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Common.MonitorElements;
@@ -20,14 +21,28 @@ namespace ExtensibleOpeningManager.Controll
         public static UiController CurrentController { get; set; }
         public List<ExtensibleElement> Elements = new List<ExtensibleElement>();
         public List<ExtensibleElement> Selection = new List<ExtensibleElement>();
-        public List<ExtensibleComment> Comments = new List<ExtensibleComment>();
+        public List<ExtensibleMessage> Comments = new List<ExtensibleMessage>();
         public List<RevitLinkInstance> Links = new List<RevitLinkInstance>();
+        public List<ExtensibleSubElement> UpperElements = new List<ExtensibleSubElement>();
         public List<int> LinksIds = new List<int>();
         public MonitorCollection MonitorCollection { get; set; }
         public string SelectionSet = "";
         public string AllSelectionSet = "";
+        public void UpdateUpperElements()
+        {
+            try
+            {
+                UpperElements = CollectorTools.GetUpperInstances(Document);
+            }
+            catch (Exception e)
+            {
+                PrintError(e);
+                UpperElements = new List<ExtensibleSubElement>();
+            }
+        }
         public UiController(Document document)
         {
+            Document = document;
             MonitorCollection = new MonitorCollection();
             Elements = CollectorTools.GetInstances(document);
             foreach (ExtensibleElement el in Elements)
@@ -38,9 +53,10 @@ namespace ExtensibleOpeningManager.Controll
                 }
                 catch (Exception e) { PrintError(e); }
             }
-            Document = document;
             Document.DocumentClosing += new EventHandler<DocumentClosingEventArgs>(OnDocumentClose);
             LoopController = new LoopController(Document);
+            UpdateUpperElements();
+            ModuleData.CommandQueue.Enqueue(new CommandUpdateAllElements(this));
         }
         public static UiController GetControllerByDocument(Document doc)
         {
@@ -364,11 +380,11 @@ namespace ExtensibleOpeningManager.Controll
                 LinksIds.Add(instance.Id.IntegerValue);
             }
         }
-        public void UpdateComments(List<ExtensibleComment> comments)
+        public void UpdateComments(List<ExtensibleMessage> comments)
         {
             Comments = comments;
             DockablePreferences.Page.chatPanel.Children.Clear();
-            foreach (ExtensibleComment comment in comments)
+            foreach (ExtensibleMessage comment in comments)
             {
                 DockablePreferences.Page.chatPanel.Children.Add(comment.GetUiElement());
             }

@@ -15,6 +15,17 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 return ExtensibleTools.GetSubElementComments(this);
             }
         }
+        public List<ExtensibleRemark> GetRemarks(ExtensibleElement parent)
+        {
+            try
+            {
+                return ExtensibleTools.GetSubElementRemarks(this, parent);
+            }
+            catch (Exception)
+            {
+                return new List<ExtensibleRemark>();
+            }
+        }
         public override ElementId LinkId { get; protected set; }
         public override string ToString()
         {

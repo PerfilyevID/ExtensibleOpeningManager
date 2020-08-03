@@ -20,18 +20,18 @@ namespace ExtensibleOpeningManager.Extensible
         }
         public static void Write(FamilyInstance instance, ExtensibleParameter parameter, string value)
         {
-                try
-                {
-                    Entity entity = instance.GetEntity(GetCurrentSchema());
-                    entity.Set<string>(ExtensibleParameter_String[(int)parameter], value);
-                    instance.SetEntity(entity);
-                }
-                catch (Exception)
-                {
-                    Entity entity = new Entity(GetCurrentSchema());
-                    entity.Set<string>(ExtensibleParameter_String[(int)parameter], value);
-                    instance.SetEntity(entity);
-                }
+            try
+            {
+                Entity entity = instance.GetEntity(GetCurrentSchema());
+                entity.Set<string>(ExtensibleParameter_String[(int)parameter], value);
+                instance.SetEntity(entity);
+            }
+            catch (Exception)
+            {
+                Entity entity = new Entity(GetCurrentSchema());
+                entity.Set<string>(ExtensibleParameter_String[(int)parameter], value);
+                instance.SetEntity(entity);
+            }
         }
         public static Schema CreateNewSchema()
         {

@@ -11,17 +11,13 @@ using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Common
 {
-    public class ExtensibleComment
+    public class ExtensibleComment : ExtensibleMessage
     {
         private ExtensibleElement Parent { get; }
         public string Message { get; }
         public string User { get; }
-        public DateTime Time { get; }
+        public override DateTime Time { get; }
         public Department Department { get; }
-        /// <summary>
-        /// Конструктор для создания нового пользовательского комментария. Время = Now.
-        /// </summary>
-        /// <param name="message"></param>
         public ExtensibleComment(string message, ExtensibleElement parent)
         {
             Message = message;
@@ -30,13 +26,6 @@ namespace ExtensibleOpeningManager.Common
             Department = UserPreferences.Department;
             Parent = parent;
         }
-        /// <summary>
-        /// Конструктор для существующего коммертария.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="user"></param>
-        /// <param name="time"></param>
-        /// <param name="department"></param>
         private ExtensibleComment(string message, string user, DateTime time, Department department, ExtensibleElement parent)
         {
             Message = message;
@@ -53,11 +42,7 @@ namespace ExtensibleOpeningManager.Common
             Department = department;
             Parent = null;
         }
-        /// <summary>
-        /// Получение UIElement для вставки в WPF форму.
-        /// </summary>
-        /// <returns></returns>
-        public UIElement GetUiElement()
+        public override UIElement GetUiElement()
         {
             string departmentText = string.Empty;
             SQLUserInfo user = KPLN_Loader.Preferences.SQLiteDataBase.GetUser(User);
@@ -125,21 +110,6 @@ namespace ExtensibleOpeningManager.Common
             btnClose.Click += OnClick;
             return grid;
         }
-        private string GetUserNameBySystemName(string systemName)
-        {
-            foreach (SQLUserInfo user in KPLN_Loader.Preferences.Users)
-            {
-                if (user.SystemName == systemName && user.Surname != "")
-                {
-                    return string.Format("{0} {1} {2}.", user.Family, user.Name, user.Surname[0]);
-                }
-                if (user.SystemName == systemName && user.Surname == "")
-                {
-                    return string.Format("{0} {1}", user.Family, user.Name);
-                }
-            }
-            return systemName;
-        }
         private void OnClick(object sender, EventArgs e)
         {
             if (Parent != null)
@@ -151,16 +121,19 @@ namespace ExtensibleOpeningManager.Common
         {
             return string.Join(Variables.separator_sub_element, new string[] { Message, User, Time.ToString(), Department.ToString() });
         }
-        public static List<ExtensibleComment> TryParseCollection(string value, ExtensibleElement parent)
+        public static List<ExtensibleMessage> TryParseCollection(string value, ExtensibleElement parent)
         {
-            List<ExtensibleComment> comments = new List<ExtensibleComment>();
+            List<ExtensibleMessage> comments = new List<ExtensibleMessage>();
             foreach (string commentString in value.Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries))
             {
                 string[] parts = commentString.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries);
-                DateTime time = DateTime.Parse(parts[2]);
-                Department department;
-                Enum.TryParse(parts[3], out department);
-                comments.Add(new ExtensibleComment(parts[0], parts[1], time, department, parent));
+                if (parts.Length == 4)
+                {
+                    DateTime time = DateTime.Parse(parts[2]);
+                    Department department;
+                    Enum.TryParse(parts[3], out department);
+                    comments.Add(new ExtensibleComment(parts[0], parts[1], time, department, parent));
+                }
             }
             return comments;
         }
@@ -170,10 +143,13 @@ namespace ExtensibleOpeningManager.Common
             foreach (string commentString in value.Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries))
             {
                 string[] parts = commentString.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries);
-                DateTime time = DateTime.Parse(parts[2]);
-                Department department;
-                Enum.TryParse(parts[3], out department);
-                comments.Add(new ExtensibleComment(parts[0], parts[1], time, department));
+                if(parts.Length == 4)
+                {
+                    DateTime time = DateTime.Parse(parts[2]);
+                    Department department;
+                    Enum.TryParse(parts[3], out department);
+                    comments.Add(new ExtensibleComment(parts[0], parts[1], time, department));
+                }
             }
             return comments;
         }

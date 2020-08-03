@@ -103,6 +103,41 @@ namespace ExtensibleOpeningManager.Tools
             }
             return instances;
         }
+        public static List<ExtensibleSubElement> GetUpperInstances(Document doc)
+        {
+            List<ExtensibleSubElement> instances = new List<ExtensibleSubElement>();
+            List<RevitLinkInstance> links = GetRevitLinks(doc);
+            foreach (RevitLinkInstance link in links)
+            {
+                foreach (Element e in new FilteredElementCollector(link.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElements())
+                {
+                    FamilyInstance instance = e as FamilyInstance;
+                    if (UserPreferences.Department == Collections.Department.MEP)
+                    {
+                        if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square ||
+                            instance.Symbol.FamilyName == Variables.family_kr_round || instance.Symbol.FamilyName == Variables.family_kr_square)
+                        {
+                            instances.Add(new SE_LinkedInstance(link, instance));
+                        }
+                    }
+                    if (UserPreferences.Department == Collections.Department.AR)
+                    {
+                        if (instance.Symbol.FamilyName == Variables.family_kr_round || instance.Symbol.FamilyName == Variables.family_kr_square)
+                        {
+                            instances.Add(new SE_LinkedInstance(link, instance));
+                        }
+                    }
+                    if (UserPreferences.Department == Collections.Department.KR)
+                    {
+                        if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square)
+                        {
+                            instances.Add(new SE_LinkedInstance(link, instance));
+                        }
+                    }
+                }
+            }
+            return instances;
+        }
         public static List<Wall> GetWalls(Document doc)
         {
             List<Wall> instances = new List<Wall>();

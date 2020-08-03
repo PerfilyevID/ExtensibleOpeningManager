@@ -236,5 +236,15 @@ namespace DockableDialog.Forms
         {
             ModuleData.CommandQueue.Enqueue(new CommandPlaceOpeningByTask());
         }
+
+        private void OnSubItemAddRemarkBtnClick(object sender, RoutedEventArgs e)
+        {
+            object storedObject = ((sender as Button).DataContext as MonitorSubElement).Object;
+            if (storedObject.GetType() == typeof(SE_LinkedInstance))
+            {
+                ExtensibleSubElement subElement = storedObject as ExtensibleSubElement;
+                ModuleData.CommandQueue.Enqueue(new CommandAddRemark(subElement.Parent, subElement as SE_LinkedInstance));
+            }
+        }
     }
 }

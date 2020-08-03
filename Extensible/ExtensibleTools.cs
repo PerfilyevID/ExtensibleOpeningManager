@@ -43,9 +43,12 @@ namespace ExtensibleOpeningManager.Extensible
                 }
             }
         }
-        public static void ApplyInstance(ExtensibleElement element)
+        public static void ApplyInstance(ExtensibleElement element, bool overrideGuid)
         {
-            ApplyUniqId(element);
+            if (overrideGuid)
+            {
+                ApplyUniqId(element);
+            }
             ExtensibleController.Write(element.Instance, ExtensibleParameter.Instance, element.ToString());
         }
         public static void AddComment(FamilyInstance instance, ExtensibleComment comment)
@@ -54,20 +57,58 @@ namespace ExtensibleOpeningManager.Extensible
             parts.Add(comment.ToString());
             ExtensibleController.Write(instance, ExtensibleParameter.CommentsCollection, string.Join(Variables.separator_element, parts));
         }
+        public static void AddRemark(FamilyInstance instance, ExtensibleRemark remark)
+        {
+            List<string> parts = ExtensibleController.Read(instance, ExtensibleParameter.CommentsCollection).Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            parts.Add(remark.ToString());
+            ExtensibleController.Write(instance, ExtensibleParameter.CommentsCollection, string.Join(Variables.separator_element, parts));
+        }
         public static void RemoveComment(FamilyInstance instance, ExtensibleComment comment)
         {
             List<string> reWriteComments = new List<string>();
             foreach (string c in ExtensibleController.Read(instance, ExtensibleParameter.CommentsCollection).Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries))
             {
                 string[] parts = c.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.None);
-                if (parts[0] == comment.Message && parts[1] == comment.User && parts[2] == comment.Time.ToString() && parts[3] == comment.Department.ToString())
+                if (parts.Length == 4)
                 {
-                    continue;
+                    if (c == comment.ToString())
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        reWriteComments.Add(c);
+                    }
                 }
                 else
                 {
                     reWriteComments.Add(c);
                 }
+            }
+            ExtensibleController.Write(instance, ExtensibleParameter.CommentsCollection, string.Join(Variables.separator_element, reWriteComments));
+        }
+        public static void RemoveRemark(FamilyInstance instance, ExtensibleRemark comment)
+        {
+            List<string> reWriteComments = new List<string>();
+            foreach (string c in ExtensibleController.Read(instance, ExtensibleParameter.CommentsCollection).Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] parts = c.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.None);
+                if (parts.Length == 9)
+                {
+                    if (c == comment.ToString())
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        reWriteComments.Add(c);
+                    }
+                }
+                else
+                {
+                    reWriteComments.Add(c);
+                }
+
             }
             ExtensibleController.Write(instance, ExtensibleParameter.CommentsCollection, string.Join(Variables.separator_element, reWriteComments));
         }
@@ -116,14 +157,33 @@ namespace ExtensibleOpeningManager.Extensible
         public static List<ExtensibleComment> GetSubElementComments(ExtensibleSubElement element)
         {
             List<ExtensibleComment> comments = new List<ExtensibleComment>();
-            if (element.Element == null || element.Status == SubStatus.NotFound)
-            { return comments; }
+            if (element.Element == null)
+            {
+                return comments;
+            }
             if (element.Element.GetType() != typeof(FamilyInstance)) { return comments; }
             foreach (ExtensibleComment comment in ExtensibleComment.TryParseCollection(ExtensibleController.Read(element.Element as FamilyInstance, ExtensibleParameter.CommentsCollection)))
             {
                 comments.Add(comment);
             }
             return comments;
+        }
+        public static List<ExtensibleRemark> GetSubElementRemarks(ExtensibleSubElement element, ExtensibleElement parent)
+        {
+            List<ExtensibleRemark> remarks = new List<ExtensibleRemark>();
+            if (element.Element == null)
+            {
+                return remarks;
+            }
+            if (element.Element.GetType() != typeof(FamilyInstance))
+            {
+                return remarks;
+            }
+            foreach (ExtensibleRemark remark in ExtensibleRemark.TryParseCollection(ExtensibleController.Read(element.Element as FamilyInstance, ExtensibleParameter.CommentsCollection), parent))
+            {
+                remarks.Add(remark);
+            }
+            return remarks;
         }
         public static string GetSubElementMeta(FamilyInstance instance, ExtensibleSubElement subElement)
         {

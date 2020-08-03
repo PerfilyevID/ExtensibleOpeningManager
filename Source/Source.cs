@@ -80,6 +80,9 @@ namespace ExtensibleOpeningManager.Source
                 case ImageMonitor.Element_Unapproved:
                     Value = Path.Combine(AssemblyPath, @"Source\Monitor\Icon_Task_Unapproved.png");
                     break;
+                case ImageMonitor.Request:
+                    Value = Path.Combine(AssemblyPath, @"Source\Monitor\Icon_Request.png");
+                    break;
                 case ImageMonitor.Error:
                     Value = Path.Combine(AssemblyPath, @"Source\Monitor\Icon_Error.png");
                     break;

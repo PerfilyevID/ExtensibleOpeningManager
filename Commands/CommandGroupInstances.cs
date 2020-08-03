@@ -32,7 +32,7 @@ namespace ExtensibleOpeningManager.Commands
             ExtensibleElement groupedElement = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.GroupInstance(ExtensibleElements[0].Wall, ExtensibleElements, app.ActiveUIDocument.Document));
             groupedElement.SetWall(wall);
             groupedElement.AddComment(Variables.msg_created);
-            groupedElement.Approve();
+            groupedElement.Approve(true);
             groupedElement.Reject();
             foreach (ExtensibleSubElement s in subElements)
             {
