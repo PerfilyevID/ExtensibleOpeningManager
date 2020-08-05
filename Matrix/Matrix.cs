@@ -11,7 +11,7 @@ namespace ExtensibleOpeningManager.Matrix
 {
     public class Matrix<T>
     {
-        public Matrix(List<T> elements)
+        public Matrix(List<T> elements, bool showProgress = false)
         {
             if (elements.Count == 0) { throw new Exception("Нельзя создать матрицу на основе пустого списка!"); }
             double maxX = -999999;
@@ -20,48 +20,118 @@ namespace ExtensibleOpeningManager.Matrix
             double minX = 999999;
             double minY = 999999;
             double minZ = 999999;
-            foreach (var i in elements)
+            string format = "{0} из " + elements.Count.ToString() + " элементов обработано";
+            if (showProgress)
             {
-                bool detected = false;
-                MatrixElement el = null;
-                if (!detected && i.GetType() == typeof(ExtensibleElement))
+                using (Progress_Single progress = new Progress_Single("Подготовка поисковой матрицы", format, elements.Count))
                 {
-                    el = new MatrixElement(i as ExtensibleElement);
-                    detected = true;
+                    foreach (var i in elements)
+                    {
+                        progress.Increment();
+                        try
+                        {
+                            bool detected = false;
+                            MatrixElement el = null;
+                            if (!detected && i.GetType() == typeof(ExtensibleElement))
+                            {
+                                el = new MatrixElement(i as ExtensibleElement);
+                                detected = true;
+                            }
+                            if (!detected && i.GetType() == typeof(ExtensibleSubElement))
+                            {
+                                el = new MatrixElement(i as ExtensibleSubElement);
+                                detected = true;
+                            }
+                            if (!detected && i.GetType() == typeof(SE_LinkedWall))
+                            {
+                                el = new MatrixElement(i as SE_LinkedWall);
+                                detected = true;
+                            }
+                            if (!detected && i.GetType() == typeof(SE_LinkedInstance))
+                            {
+                                el = new MatrixElement(i as SE_LinkedInstance);
+                                detected = true;
+                            }
+                            if (!detected && i.GetType() == typeof(Wall))
+                            {
+                                el = new MatrixElement(i as Wall);
+                                detected = true;
+                            }
+                            if (!detected)
+                            {
+                                el = new MatrixElement(i as Element);
+                                detected = true;
+                            }
+                            if (el == null)
+                            {
+                                continue;
+                            }
+                            Elements.Add(el);
+                            if (maxX < el.BoundingBox.Max.X) { maxX = el.BoundingBox.Max.X; }
+                            if (maxY < el.BoundingBox.Max.Y) { maxY = el.BoundingBox.Max.Y; }
+                            if (maxZ < el.BoundingBox.Max.Z) { maxZ = el.BoundingBox.Max.Z; }
+                            if (minX > el.BoundingBox.Min.X) { minX = el.BoundingBox.Min.X; }
+                            if (minY > el.BoundingBox.Min.Y) { minY = el.BoundingBox.Min.Y; }
+                            if (minZ > el.BoundingBox.Min.Z) { minZ = el.BoundingBox.Min.Z; }
+                        }
+                        catch (Exception)
+                        { }
+                    }
                 }
-                if (!detected && i.GetType() == typeof(ExtensibleSubElement))
+            }
+            else
+            {
+                foreach (var i in elements)
                 {
-                    el = new MatrixElement(i as ExtensibleSubElement);
-                    detected = true;
+                    try
+                    {
+                        bool detected = false;
+                        MatrixElement el = null;
+                        if (!detected && i.GetType() == typeof(ExtensibleElement))
+                        {
+                            el = new MatrixElement(i as ExtensibleElement);
+                            detected = true;
+                        }
+                        if (!detected && i.GetType() == typeof(ExtensibleSubElement))
+                        {
+                            el = new MatrixElement(i as ExtensibleSubElement);
+                            detected = true;
+                        }
+                        if (!detected && i.GetType() == typeof(SE_LinkedWall))
+                        {
+                            el = new MatrixElement(i as SE_LinkedWall);
+                            detected = true;
+                        }
+                        if (!detected && i.GetType() == typeof(SE_LinkedInstance))
+                        {
+                            el = new MatrixElement(i as SE_LinkedInstance);
+                            detected = true;
+                        }
+                        if (!detected && i.GetType() == typeof(Wall))
+                        {
+                            el = new MatrixElement(i as Wall);
+                            detected = true;
+                        }
+                        if (!detected)
+                        {
+                            el = new MatrixElement(i as Element);
+                            detected = true;
+                        }
+                        if (el == null)
+                        {
+                            continue;
+                        }
+                        Elements.Add(el);
+                        if (maxX < el.BoundingBox.Max.X) { maxX = el.BoundingBox.Max.X; }
+                        if (maxY < el.BoundingBox.Max.Y) { maxY = el.BoundingBox.Max.Y; }
+                        if (maxZ < el.BoundingBox.Max.Z) { maxZ = el.BoundingBox.Max.Z; }
+                        if (minX > el.BoundingBox.Min.X) { minX = el.BoundingBox.Min.X; }
+                        if (minY > el.BoundingBox.Min.Y) { minY = el.BoundingBox.Min.Y; }
+                        if (minZ > el.BoundingBox.Min.Z) { minZ = el.BoundingBox.Min.Z; }
+                    }
+                    catch (Exception)
+                    { }
                 }
-                if (!detected && i.GetType() == typeof(SE_LinkedWall))
-                {
-                    el = new MatrixElement(i as SE_LinkedWall);
-                    detected = true;
-                }
-                if (!detected && i.GetType() == typeof(SE_LinkedInstance))
-                {
-                    el = new MatrixElement(i as SE_LinkedInstance);
-                    detected = true;
-                }
-                if (!detected && i.GetType() == typeof(Wall))
-                {
-                    el = new MatrixElement(i as Wall);
-                    detected = true;
-                }
-                if (!detected)
-                {
-                    el = new MatrixElement(i as Element);
-                    detected = true;
-                }
-                if (el == null) { continue; }
-                Elements.Add(el);
-                if (maxX < el.BoundingBox.Max.X) { maxX = el.BoundingBox.Max.X; }
-                if (maxY < el.BoundingBox.Max.Y) { maxY = el.BoundingBox.Max.Y; }
-                if (maxZ < el.BoundingBox.Max.Z) { maxZ = el.BoundingBox.Max.Z; }
-                if (minX > el.BoundingBox.Min.X) { minX = el.BoundingBox.Min.X; }
-                if (minY > el.BoundingBox.Min.Y) { minY = el.BoundingBox.Min.Y; }
-                if (minZ > el.BoundingBox.Min.Z) { minZ = el.BoundingBox.Min.Z; }
             }
             if (Elements.Count == 0) { throw new Exception("Null collection!"); }
             BoundingBoxXYZ boundingBox = new BoundingBoxXYZ() { Min = new XYZ(minX, minY, minZ), Max = new XYZ(maxX, maxY, maxZ) };
@@ -72,10 +142,39 @@ namespace ExtensibleOpeningManager.Matrix
             length = Math.Ceiling(Math.Max(length, z_length) / 12) * 12 * 2;
             XYZ c = new XYZ(Math.Round((boundingBox.Max.X + boundingBox.Min.X) / 2 / 12) * 12, Math.Round((boundingBox.Max.Y + boundingBox.Min.Y) / 2 / 12) * 12, Math.Round((boundingBox.Max.Z + boundingBox.Min.Z) / 2 / 12) * 12);
             BoundingBox = new BoundingBoxXYZ() { Min = new XYZ(c.X - length, c.Y - length, c.Z - length), Max = new XYZ(c.X + length, c.Y + length, c.Z + length) };
-            Container = new MatrixContainer(BoundingBox.Min, BoundingBox.Max);
-            foreach (MatrixElement el in Elements)
+
+            if (showProgress)
             {
-                Container.Add(el);
+                int l = (int)(Math.Ceiling(length / 48) + 2) * (int)(Math.Ceiling(length / 48) + 2) * (int)(Math.Ceiling(length / 48) + 2);
+                format = "{0} из " + l.ToString() + " поисковых частей создано";
+                using (Progress_Single progress = new Progress_Single("Подготовка поисковой матрицы", format, l))
+                {
+                    Container = new MatrixContainer(BoundingBox.Min, BoundingBox.Max, true, progress);
+                }  
+            }
+            else
+            {
+                Container = new MatrixContainer(BoundingBox.Min, BoundingBox.Max, true, null);
+            }
+                
+            if (showProgress)
+            {
+                format = "{0} из " + Elements.Count.ToString() + " элементов добавлено в матрицу поиска";
+                using (Progress_Single progress = new Progress_Single("Подготовка поисковой матрицы", format, Elements.Count))
+                {
+                    foreach (MatrixElement el in Elements)
+                    {
+                        progress.Increment();
+                        Container.Add(el);
+                    }
+                }
+            }
+            else
+            {
+                foreach (MatrixElement el in Elements)
+                {
+                    Container.Add(el);
+                }
             }
             Container.Optimize();
         }
@@ -89,7 +188,16 @@ namespace ExtensibleOpeningManager.Matrix
         }
         public List<Intersection> GetContext(SE_LinkedWall element)
         {
-            return Container.GetBySolidIntersection(new MatrixElement(element));
+            try
+            {
+                return Container.GetBySolidIntersection(new MatrixElement(element));
+
+            }
+            catch (Exception e)
+            {
+                PrintError(e);
+                return new List<Intersection>();
+            }
         }
         public List<Intersection> GetContext(ExtensibleElement element)
         {

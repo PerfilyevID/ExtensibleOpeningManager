@@ -103,7 +103,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 {
                     geometryElement = element.get_Geometry(new Options() { IncludeNonVisibleObjects = false, DetailLevel = ViewDetailLevel.Fine });
                 }
-                Solid = GeometryTools.GetSolidOfElement(element);
+                Solid = GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Medium);
             }
             catch (Exception e) { PrintError(e); }
             Value = this.ToString();

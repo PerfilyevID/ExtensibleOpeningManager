@@ -38,6 +38,8 @@ namespace ExtensibleOpeningManager.Commands
             {
                 groupedElement.AddSubElement(s);
             }
+            groupedElement.Approve(false);
+            groupedElement.Reject();
             groupedElement.Instance.LookupParameter(Variables.parameter_offset_bounds).Set(UserPreferences.DefaultOffset / 304.8);
             return Result.Succeeded;
         }

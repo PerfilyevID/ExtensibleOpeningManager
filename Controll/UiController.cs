@@ -10,6 +10,7 @@ using ExtensibleOpeningManager.Tools.Instances;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using static ExtensibleOpeningManager.Common.Collections;
 using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Controll
@@ -445,9 +446,9 @@ namespace ExtensibleOpeningManager.Controll
                         DockablePreferences.Page.lblDepartmentHeader.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;
-                        DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Visible;
-                        DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Visible;
-                        DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
+                        DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
+                        DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
                         DockablePreferences.Page.btnPlaceOnSelectedTask.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.btnPlaceOnSelectedTask2.Visibility = System.Windows.Visibility.Visible;
                         break;
@@ -455,10 +456,10 @@ namespace ExtensibleOpeningManager.Controll
                         DockablePreferences.Page.cbxDepartment.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.lblDepartmentHeader.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Collapsed;
-                        DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
                         DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
-                        DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Visible;
-                        DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
+                        DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
                         DockablePreferences.Page.btnPlaceOnSelectedTask.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.btnPlaceOnSelectedTask2.Visibility = System.Windows.Visibility.Visible;
                         break;
@@ -577,7 +578,31 @@ namespace ExtensibleOpeningManager.Controll
                             isRoundInSelection = true;
                         }
                     }
-                    if (el.SavedData != el.ToString())
+                    string[] parts_saved = el.SavedData.Split(new string[] { Variables.separator_element }, StringSplitOptions.None);
+                    string[] parts_current = el.ToString().Split(new string[] { Variables.separator_element }, StringSplitOptions.None);
+                    /*
+                    Instance.Id.ToString()
+                    Status.ToString()
+                    ExtensibleConverter.ConvertLocation(Instance.Location)
+                    ExtensibleConverter.ConvertPoint(Instance.FacingOrientation)
+                    Instance.Symbol.Id.ToString()
+                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_height).AsDouble())
+                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_offset_bounds).AsDouble())
+                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_thickness).AsDouble())
+                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_width).AsDouble())
+                    ExtensibleConverter.ConvertDouble(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble())
+                    Instance.LevelId.ToString()
+                     */
+                    if (parts_saved[0] != parts_current[0] ||
+                        parts_saved[2] != parts_current[2] ||
+                        parts_saved[3] != parts_current[3] ||
+                        parts_saved[4] != parts_current[4] ||
+                        parts_saved[5] != parts_current[5] ||
+                        parts_saved[6] != parts_current[6] ||
+                        parts_saved[7] != parts_current[7] ||
+                        parts_saved[8] != parts_current[8] ||
+                        parts_saved[9] != parts_current[9] ||
+                        parts_saved[10] != parts_current[10])
                     {
                         isChanged = true;
                     }

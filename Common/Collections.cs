@@ -19,5 +19,6 @@ namespace ExtensibleOpeningManager.Common
         public enum ImageMonitor { Error, Ok, Remove, Element_Approved, Element_Errored, Element_Unapproved, Update, Waiting, Warning, Request }
         public enum SubElementStatus { Ok, NotCommited, NotFound, NotApproved, NotCommitedInside }
         public enum RemarkType { Request, Answer_Ok, Answer_No }
+        public enum MonitorSubElementType { Element, Wall, Null, Remark }
     }
 }

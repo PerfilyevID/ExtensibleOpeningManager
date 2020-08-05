@@ -43,9 +43,8 @@ namespace ExtensibleOpeningManager.Tools
                 }
                 return false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                PrintError(e);
                 return false;
             }
         }

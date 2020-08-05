@@ -30,9 +30,8 @@ namespace ExtensibleOpeningManager.Commands
                 Controller.Next();
                 return Result.Succeeded;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                PrintError(e);
                 Controller.CreatedElements.Clear();
                 Controller.Next();
                 return Result.Failed;

@@ -36,6 +36,10 @@
                 <CheckBox x:Name="chbxArchitecture" IsChecked="True" Margin="5"  Width="400" HorizontalAlignment="Left" Content="Да"  Unchecked="OnChbxUnchecked" Checked="OnChbxChecked"/>
                 <TextBlock x:Name="tbxMinWidthHeader" FontWeight="Black" Text="Минимальная толщина стен:" ToolTip="В миллиметрах. Стены с меньшей толщиной будут проигнорированы." TextWrapping="Wrap"/>
                 <TextBox x:Name="tbxMinWidth" Text="80" Margin="5" Width="400" HorizontalAlignment="Left" TextChanged="OnTbChanged"/>
+                <TextBlock x:Name="tbxMinOpeningWidthHeader" FontWeight="Black" Text="Минимальная ширина отверстий:" ToolTip="В миллиметрах. Стены с меньшей толщиной будут проигнорированы." TextWrapping="Wrap"/>
+                <TextBox x:Name="tbxMinOpeningWidth" Text="80" Margin="5" Width="400" HorizontalAlignment="Left" TextChanged="OnTbChanged"/>
+                <TextBlock x:Name="tbxMinOpeningHeightHeader" FontWeight="Black" Text="Минимальная высота отверстий:" ToolTip="В миллиметрах. Стены с меньшей толщиной будут проигнорированы." TextWrapping="Wrap"/>
+                <TextBox x:Name="tbxMinOpeningHeight" Text="80" Margin="5" Width="400" HorizontalAlignment="Left" TextChanged="OnTbChanged"/>
                 <TextBlock FontWeight="Black" Text="Стандартный отступ границ:" TextWrapping="Wrap"/>
                 <ComboBox x:Name="cbxOffsett" Margin="5"  Width="400" HorizontalAlignment="Left" Background="White">
                     <ComboBoxItem Content="0"/>

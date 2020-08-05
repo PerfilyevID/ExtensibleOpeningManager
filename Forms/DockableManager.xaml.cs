@@ -220,15 +220,19 @@ namespace DockableDialog.Forms
 
         private void OnSubItemRemoveBtnClick(object sender, RoutedEventArgs e)
         {
-            object storedObject = ((sender as Button).DataContext as MonitorSubElement).Object;
-            if (storedObject.GetType() == typeof(SE_LocalElement) || storedObject.GetType() == typeof(SE_LinkedElement) || storedObject.GetType() == typeof(SE_LinkedInstance))
+            MonitorSubElement monitorElement = (sender as Button).DataContext as MonitorSubElement;
+            object storedObject = monitorElement.Object;
+            if (monitorElement.Type == Collections.MonitorSubElementType.Element)
             {
-                ExtensibleSubElement subElement = storedObject as ExtensibleSubElement;
-                ModuleData.CommandQueue.Enqueue(new CommandRemoveSubElement(subElement.Parent.Instance, subElement));
+                if (storedObject.GetType() == typeof(SE_LocalElement) || storedObject.GetType() == typeof(SE_LinkedElement) || storedObject.GetType() == typeof(SE_LinkedInstance))
+                {
+                    ExtensibleSubElement subElement = storedObject as ExtensibleSubElement;
+                    ModuleData.CommandQueue.Enqueue(new CommandRemoveSubElement(subElement.Parent.Instance, subElement));
+                }
             }
-            if (storedObject.GetType() == typeof(SE_LinkedWall))
+            if (monitorElement.Type == Collections.MonitorSubElementType.Wall)
             {
-                ModuleData.CommandQueue.Enqueue(new CommandSetWall(((sender as Button).DataContext as MonitorSubElement).Parent.Element));
+                ModuleData.CommandQueue.Enqueue(new CommandSetWall(monitorElement.Parent.Element));
             }          
         }
 

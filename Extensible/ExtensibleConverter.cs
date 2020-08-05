@@ -8,7 +8,7 @@ namespace ExtensibleOpeningManager.Extensible
     {
         public static string ConvertDouble(double d)
         {
-            return Math.Round(d, Variables.round_value).ToString();
+            return Math.Round(d, Variables.round_system_value).ToString();
         }
         public static string ConvertPoint(XYZ point)
         {

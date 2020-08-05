@@ -17,9 +17,11 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
         public System.Windows.Visibility Visibility { get; set; }
         public bool IsEnabled { get; set; }
         public object Object { get; set; }
+        public MonitorSubElementType Type { get; set; }
         public MonitorAction Action { get; set; }
         public MonitorSubElement(MonitorElement parent)
         {
+            Type = MonitorSubElementType.Null;
             Visibility = System.Windows.Visibility.Collapsed;
             IsEnabled = false;
             Parent = parent;
@@ -33,6 +35,7 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
         }
         public MonitorSubElement(MonitorElement parent, ExtensibleRemark remark)
         {
+            Type = MonitorSubElementType.Remark;
             string reqDep = "";
             switch (remark.Department)
             {
@@ -57,11 +60,14 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
             LinkId = -1;
             Name = string.Format("Замечание от [{0}]: «{1}»", reqDep, remark.Header);
         }
-        public MonitorSubElement(SE_LinkedWall wall, WallStatus status, MonitorElement parent)
+        public MonitorSubElement(SE_LinkedWall wall, WallStatus status, MonitorElement parent, bool isEnabled)
         {
+            Type = MonitorSubElementType.Wall;
             Visibility = System.Windows.Visibility.Collapsed;
             if (UserPreferences.Department == Department.MEP)
-            { IsEnabled = true; }
+            {
+                IsEnabled = isEnabled;
+            }
             else
             { IsEnabled = false; }
             Parent = parent;
@@ -96,6 +102,7 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
         }
         public MonitorSubElement(ExtensibleSubElement subElement, MonitorElement parent)
         {
+            Type = MonitorSubElementType.Element;
             IsEnabled = true;
             Parent = parent;
             Action = new MonitorAction("✖", "Разорвать связь", Brushes.Black);

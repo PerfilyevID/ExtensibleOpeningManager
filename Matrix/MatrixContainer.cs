@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
+using ExtensibleOpeningManager.Forms;
 using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Tools.Instances;
 using System;
@@ -11,54 +12,65 @@ namespace ExtensibleOpeningManager.Matrix
 {
     public class MatrixContainer
     {
+        private static int Count = 0;
         private double Length { get; }
         private double Width { get; }
         private double Height { get; }
         private BoundingBoxXYZ BoundingBox { get; }
         private List<MatrixContainer> Containers = new List<MatrixContainer>();
         private List<MatrixElement> Elements = new List<MatrixElement>();
-        public MatrixContainer(XYZ min, XYZ max)
+        private MatrixContainer Parent { get; set; }
+        public MatrixContainer(XYZ min, XYZ max, bool parent = true, Progress_Single progress = null)
         {
+            if (parent) { Count = 8; }
+            else { Count += 8; }
             BoundingBox = new BoundingBoxXYZ();
             BoundingBox.Min = min;
             BoundingBox.Max = max;
             Width = Math.Round(Math.Abs(BoundingBox.Max.X - BoundingBox.Min.X));
             Length = Math.Round(Math.Abs(BoundingBox.Max.Y - BoundingBox.Min.Y));
             Height = Math.Round(Math.Abs(BoundingBox.Max.Z - BoundingBox.Min.Z));
-            if (Length >= 12.0 && Height >= 12.0 && Width >= 12.0)
+            if (Length >= 48.0 && Height >= 48.0 && Width >= 48.0)
             {
                 //##
                 //$#
+                if (progress != null) { progress.Increment(); }
                 Containers.Add(new MatrixContainer(new XYZ(BoundingBox.Min.X, BoundingBox.Min.Y, BoundingBox.Min.Z),
-                    new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height / 2)));
+                    new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height / 2), false, progress));
                 //$#
                 //##
+                if (progress != null) { progress.Increment(); }
                 Containers.Add(new MatrixContainer(new XYZ(BoundingBox.Min.X, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z),
-                    new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length, BoundingBox.Min.Z + Height / 2)));
+                    new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length, BoundingBox.Min.Z + Height / 2), false, progress));
                 //##
                 //#$
+                if (progress != null) { progress.Increment(); }
                 Containers.Add(new MatrixContainer(new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y, BoundingBox.Min.Z),
-                    new XYZ(BoundingBox.Min.X + Width, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height / 2)));
+                    new XYZ(BoundingBox.Min.X + Width, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height / 2), false, progress));
                 //#$
                 //##
+                if (progress != null) { progress.Increment(); }
                 Containers.Add(new MatrixContainer(new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z),
-                    new XYZ(BoundingBox.Min.X + Width, BoundingBox.Min.Y + Length, BoundingBox.Min.Z + Height / 2)));
+                    new XYZ(BoundingBox.Min.X + Width, BoundingBox.Min.Y + Length, BoundingBox.Min.Z + Height / 2), false, progress));
                 //##
                 //$#
+                if (progress != null) { progress.Increment(); }
                 Containers.Add(new MatrixContainer(new XYZ(BoundingBox.Min.X, BoundingBox.Min.Y, BoundingBox.Min.Z + Height / 2),
-                    new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height)));
+                    new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height), false, progress));
                 //$#
                 //##
+                if (progress != null) { progress.Increment(); }
                 Containers.Add(new MatrixContainer(new XYZ(BoundingBox.Min.X, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height / 2),
-                    new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length, BoundingBox.Min.Z + Height)));
+                    new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length, BoundingBox.Min.Z + Height), false, progress));
                 //##
                 //#$
                 Containers.Add(new MatrixContainer(new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y, BoundingBox.Min.Z + Height / 2),
-                    new XYZ(BoundingBox.Min.X + Width, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height)));
+                    new XYZ(BoundingBox.Min.X + Width, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height), false, progress));
                 //#$
                 //##
+                if (progress != null) { progress.Increment(); }
                 Containers.Add(new MatrixContainer(new XYZ(BoundingBox.Min.X + Width / 2, BoundingBox.Min.Y + Length / 2, BoundingBox.Min.Z + Height / 2),
-                    new XYZ(BoundingBox.Min.X + Width, BoundingBox.Min.Y + Length, BoundingBox.Min.Z + Height)));
+                    new XYZ(BoundingBox.Min.X + Width, BoundingBox.Min.Y + Length, BoundingBox.Min.Z + Height), false, progress));
             }
         }
         public void Optimize()
@@ -127,14 +139,27 @@ namespace ExtensibleOpeningManager.Matrix
         public List<Intersection> GetBySolidIntersection(MatrixElement element)
         {
             List<Intersection> elements = new List<Intersection>();
-            foreach (MatrixElement e in GetByBoundingBoxIntersection(element))
+            try
             {
-                if (IntersectionTools.IntersectsSolid(e.Solid, element.Solid))
+                foreach (MatrixElement e in GetByBoundingBoxIntersection(element))
                 {
-                    Solid s = IntersectionTools.GetIntersectionSolid(e.Solid, element.Solid);
-                    elements.Add(new Intersection(e.Element, s));
+                    try
+                    {
+                        if (IntersectionTools.IntersectsSolid(e.Solid, element.Solid))
+                        {
+                            try
+                            {
+                                Solid s = IntersectionTools.GetIntersectionSolid(e.Solid, element.Solid);
+                                elements.Add(new Intersection(e.Element, s));
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                    catch (Exception) { }
                 }
             }
+            catch (Exception)
+            { }
             return elements;
         }
         public List<ExtensibleSubElement> GetSubElementsBySolidIntersection(MatrixElement element)
@@ -142,10 +167,14 @@ namespace ExtensibleOpeningManager.Matrix
             List<ExtensibleSubElement> subElements = new List<ExtensibleSubElement>();
             foreach (MatrixElement e in GetByBoundingBoxIntersection(element))
             {
-                if (IntersectionTools.IntersectsSolid(e.Solid, element.Solid))
+                try
                 {
-                    subElements.Add(e.Object as ExtensibleSubElement);
+                    if (IntersectionTools.IntersectsSolid(e.Solid, element.Solid))
+                    {
+                        subElements.Add(e.Object as ExtensibleSubElement);
+                    }
                 }
+                catch (Exception) { }
             }
             return subElements;
         }
@@ -154,13 +183,17 @@ namespace ExtensibleOpeningManager.Matrix
             List<SE_LinkedWall> walls = new List<SE_LinkedWall>();
             foreach (MatrixElement e in GetByBoundingBoxIntersection(element))
             {
-                if (IntersectionTools.IntersectsSolid(e.Solid, element.Solid))
+                try
                 {
-                    if(e.Element.GetType() == typeof(Wall))
+                    if (IntersectionTools.IntersectsSolid(e.Solid, element.Solid))
                     {
-                        walls.Add(new SE_LinkedWall(e.Element as Wall));
+                        if (e.Element.GetType() == typeof(Wall))
+                        {
+                            walls.Add(new SE_LinkedWall(e.Element as Wall));
+                        }
                     }
                 }
+                catch (Exception) { }
             }
             return walls;
         }

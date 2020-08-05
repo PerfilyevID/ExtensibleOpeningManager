@@ -109,32 +109,36 @@ namespace ExtensibleOpeningManager.Tools
             List<RevitLinkInstance> links = GetRevitLinks(doc);
             foreach (RevitLinkInstance link in links)
             {
-                foreach (Element e in new FilteredElementCollector(link.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElements())
+                try
                 {
-                    FamilyInstance instance = e as FamilyInstance;
-                    if (UserPreferences.Department == Collections.Department.MEP)
+                    foreach (Element e in new FilteredElementCollector(link.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElements())
                     {
-                        if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square ||
-                            instance.Symbol.FamilyName == Variables.family_kr_round || instance.Symbol.FamilyName == Variables.family_kr_square)
+                        FamilyInstance instance = e as FamilyInstance;
+                        if (UserPreferences.Department == Collections.Department.MEP)
                         {
-                            instances.Add(new SE_LinkedInstance(link, instance));
+                            if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square ||
+                                instance.Symbol.FamilyName == Variables.family_kr_round || instance.Symbol.FamilyName == Variables.family_kr_square)
+                            {
+                                instances.Add(new SE_LinkedInstance(link, instance));
+                            }
                         }
-                    }
-                    if (UserPreferences.Department == Collections.Department.AR)
-                    {
-                        if (instance.Symbol.FamilyName == Variables.family_kr_round || instance.Symbol.FamilyName == Variables.family_kr_square)
+                        if (UserPreferences.Department == Collections.Department.AR)
                         {
-                            instances.Add(new SE_LinkedInstance(link, instance));
+                            if (instance.Symbol.FamilyName == Variables.family_kr_round || instance.Symbol.FamilyName == Variables.family_kr_square)
+                            {
+                                instances.Add(new SE_LinkedInstance(link, instance));
+                            }
                         }
-                    }
-                    if (UserPreferences.Department == Collections.Department.KR)
-                    {
-                        if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square)
+                        if (UserPreferences.Department == Collections.Department.KR)
                         {
-                            instances.Add(new SE_LinkedInstance(link, instance));
+                            if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square)
+                            {
+                                instances.Add(new SE_LinkedInstance(link, instance));
+                            }
                         }
                     }
                 }
+                catch (Exception) { }
             }
             return instances;
         }
@@ -166,7 +170,7 @@ namespace ExtensibleOpeningManager.Tools
                         instances.Add(new SE_LinkedWall(instance, e as Wall));
                     }
                 }
-                catch (Exception ex) { PrintError(ex); }
+                catch (Exception) { }
             }
             return instances;
         }

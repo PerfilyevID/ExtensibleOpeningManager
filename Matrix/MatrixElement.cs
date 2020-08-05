@@ -4,6 +4,7 @@ using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Tools;
 using System;
+using System.IO;
 using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Matrix
@@ -57,7 +58,7 @@ namespace ExtensibleOpeningManager.Matrix
         }
         public MatrixElement(Element element)
         {
-            Solid = GeometryTools.GetSolidOfElement(element);
+            Solid = GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Medium);
             Element = element;
             Centroid = Solid.ComputeCentroid();
             BoundingBox = new BoundingBoxXYZ();

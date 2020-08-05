@@ -4,7 +4,6 @@ namespace ExtensibleOpeningManager
 {
     public static class Variables
     {
-        public static readonly int round_value = 1;
         public static readonly int round_system_value = 7;
 
         public static readonly string empty = "";
@@ -18,12 +17,12 @@ namespace ExtensibleOpeningManager
         public static readonly string parameter_height = "Высота";
         public static readonly string parameter_thickness = "Толщина";
 
-        public static readonly string family_ar_round = "199_AR_Отверстие_Гильза_Стены";
-        public static readonly string family_ar_square = "199_AR_Отверстие прямоугольное_Стены";
-        public static readonly string family_kr_round = "199_STR_Отверстие_Гильза_Стены";
-        public static readonly string family_kr_square = "199_STR_Отверстие прямоугольное_Стены";
-        public static readonly string family_mep_round = "501_MEP_Задание_Гильза_Стены";
-        public static readonly string family_mep_square = "501_MEP_Задание_Отверстие прямоугольное_Стены";
+        public static readonly string family_ar_round = "199_AR_ORW";
+        public static readonly string family_ar_square = "199_AR_OSW";
+        public static readonly string family_kr_round = "199_STR_ORW";
+        public static readonly string family_kr_square = "199_STR_OSW";
+        public static readonly string family_mep_round = "501_MEP_TRW";
+        public static readonly string family_mep_square = "501_MEP_TSW";
 
         public static readonly string separator_element = "~0SE~";
         public static readonly string separator_sub_element = "~1SE~";

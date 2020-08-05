@@ -250,7 +250,7 @@ namespace ExtensibleOpeningManager.Tools
                     return;
                 }
             }
-            catch (Exception e) { PrintError(e); }
+            catch (Exception) { }
         }
         private static XYZ VectorFromHorizVertAngles(double angleHorizD, double angleVertD)
         {

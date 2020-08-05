@@ -33,7 +33,23 @@ namespace ExtensibleOpeningManager.Forms
             {
                 Add_lbl.Text = value;
             }
-            ++progressBar1.Value;
+            if (progressBar1.Maximum > progressBar1.Value)
+            {
+                ++progressBar1.Value;
+                if (null != _format)
+                {
+                    Header_lbl.Text = string.Format(_format, progressBar1.Value);
+                }
+            }
+            System.Windows.Forms.Application.DoEvents();
+        }
+        public void Update(int progressvalue, string value = null)
+        {
+            if (value != null)
+            {
+                Add_lbl.Text = value;
+            }
+            progressBar1.Value = progressvalue;
             if (null != _format)
             {
                 Header_lbl.Text = string.Format(_format, progressBar1.Value);

@@ -47,8 +47,19 @@ namespace ExtensibleOpeningManager.Forms
                     revitLinkInstances.Add(wpfElement.Source as RevitLinkInstance);
                 }
             }
-            UiController.CurrentController.LoopController.Prepare(revitLinkInstances);
-            Close();
+            if (revitLinkInstances.Count != 0)
+            {
+                try
+                {
+                    UiController.CurrentController.LoopController.Prepare(revitLinkInstances, this);
+
+                }
+                catch (Exception e)
+                {
+                    PrintError(e);
+                    Close();
+                }
+            }
         }
     }
 }

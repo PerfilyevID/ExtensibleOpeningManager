@@ -35,13 +35,14 @@ namespace ExtensibleOpeningManager
                 string assembly = Assembly.GetExecutingAssembly().Location.Split(new string[] { "\\" }, StringSplitOptions.None).Last().Split('.').First();
                 #region buttons
                 RibbonPanel panel = application.CreateRibbonPanel(tabName, "Мониторинг отверстий");
-                AddPushButtonData("Открыть менеджер отверстий", "Открыть\nменеджер", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowDockablePane"), panel, new Source.Source(Common.Collections.Icon.OpenManager));
-                AddPushButtonData("Пользовательскте настройки модуля", "Настройки", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowPreferences"), panel, new Source.Source(Common.Collections.Icon.Settings));
+                AddPushButtonData("Открыть менеджер отверстий", "Открыть\nменеджер", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowDockablePane"), panel, new Source.Source(Common.Collections.Icon.OpenManager), false);
+                AddPushButtonData("Пользовательскте настройки модуля", "Настройки", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowPreferences"), panel, new Source.Source(Common.Collections.Icon.Settings), true);
                 #endregion
                 RegisterPane(application);
                 application.Idling += new EventHandler<IdlingEventArgs>(OnIdling);
                 application.ControlledApplication.DocumentChanged += new EventHandler<DocumentChangedEventArgs>(OnDocumentChanged);
                 application.ViewActivated += new EventHandler<ViewActivatedEventArgs>(OnViewActivated);
+                UserPreferences.TryLoadParameters();
                 return Result.Succeeded;
             }
             catch (Exception e)
@@ -165,11 +166,15 @@ namespace ExtensibleOpeningManager
             catch (Exception e)
             { PrintError(e); }
         }
-        private void AddPushButtonData(string name, string text, string description, string className, RibbonPanel panel, Source.Source imageSource, string url = @"https://kpln.kdb24.ru/article/76440/")
+        private void AddPushButtonData(string name, string text, string description, string className, RibbonPanel panel, Source.Source imageSource, bool avclass, string url = @"https://kpln.kdb24.ru/article/76440/")
         {
             PushButtonData data = new PushButtonData(name, text, Assembly.GetExecutingAssembly().Location, className);
             PushButton button = panel.AddItem(data) as PushButton;
             button.ToolTip = description;
+            if (avclass)
+            {
+                button.AvailabilityClassName = "ExtensibleOpeningManager.Availability.StaticAvailable";
+            }
             button.LongDescription = string.Format("{0}", Assembly.GetExecutingAssembly().Location);
             button.ItemText = text;
             button.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, url));

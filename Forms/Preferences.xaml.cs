@@ -34,6 +34,8 @@ namespace ExtensibleOpeningManager.Forms
                 this.infoDate.Text = ModuleData.Date;
                 this.infoVer.Text = ModuleData.Version;
                 this.tbxMinWidth.Text = (Math.Round(UserPreferences.MinWallWidth, 2)).ToString();
+                this.tbxMinOpeningHeight.Text = (Math.Round(UserPreferences.MinInstanceHeight, 2)).ToString();
+                this.tbxMinOpeningWidth.Text = (Math.Round(UserPreferences.MinInstanceWidth, 2)).ToString();
                 this.cbxOffsett.Text = Math.Round(UserPreferences.DefaultOffset).ToString();
             }
             if (UserPreferences.Department == Common.Collections.Department.AR)
@@ -47,6 +49,8 @@ namespace ExtensibleOpeningManager.Forms
                 this.infoDate.Text = ModuleData.Date;
                 this.infoVer.Text = ModuleData.Version;
                 this.tbxMinWidth.Text = (Math.Round(UserPreferences.MinWallWidth, 2)).ToString();
+                this.tbxMinOpeningHeight.Text = (Math.Round(UserPreferences.MinInstanceHeight, 2)).ToString();
+                this.tbxMinOpeningWidth.Text = (Math.Round(UserPreferences.MinInstanceWidth, 2)).ToString();
                 this.cbxOffsett.Text = Math.Round(UserPreferences.DefaultOffset).ToString();
             }
             if (UserPreferences.Department == Common.Collections.Department.KR)
@@ -60,6 +64,8 @@ namespace ExtensibleOpeningManager.Forms
                 this.infoDate.Text = ModuleData.Date;
                 this.infoVer.Text = ModuleData.Version;
                 this.tbxMinWidth.Text = (Math.Round(UserPreferences.MinWallWidth, 2)).ToString();
+                this.tbxMinOpeningHeight.Text = (Math.Round(UserPreferences.MinInstanceHeight, 2)).ToString();
+                this.tbxMinOpeningWidth.Text = (Math.Round(UserPreferences.MinInstanceWidth, 2)).ToString();
                 this.cbxOffsett.Text = Math.Round(UserPreferences.DefaultOffset).ToString();
             }
             try
@@ -106,6 +112,7 @@ namespace ExtensibleOpeningManager.Forms
                 UserPreferences.SubDepartment = this.cbxSubDepartment.Text;
             }
             UserPreferences.DefaultOffset = double.Parse(this.cbxOffsett.Text, System.Globalization.NumberStyles.Integer);
+            UserPreferences.TrySaveParameters();
             this.Close();
         }
 
@@ -121,10 +128,11 @@ namespace ExtensibleOpeningManager.Forms
 
         private void OnTbChanged(object sender, TextChangedEventArgs e)
         {
-            int s = this.tbxMinWidth.SelectionStart;
-            int l = this.tbxMinWidth.SelectionLength;
+            TextBox tb = sender as TextBox;
+            int s = tb.SelectionStart;
+            int l = tb.SelectionLength;
             int x = 0;
-            string text = this.tbxMinWidth.Text;
+            string text = tb.Text;
             string ntext = "";
             bool alreadyGotPoint = false;
             int signsAfterPoint = 0;
@@ -186,12 +194,12 @@ namespace ExtensibleOpeningManager.Forms
                 }
             }
             
-            if (ntext != this.tbxMinWidth.Text)
+            if (ntext != tb.Text)
             {
-                this.tbxMinWidth.Text = ntext;
+                tb.Text = ntext;
                 try
                 {
-                    this.tbxMinWidth.SelectionStart = s - x;
+                    tb.SelectionStart = s - x;
                 }
                 catch (Exception) { }
             }
@@ -204,7 +212,11 @@ namespace ExtensibleOpeningManager.Forms
         private void UpdateEnability()
         {
             bool ParseError = false;
+            bool ParseError2 = false;
+            bool ParseError3 = false;
             bool NoneError = false;
+            bool NoneError2 = false;
+            bool NoneError3 = false;
             bool BothUnchecked = false;
             try
             {
@@ -214,9 +226,33 @@ namespace ExtensibleOpeningManager.Forms
             {
                 ParseError = true;
             }
+            try
+            {
+                Double.Parse(this.tbxMinOpeningWidth.Text, System.Globalization.NumberStyles.Float);
+            }
+            catch (Exception)
+            {
+                ParseError2 = true;
+            }
+            try
+            {
+                Double.Parse(this.tbxMinOpeningHeight.Text, System.Globalization.NumberStyles.Float);
+            }
+            catch (Exception)
+            {
+                ParseError3 = true;
+            }
             if (this.tbxMinWidth.Text == "")
             {
                 NoneError = true;
+            }
+            if (this.tbxMinOpeningWidth.Text == "")
+            {
+                NoneError2 = true;
+            }
+            if (this.tbxMinOpeningHeight.Text == "")
+            {
+                NoneError3 = true;
             }
             if (!(bool)this.chbxArchitecture.IsChecked && !(bool)this.chbxConcrete.IsChecked)
             {
@@ -240,7 +276,23 @@ namespace ExtensibleOpeningManager.Forms
             {
                 this.tbxMinWidthHeader.Foreground = Brushes.Black;
             }
-            if (ParseError || NoneError || BothUnchecked)
+            if (ParseError2 || NoneError2)
+            {
+                this.tbxMinOpeningWidthHeader.Foreground = Brushes.Red;
+            }
+            else
+            {
+                this.tbxMinOpeningWidthHeader.Foreground = Brushes.Black;
+            }
+            if (ParseError3 || NoneError3)
+            {
+                this.tbxMinOpeningHeightHeader.Foreground = Brushes.Red;
+            }
+            else
+            {
+                this.tbxMinOpeningHeightHeader.Foreground = Brushes.Black;
+            }
+            if (ParseError || ParseError2 || ParseError3 || NoneError || NoneError2 || NoneError3 || BothUnchecked)
             {
                 this.btnApply.IsEnabled = false;
             }

@@ -42,17 +42,20 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
                     if (element.HasUncommitedSubElements())
                     { tipParts.Add("Субэлементы: Неутвержденные изменения"); }
                 }
-                else
-                {
-                    Source = new Source.Source(Collections.ImageMonitor.Ok);
-                    tipParts.Add("Без предупреждений!");
-                }
+            }
+            if (element.ActiveRemarks.Count != 0)
+            {
+                tipParts.Add("Есть незакрытые замечания");
+            }
+            if (tipParts.Count == 0)
+            {
+                tipParts.Add("Без предупреждений!");
             }
             ToolTip = string.Join("\n", tipParts);
             Collection = new ObservableCollection<MonitorSubElement>();
             Id = element.Id;
             Name = string.Format("{0}: {1} [{2}.rfa]", element.Id, element.Instance.Symbol.Name, element.Instance.Symbol.FamilyName);
-            Collection.Add(new MonitorSubElement(element.Wall, element.WallStatus, this));
+            Collection.Add(new MonitorSubElement(element.Wall, element.WallStatus, this, element.Status != Status.Null));
             if (element.SubElements.Count == 0)
             {
                 Collection.Add(new MonitorSubElement(this));

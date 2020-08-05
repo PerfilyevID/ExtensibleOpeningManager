@@ -82,7 +82,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Transform transform = linkInstance.GetTotalTransform();
             Element = linkedDocument.GetElement(reference.LinkedElementId) as Element;
             Id = Element.Id.IntegerValue;
-            Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(Element), transform);
+            Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(Element, ViewDetailLevel.Coarse), transform);
             LinkId = linkInstance.Id;
         }
         private string Value { get; set; }
@@ -99,7 +99,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Id = element.Id.IntegerValue;
             Transform transform = linkInstance.GetTotalTransform();
             Element = element;
-            Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(Element), transform);
+            Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(Element, ViewDetailLevel.Coarse), transform);
             LinkId = linkInstance.Id;
             Value = this.ToString();
         }
