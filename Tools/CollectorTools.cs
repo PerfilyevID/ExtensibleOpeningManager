@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using ExtensibleOpeningManager.Common;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
+using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Filters;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,8 @@ namespace ExtensibleOpeningManager.Tools
                                     BuiltInCategory.OST_FlexDuctCurves,
                                     BuiltInCategory.OST_DuctFitting,
                                     BuiltInCategory.OST_ConduitFitting,
-                                    BuiltInCategory.OST_PipeFitting};
+                                    BuiltInCategory.OST_PipeFitting,
+                                    BuiltInCategory.OST_DuctAccessory};
         public static List<Element> GetMepElements(Document doc)
         {
             List<Element> instances = new List<Element>();
@@ -103,8 +105,30 @@ namespace ExtensibleOpeningManager.Tools
             }
             return instances;
         }
+        public static List<ExtensibleSubElement> GetAllSubInstances(Document doc)
+        {
+            List<ExtensibleSubElement> instances = new List<ExtensibleSubElement>();
+            List<RevitLinkInstance> links = GetRevitLinks(doc);
+            foreach (RevitLinkInstance link in links)
+            {
+                foreach (Element e in new FilteredElementCollector(link.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElements())
+                {
+                    FamilyInstance instance = e as FamilyInstance;
+                    if (UserPreferences.Department == Collections.Department.AR && (instance.Symbol.FamilyName == Variables.family_mep_round || instance.Symbol.FamilyName == Variables.family_mep_square || instance.Symbol.FamilyName == Variables.family_kr_round || instance.Symbol.FamilyName == Variables.family_kr_square))
+                    {
+                        instances.Add(new SE_LinkedInstance(link, instance));
+                    }
+                    if (UserPreferences.Department == Collections.Department.KR && (instance.Symbol.FamilyName == Variables.family_mep_round || instance.Symbol.FamilyName == Variables.family_mep_square || instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square))
+                    {
+                        instances.Add(new SE_LinkedInstance(link, instance));
+                    }
+                }
+            }
+            return instances;
+        }
         public static List<ExtensibleSubElement> GetUpperInstances(Document doc)
         {
+            HashSet<string> uniq = new HashSet<string>();
             List<ExtensibleSubElement> instances = new List<ExtensibleSubElement>();
             List<RevitLinkInstance> links = GetRevitLinks(doc);
             foreach (RevitLinkInstance link in links)
@@ -114,12 +138,16 @@ namespace ExtensibleOpeningManager.Tools
                     foreach (Element e in new FilteredElementCollector(link.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElements())
                     {
                         FamilyInstance instance = e as FamilyInstance;
+                        string guid = ExtensibleController.Read(instance, Collections.ExtensibleParameter.Document);
+                        if (uniq.Contains(guid)) { continue; }
                         if (UserPreferences.Department == Collections.Department.MEP)
                         {
                             if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square ||
                                 instance.Symbol.FamilyName == Variables.family_kr_round || instance.Symbol.FamilyName == Variables.family_kr_square)
                             {
-                                instances.Add(new SE_LinkedInstance(link, instance));
+                                SE_LinkedInstance i = new SE_LinkedInstance(link, instance);
+                                instances.Add(i);
+                                uniq.Add(guid);
                             }
                         }
                         if (UserPreferences.Department == Collections.Department.AR)
@@ -127,6 +155,7 @@ namespace ExtensibleOpeningManager.Tools
                             if (instance.Symbol.FamilyName == Variables.family_kr_round || instance.Symbol.FamilyName == Variables.family_kr_square)
                             {
                                 instances.Add(new SE_LinkedInstance(link, instance));
+                                uniq.Add(guid);
                             }
                         }
                         if (UserPreferences.Department == Collections.Department.KR)
@@ -134,6 +163,7 @@ namespace ExtensibleOpeningManager.Tools
                             if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square)
                             {
                                 instances.Add(new SE_LinkedInstance(link, instance));
+                                uniq.Add(guid);
                             }
                         }
                     }
@@ -142,16 +172,16 @@ namespace ExtensibleOpeningManager.Tools
             }
             return instances;
         }
-        public static List<Wall> GetWalls(Document doc)
+        public static List<SE_LinkedWall> GetWalls(Document doc)
         {
-            List<Wall> instances = new List<Wall>();
+            List<SE_LinkedWall> instances = new List<SE_LinkedWall>();
             foreach (Element e in new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls).WhereElementIsNotElementType().ToElements())
             {
                 try
                 {
                     if (LocalFilter.Passes(e as Wall))
                     {
-                        instances.Add(e as Wall);
+                        instances.Add(new SE_LinkedWall(e as Wall));
                     }
                 }
                 catch (Exception ex) { PrintError(ex); }

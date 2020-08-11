@@ -70,7 +70,7 @@ namespace ExtensibleOpeningManager.Forms
             }
             try
             {
-                Double.Parse(this.tbxMinWidth.Text, System.Globalization.NumberStyles.Float);
+                double.Parse(this.tbxMinWidth.Text, System.Globalization.NumberStyles.Float);
                 this.tbxMinWidthHeader.Foreground = Brushes.Black;
                 if ((bool)this.chbxArchitecture.IsChecked || (bool)this.chbxConcrete.IsChecked)
                 {
@@ -103,8 +103,12 @@ namespace ExtensibleOpeningManager.Forms
             UserPreferences.PlaceOnStructuralWalls = (bool)this.chbxConcrete.IsChecked;
             try
             {
-                Double d = Double.Parse(this.tbxMinWidth.Text, System.Globalization.NumberStyles.Float);
+                double d = double.Parse(this.tbxMinWidth.Text, System.Globalization.NumberStyles.Float);
+                double h = double.Parse(this.tbxMinOpeningHeight.Text, System.Globalization.NumberStyles.Float);
+                double w = double.Parse(this.tbxMinOpeningWidth.Text, System.Globalization.NumberStyles.Float);
                 UserPreferences.MinWallWidth = d;
+                UserPreferences.MinInstanceHeight = h;
+                UserPreferences.MinInstanceWidth = w;
             }
             catch (Exception) { }
             if (UserPreferences.Department == Common.Collections.Department.MEP)

@@ -45,7 +45,6 @@ namespace ExtensibleOpeningManager.Tools.Instances
             {
                 Curve curve = edge.AsCurve();
                 points.Add(curve.GetEndPoint(0));
-                //points.Add(curve.GetEndPoint(1));
             }
             if (wall.LinkId != ElementId.InvalidElementId)
             {
@@ -98,14 +97,17 @@ namespace ExtensibleOpeningManager.Tools.Instances
                     catch (Exception) { }
                 }
             }
-            Position = GetCentroid(new List<BoundingBoxXYZ>() { intersection.BoundingBox });
+            XYZ position = GetCentroid(new List<BoundingBoxXYZ>() { intersection.BoundingBox });
+            XYZ projectedPosition = wall.WallLine.Project(position).XYZPoint;
+            Position = new XYZ(projectedPosition.X, projectedPosition.Y, position.Z);
             Width = Math.Round(LongestLine.Length, Variables.round_system_value);
             Height = GetCompoundHeight(geometry);
             Thickness = Math.Round(wall.Wall.Width, Variables.round_system_value);
             Offset = Math.Round(UserPreferences.DefaultOffset / 304.8, Variables.round_system_value);
+            Level = GetNearestLevel(doc, wall.Wall.Document.GetElement(wall.Wall.LevelId) as Level);
             if (Position.Z - wall.BoundingBox.Min.Z - Height / 2 > 0)
             {
-                Math.Round(OffsetDown = Position.Z - wall.BoundingBox.Min.Z - Height / 2, Variables.round_system_value);
+                OffsetDown = Math.Round(Position.Z - wall.BoundingBox.Min.Z - Height / 2, Variables.round_system_value);
             }
             else
             { 
@@ -113,13 +115,12 @@ namespace ExtensibleOpeningManager.Tools.Instances
             }
             if (wall.BoundingBox.Max.Z - Position.Z - Height / 2 > 0)
             {
-                Math.Round(OffsetUp = wall.BoundingBox.Max.Z - Position.Z - Height / 2, Variables.round_system_value);
+                OffsetUp = Math.Round(wall.BoundingBox.Max.Z - Position.Z - Height / 2, Variables.round_system_value);
             }
             else
             {
                 OffsetUp = 0;
             }
-            Level = GetNearestLevel(doc, wall.Wall.Document.GetElement(wall.Wall.LevelId) as Level);
             Elevation = Math.Round(Position.Z - Level.Elevation - Height / 2, Variables.round_system_value);
     }
         public PlaceParameters(SE_LinkedWall wall, List<Intersection> intersection, Document doc)
@@ -205,11 +206,14 @@ namespace ExtensibleOpeningManager.Tools.Instances
                     catch (Exception) { }
                 }
             }
-            Position = GetCentroid(boxes);
+            XYZ position = GetCentroid(boxes);
+            XYZ projectedPosition = wall.WallLine.Project(position).XYZPoint;
+            Position = new XYZ(projectedPosition.X, projectedPosition.Y, position.Z);
             Width = Math.Round(LongestLine.Length, Variables.round_system_value);
             Height = Math.Round(GetCompoundHeight(geometry), Variables.round_system_value);
             Thickness = Math.Round(wall.Wall.Width, Variables.round_system_value);
             Offset = Math.Round(UserPreferences.DefaultOffset / 304.8, Variables.round_system_value);
+            Level = GetNearestLevel(doc, wall.Wall.Document.GetElement(wall.Wall.LevelId) as Level);
             if (Position.Z - wall.BoundingBox.Min.Z - Height / 2 > 0)
             {
 
@@ -227,7 +231,6 @@ namespace ExtensibleOpeningManager.Tools.Instances
             {
                 OffsetUp = 0;
             }
-            Level = GetNearestLevel(doc, wall.Wall.Document.GetElement(wall.Wall.LevelId) as Level);
             Elevation = Math.Round(Position.Z - Level.Elevation - Height / 2, Variables.round_system_value);
         }
         private XYZ GetCentroid(List<BoundingBoxXYZ> boxes)

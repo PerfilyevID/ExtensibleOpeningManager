@@ -12,7 +12,7 @@ namespace ExtensibleOpeningManager.Filters
                 if (UserPreferences.Department == Common.Collections.Department.AR)
                 {
                     FamilyInstance instance = elem as FamilyInstance;
-                    if (instance.Symbol.FamilyName != Variables.family_ar_round && instance.Symbol.FamilyName != Variables.family_ar_square)
+                    if (instance.Symbol.FamilyName != Variables.family_kr_round || instance.Symbol.FamilyName != Variables.family_kr_square || instance.Symbol.FamilyName == Variables.family_mep_round || instance.Symbol.FamilyName == Variables.family_mep_square)
                     {
                         return true;
                     }
@@ -24,7 +24,7 @@ namespace ExtensibleOpeningManager.Filters
                 if (UserPreferences.Department == Common.Collections.Department.KR)
                 {
                     FamilyInstance instance = elem as FamilyInstance;
-                    if (instance.Symbol.FamilyName != Variables.family_kr_round && instance.Symbol.FamilyName != Variables.family_kr_square)
+                    if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square || instance.Symbol.FamilyName == Variables.family_mep_round || instance.Symbol.FamilyName == Variables.family_mep_square)
                     {
                         return true;
                     }
@@ -36,7 +36,7 @@ namespace ExtensibleOpeningManager.Filters
                 if (UserPreferences.Department == Common.Collections.Department.MEP)
                 {
                     FamilyInstance instance = elem as FamilyInstance;
-                    if (instance.Symbol.FamilyName != Variables.family_mep_round && instance.Symbol.FamilyName != Variables.family_mep_square)
+                    if (instance.Symbol.FamilyName == Variables.family_ar_round || instance.Symbol.FamilyName == Variables.family_ar_square || instance.Symbol.FamilyName != Variables.family_kr_round || instance.Symbol.FamilyName != Variables.family_kr_square)
                     {
                         return true;
                     }

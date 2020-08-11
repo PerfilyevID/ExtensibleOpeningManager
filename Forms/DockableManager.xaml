@@ -23,7 +23,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="26"/>
                             <ColumnDefinition Width="26"/>
-                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Button VerticalAlignment="Top" Height="20" x:Name="btnLoopDeny2" Grid.Column="0" Content="✖" Margin="0,5,5,0" ToolTip="Пометить элементы как «Неутвержденные» и перейти к следующему шагу" Background="White" Foreground="#FFDE0909" Click="OnBtnLoopDeny"/>
@@ -174,7 +174,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="26"/>
                                 <ColumnDefinition Width="26"/>
-                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Button x:Name="btnLoopDeny" Grid.Column="0" Content="✖" Margin="0,5,5,0" ToolTip="Пометить элементы как «Неутвержденные» и перейти к следующему шагу" Background="White" Foreground="#FFDE0909" Click="OnBtnLoopDeny"/>

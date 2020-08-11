@@ -84,7 +84,10 @@ namespace DockableDialog.Forms
         }
         private void OnBtnApprove(object sender, RoutedEventArgs e)
         {
-            ModuleData.CommandQueue.Enqueue(new CommandApprove(UiController.CurrentController.Selection[0]));
+            foreach (ExtensibleElement element in UiController.CurrentController.Selection)
+            {
+                ModuleData.CommandQueue.Enqueue(new CommandApprove(element));
+            }
         }
         private void OnBtnReject(object sender, RoutedEventArgs e)
         {

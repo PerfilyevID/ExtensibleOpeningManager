@@ -1,9 +1,11 @@
 ﻿using Autodesk.Revit.DB;
+using ExtensibleOpeningManager.Tools.Instances;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Tools
 {
@@ -11,7 +13,23 @@ namespace ExtensibleOpeningManager.Tools
     {
         public static Solid GetCorrectSolid(Wall wall, Transform transform = null)
         {
-            Solid solid;
+            Solid solid = null;
+            try
+            {
+                solid = GetOptimizedWallSolid(wall);
+                if (solid != null)
+                {
+                    if (transform == null)
+                    {
+                        return solid;
+                    }
+                    else
+                    {
+                        return SolidUtils.CreateTransformed(solid, transform);
+                    }
+                }
+            }
+            catch (Exception e) { PrintError(e); }
             try
             {
                 List<Solid> solids = new List<Solid>();
@@ -41,7 +59,6 @@ namespace ExtensibleOpeningManager.Tools
                     try
                     {
                         solid = BooleanOperationsUtils.ExecuteBooleanOperation(solid, s, BooleanOperationsType.Union);
-
                     }
                     catch (Exception) { }
                 }
@@ -234,6 +251,257 @@ namespace ExtensibleOpeningManager.Tools
             }
             catch (Exception) { }
             return theSolid;
+        }
+        public static Solid GetOptimizedWallSolid(Wall wall)
+        {
+            try
+            {
+                List<Solid> solids = new List<Solid>();
+                IList<Reference> sideFaces = HostObjectUtils.GetSideFaces(wall, ShellLayerType.Exterior);
+                Element e2 = wall.Document.GetElement(sideFaces[0]);
+                Face face = e2.GetGeometryObjectFromReference(sideFaces[0]) as Face;
+                Surface surface = face.GetSurface();
+                XYZ normal = wall.Orientation;
+                XYZ NORMAL = normal;
+                IList<CurveLoop> loops = face.GetEdgesAsCurveLoops();
+                CurveLoop edgeLoop = null;
+                IList<CurveLoop> iLoops = new List<CurveLoop>();
+                foreach (CurveLoop loop in loops)
+                {
+                    if (loop.IsCounterclockwise(normal))
+                    {
+                        edgeLoop = loop;
+                        List<Line> optimizedCurves = RemoveCounterClockwiseLines(edgeLoop, surface);
+                        List<Line> saved = new List<Line>();
+                        int count = 0;
+                        while (optimizedCurves.Count != count)
+                        {
+                            saved = optimizedCurves;
+                            try
+                            {
+                                optimizedCurves = RemoveCoherentLines(optimizedCurves);
+                                optimizedCurves = JoinCurves(optimizedCurves);
+                                optimizedCurves = RemoveCoherentLines(optimizedCurves);
+                                optimizedCurves = RemoveCounterClockwiseLines(optimizedCurves, surface);
+                                optimizedCurves = JoinCurves(optimizedCurves);
+                                count = optimizedCurves.Count();
+                            }
+                            catch (Exception)
+                            {
+                                optimizedCurves = saved;
+                                break;
+                            }
+                        }
+                        CurveLoop resultLoop = new CurveLoop();
+                        foreach (Curve c in optimizedCurves)
+                        {
+                            resultLoop.Append(c);
+                        }
+                        iLoops.Add(resultLoop);
+                    }
+                }
+                return GeometryCreationUtilities.CreateExtrusionGeometry(iLoops, normal.Negate(), wall.Width, new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        private static List<Line> RemoveCounterClockwiseLines(List<Line> curveloop, Surface surface)
+        {
+            List<Line> list = new List<Line>();
+            Curve previous;
+            Curve current;
+            Curve next;
+            for (int i = 0; i < curveloop.Count(); i++)
+            {
+                if (i == 0)
+                {
+                    previous = curveloop.Last();
+                    current = curveloop.ElementAt(0);
+                    next = curveloop.ElementAt(1);
+                    if (!CounterClockVise(previous, current, next, surface))
+                    { list.Add(GetLine(current)); }
+                }
+                if (i == curveloop.Count() - 1)
+                {
+                    previous = curveloop.ElementAt(i - 1);
+                    current = curveloop.ElementAt(i);
+                    next = curveloop.ElementAt(0);
+                    if (!CounterClockVise(previous, current, next, surface))
+                    { list.Add(GetLine(current)); }
+                }
+                if (i != curveloop.Count() - 1 && i != 0)
+                {
+                    previous = curveloop.ElementAt(i - 1);
+                    current = curveloop.ElementAt(i);
+                    next = curveloop.ElementAt(i + 1);
+                    if (!CounterClockVise(previous, current, next, surface))
+                    { list.Add(GetLine(current)); }
+                }
+            }
+            return list;
+        }
+        private static List<Line> RemoveCounterClockwiseLines(CurveLoop curveloop, Surface surface)
+        {
+            List<Line> list = new List<Line>();
+            Curve previous;
+            Curve current;
+            Curve next;
+            for (int i = 0; i < curveloop.Count(); i++)
+            {
+                if (i == 0)
+                {
+                    previous = curveloop.Last();
+                    current = curveloop.ElementAt(0);
+                    next = curveloop.ElementAt(1);
+                    if (!CounterClockVise(previous, current, next, surface))
+                    { list.Add(GetLine(current)); }
+                }
+                if (i == curveloop.Count() - 1)
+                {
+                    previous = curveloop.ElementAt(i - 1);
+                    current = curveloop.ElementAt(i);
+                    next = curveloop.ElementAt(0);
+                    if (!CounterClockVise(previous, current, next, surface))
+                    { list.Add(GetLine(current)); }
+                }
+                if (i != curveloop.Count() - 1 && i != 0)
+                {
+                    previous = curveloop.ElementAt(i - 1);
+                    current = curveloop.ElementAt(i);
+                    next = curveloop.ElementAt(i + 1);
+                    if (!CounterClockVise(previous, current, next, surface))
+                    { list.Add(GetLine(current)); }
+                }
+            }
+            return list;
+        }
+        private static Line GetLine(Curve curve)
+        {
+            return Line.CreateBound(curve.GetEndPoint(0), curve.GetEndPoint(1));
+        }
+        private static List<Line> JoinCurves(List<Line> curves)
+        {
+            List<XYZ> points = new List<XYZ>();
+            Line current;
+            Line next;
+            List<Line> curveLoop = new List<Line>();
+            for (int i = 0; i < curves.Count; i++)
+            {
+                if (i == curves.Count - 1)
+                {
+                    current = curves.ElementAt(i);
+                    next = curves.ElementAt(0);
+                    try
+                    {
+                        points.Add(FindIntersection(current, next));
+                    }
+                    catch (Exception) { }
+                }
+                else
+                {
+                    current = curves.ElementAt(i);
+                    next = curves.ElementAt(i + 1);
+                    try
+                    {
+                        points.Add(FindIntersection(current, next));
+                    }
+                    catch (Exception) { }
+                }
+            }
+            for (int i = 0; i < points.Count; i++)
+            {
+                if (i == curves.Count - 1)
+                {
+                    try
+                    {
+                        curveLoop.Add(Line.CreateBound(points[i], points[0]));
+                    }
+                    catch (Exception)
+                    { }
+                }
+                else
+                {
+                    try
+                    {
+                        curveLoop.Add(Line.CreateBound(points[i], points[i + 1]));
+                    }
+                    catch (Exception) { }
+                }
+            }
+            return curveLoop;
+        }
+        private static XYZ FindIntersection(Line curve_a, Line curve_b)
+        {
+
+            Line curve_A = Line.CreateBound(curve_a.GetEndPoint(0) + (curve_a as Line).Direction.Negate() * 200, curve_a.GetEndPoint(1) + (curve_a as Line).Direction * 200);
+            Line curve_B = Line.CreateBound(curve_b.GetEndPoint(0) + (curve_b as Line).Direction.Negate() * 200, curve_b.GetEndPoint(1) + (curve_b as Line).Direction * 200);
+            IntersectionResultArray result;
+            curve_A.Intersect(curve_B, out result);
+            try
+            {
+                foreach (IntersectionResult i in result)
+                {
+                    try
+                    {
+                        return i.XYZPoint;
+                    }
+                    catch (Exception) { }
+                }
+            }
+            catch (Exception) { }
+            IList<ClosestPointsPairBetweenTwoCurves> res = new List<ClosestPointsPairBetweenTwoCurves>();
+            curve_A.ComputeClosestPoints(curve_B, false, false, false, out res);
+            foreach (var i in res)
+            {
+                return i.XYZPointOnFirstCurve;
+            }
+            return null;
+        }
+        private static List<Line> RemoveCoherentLines(List<Line> curves)
+        {
+            int r = 3;
+            List<Line> optimizedCurves = new List<Line>();
+            for (int i = 0; i < curves.Count(); i++)
+            {
+                if (i == 0)
+                {
+                    if (curves[i].Direction.ToString() != curves[i + 1].Direction.ToString() && curves[i].Direction.ToString() != curves[i + 1].Direction.Negate().ToString())
+                    {
+                        optimizedCurves.Add(curves[i]);
+                    }
+                }
+                if (i == curves.Count() - 1)
+                {
+                    if (curves[i].Direction.ToString() != curves[0].Direction.ToString() && curves[i].Direction.ToString() != curves[0].Direction.Negate().ToString())
+                    {
+                        optimizedCurves.Add(curves[i]);
+                    }
+                }
+                if (i != curves.Count() - 1 && i != 0)
+                {
+                    if (curves[i].Direction.ToString() != curves[i + 1].Direction.ToString() && curves[i].Direction.ToString() != curves[i + 1].Direction.Negate().ToString())
+                    {
+                        optimizedCurves.Add(curves[i]);
+                    }
+                }
+            }
+            return optimizedCurves;
+        }
+        private static bool CounterClockVise(Curve previous, Curve current, Curve next, Surface surface)
+        {
+            UVLine pr = new UVLine(previous, surface);
+            UVLine cr = new UVLine(current, surface);
+            UVLine nt = new UVLine(next, surface);
+            if (cr.AngleTo(nt) > 180 || pr.AngleTo(cr) > 180)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

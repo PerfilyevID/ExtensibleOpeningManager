@@ -110,6 +110,7 @@ namespace ExtensibleOpeningManager.Controll
         {
             if (!args.IsCancelled())
             {
+                CurrentController = null;
                 Controllers.Remove(this);
             }
         }
@@ -464,10 +465,11 @@ namespace ExtensibleOpeningManager.Controll
                         DockablePreferences.Page.btnPlaceOnSelectedTask2.Visibility = System.Windows.Visibility.Visible;
                         break;
                     case Collections.Department.MEP:
+                        LoopController.UpdateButtonToolTips();
                         DockablePreferences.Page.cbxDepartment.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.cbxDepartment.Text = UserPreferences.SubDepartment;
                         DockablePreferences.Page.lblDepartmentHeader.Visibility = System.Windows.Visibility.Visible;
-                        DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Collapsed;
@@ -551,6 +553,7 @@ namespace ExtensibleOpeningManager.Controll
                 bool isSingleSelection = Selection.Count == 1;
                 bool isNotApproved = false;
                 bool isNotRejected = false;
+                bool isByOpening = false;
                 bool isNotCommitedWall = false;
                 if (Selection.Count != 0)
                 {
@@ -565,6 +568,25 @@ namespace ExtensibleOpeningManager.Controll
                 bool isNotFoundElementsInElement = false;
                 foreach (ExtensibleElement el in Selection)
                 {
+                    foreach (ExtensibleSubElement subelement in el.SubElements)
+                    {
+                        try
+                        {
+                            if (subelement.GetType() == typeof(SE_LinkedInstance))
+                            {
+                                string familyName = (subelement.Element as FamilyInstance).Symbol.FamilyName;
+                                if (familyName == Variables.family_ar_round ||
+                                    familyName == Variables.family_ar_square ||
+                                    familyName == Variables.family_kr_round ||
+                                    familyName == Variables.family_kr_square)
+                                {
+                                    isByOpening = true;
+                                }
+                            }
+                        }
+                        catch (Exception) { }
+                    }
+                    
                     if (el.HasUnfoundSubElements() || el.WallStatus == Collections.WallStatus.NotFound)
                     {
                         isNotFoundElementsInElement = true;
@@ -580,19 +602,6 @@ namespace ExtensibleOpeningManager.Controll
                     }
                     string[] parts_saved = el.SavedData.Split(new string[] { Variables.separator_element }, StringSplitOptions.None);
                     string[] parts_current = el.ToString().Split(new string[] { Variables.separator_element }, StringSplitOptions.None);
-                    /*
-                    Instance.Id.ToString()
-                    Status.ToString()
-                    ExtensibleConverter.ConvertLocation(Instance.Location)
-                    ExtensibleConverter.ConvertPoint(Instance.FacingOrientation)
-                    Instance.Symbol.Id.ToString()
-                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_height).AsDouble())
-                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_offset_bounds).AsDouble())
-                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_thickness).AsDouble())
-                    ExtensibleConverter.ConvertDouble(Instance.LookupParameter(Variables.parameter_width).AsDouble())
-                    ExtensibleConverter.ConvertDouble(Instance.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble())
-                    Instance.LevelId.ToString()
-                     */
                     if (parts_saved[0] != parts_current[0] ||
                         parts_saved[2] != parts_current[2] ||
                         parts_saved[3] != parts_current[3] ||
@@ -639,7 +648,7 @@ namespace ExtensibleOpeningManager.Controll
                 DockablePreferences.Page.btnSwap.Visibility = System.Windows.Visibility.Collapsed;
                 DockablePreferences.Page.btnUngroup.Visibility = System.Windows.Visibility.Collapsed;
                 DockablePreferences.Page.btnUpdate.Visibility = System.Windows.Visibility.Collapsed;
-                if (isSingleSelection)
+                if (isSingleSelection && !isByOpening)
                 {
                     DockablePreferences.Page.btnAddSubElement.Visibility = System.Windows.Visibility.Visible;
                 }
@@ -655,7 +664,7 @@ namespace ExtensibleOpeningManager.Controll
                 {
                     DockablePreferences.Page.btnApprove.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isSelectionOfSingleWall && !isRoundInSelection && !isSingleSelection && !isNotFoundElementsInElement)
+                if (isSelectionOfSingleWall && !isRoundInSelection && !isSingleSelection && !isNotFoundElementsInElement && !isByOpening)
                 {
                     DockablePreferences.Page.btnGroup.Visibility = System.Windows.Visibility.Visible;
                 }

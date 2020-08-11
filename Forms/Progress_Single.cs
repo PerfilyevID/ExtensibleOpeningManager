@@ -13,7 +13,7 @@ namespace ExtensibleOpeningManager.Forms
     public partial class Progress_Single : Form
     {
         public string _format;
-        public Progress_Single(string header, string format, int max)
+        public Progress_Single(string header, string format, int max, int current = 0)
         {
             _format = format;
             InitializeComponent();
@@ -23,7 +23,7 @@ namespace ExtensibleOpeningManager.Forms
             Titile_lbl.Text = header;
             progressBar1.Minimum = 0;
             progressBar1.Maximum = max;
-            progressBar1.Value = 0;
+            progressBar1.Value = current;
             Show();
             System.Windows.Forms.Application.DoEvents();
         }

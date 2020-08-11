@@ -20,6 +20,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             LinkId = new ElementId(-1);
             Wall = wall;
             Transform = null;
+            WallLine = (wall.Location as LocationCurve).Curve as Line;
             Solid = GeometryTools.GetCorrectSolid(Wall, Transform);
             BoundingBox = new BoundingBoxXYZ();
             BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
@@ -31,6 +32,8 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             LinkId = revitLinkInstance.Id;
             Wall = wall;
             Transform = revitLinkInstance.GetTransform();
+            Line wallLine = (wall.Location as LocationCurve).Curve as Line;
+            WallLine = wallLine.CreateTransformed(Transform) as Line;
             Solid = GeometryTools.GetCorrectSolid(Wall, Transform);
             BoundingBox = new BoundingBoxXYZ();
             BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
@@ -79,6 +82,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
         }
         public Transform Transform { get; set; }
         public BoundingBoxXYZ BoundingBox { get; set; }
+        public Line WallLine { get; set; }
         public override string ToString()
         {
             double area = Solid.SurfaceArea;
@@ -152,12 +156,18 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             }
             if (wall != null)
             {
+                Line wallLine = (wall.Location as LocationCurve).Curve as Line;
+
                 BoundingBoxXYZ BoundingBox = new BoundingBoxXYZ();
                 BoundingBox.Max = solid.GetBoundingBox().Max + solid.ComputeCentroid();
                 BoundingBox.Min = solid.GetBoundingBox().Min + solid.ComputeCentroid();
                 Transform transform = null;
-                if (link != null) { transform = link.GetTransform(); }
-                return new SE_LinkedWall() { Wall = wall, SavedAsConcrete = savedAsConcrete, Solid = solid, Document = wall.Document, LinkId = linkId, Transform = transform, BoundingBox = BoundingBox };
+                if (link != null)
+                {
+                    transform = link.GetTransform();
+                    wallLine = wallLine.CreateTransformed(transform) as Line;
+                }
+                return new SE_LinkedWall() { Wall = wall, WallLine = wallLine, SavedAsConcrete = savedAsConcrete, Solid = solid, Document = wall.Document, LinkId = linkId, Transform = transform, BoundingBox = BoundingBox };
             }
             else
             { 

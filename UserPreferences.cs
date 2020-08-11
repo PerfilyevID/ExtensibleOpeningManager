@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using static KPLN_Loader.Common.SQLDepartmentInfo;
 using static ExtensibleOpeningManager.Common.Collections;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager
 {
@@ -60,8 +61,9 @@ namespace ExtensibleOpeningManager
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                PrintError(e);
                 SubDepartment = "ОВ";
                 PlaceOnArchitecturalWalls = true;
                 PlaceOnStructuralWalls = true;

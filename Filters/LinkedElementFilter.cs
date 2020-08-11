@@ -6,14 +6,16 @@ namespace ExtensibleOpeningManager.Filters
 {
     public class LinkedElementFilter : ISelectionFilter
     {
-        private static BuiltInCategory[] CategoryListMEP = new BuiltInCategory[] { BuiltInCategory.OST_DuctCurves,
+        private static BuiltInCategory[] CategoryListMEP = new BuiltInCategory[] {
+                                    BuiltInCategory.OST_DuctCurves,
                                     BuiltInCategory.OST_PipeCurves,
                                     BuiltInCategory.OST_Conduit,
                                     BuiltInCategory.OST_CableTray,
                                     BuiltInCategory.OST_FlexDuctCurves,
                                     BuiltInCategory.OST_DuctFitting,
                                     BuiltInCategory.OST_ConduitFitting,
-                                    BuiltInCategory.OST_PipeFitting};
+                                    BuiltInCategory.OST_PipeFitting,
+                                    BuiltInCategory.OST_DuctAccessory};
         public static List<int> GetAllowedCategories(Document doc)
         {
             List<int> categories = new List<int>();

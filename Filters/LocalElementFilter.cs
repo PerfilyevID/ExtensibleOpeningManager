@@ -13,7 +13,8 @@ namespace ExtensibleOpeningManager.Filters
                                     BuiltInCategory.OST_FlexDuctCurves,
                                     BuiltInCategory.OST_DuctFitting,
                                     BuiltInCategory.OST_ConduitFitting,
-                                    BuiltInCategory.OST_PipeFitting};
+                                    BuiltInCategory.OST_PipeFitting,
+                                    BuiltInCategory.OST_DuctAccessory};
         public static List<int> GetAllowedCategories(Document doc)
         {
             List<int> categories = new List<int>();

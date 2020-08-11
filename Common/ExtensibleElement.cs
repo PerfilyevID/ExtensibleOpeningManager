@@ -360,7 +360,7 @@ namespace ExtensibleOpeningManager.Common
             {
                 Solid s = IntersectionTools.SolidIntersection(Wall.Solid, subElement.Solid);
                 if (s.Volume > 0.000001)
-                {
+                {  
                     intersections.Add(new Intersection(subElement.Element, s));
                 }
             }
@@ -387,7 +387,12 @@ namespace ExtensibleOpeningManager.Common
                     catch (Exception) { }
                     Instance.LookupParameter(Variables.parameter_height).Set(placeParameters.Height);
                     Instance.LookupParameter(Variables.parameter_thickness).Set(placeParameters.Thickness);
-                    Instance.LookupParameter(Variables.parameter_width).Set(placeParameters.Width);
+                    try
+                    {
+                        Instance.LookupParameter(Variables.parameter_width).Set(placeParameters.Width);
+                    }
+                    catch (Exception)
+                    { }
                     Instance.LookupParameter(Variables.parameter_offset_down).Set(placeParameters.OffsetDown);
                     Instance.LookupParameter(Variables.parameter_offset_up).Set(placeParameters.OffsetUp);
                     try
@@ -461,7 +466,7 @@ namespace ExtensibleOpeningManager.Common
                         if (SubElements[0].GetType() == typeof(SE_LinkedInstance))
                         {
                             string fam = (SubElements[0].Element as FamilyInstance).Symbol.FamilyName;
-                            if (fam == Variables.family_mep_round)
+                            if (fam == Variables.family_mep_round || fam == Variables.family_ar_round || fam == Variables.family_kr_round)
                             { isRound = true; }
                         }
                         if (SubElements.Count == 1 || isRound)

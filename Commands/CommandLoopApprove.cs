@@ -24,7 +24,11 @@ namespace ExtensibleOpeningManager.Commands
             {
                 foreach (ExtensibleElement element in Controller.CreatedElements)
                 {
-                    element.Apply();
+                    try
+                    {
+                        element.Apply();
+                    }
+                    catch (Exception) { }
                 }
                 Controller.CreatedElements.Clear();
                 Controller.Next();

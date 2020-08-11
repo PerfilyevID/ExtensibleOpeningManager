@@ -32,11 +32,19 @@ namespace ExtensibleOpeningManager.Tools
         }
         public static FamilyInstance GroupInstance(SE_LinkedWall wall, List<ExtensibleElement> elements, Document doc)
         {
+            string defaultType = "";
+            HashSet<string> types = new HashSet<string>();
+            string defaultTypesDescription = "";
             List<Intersection> Intersections = new List<Intersection>();
             foreach (ExtensibleElement element in elements)
             {
                 foreach (ExtensibleSubElement subElement in element.SubElements)
                 {
+                    if (subElement.GetType() == typeof(SE_LinkedInstance))
+                    {
+                        types.Add((subElement.Element as FamilyInstance).Symbol.Name);
+                        defaultType = (subElement.Element as FamilyInstance).Symbol.Name;
+                    }
                     if (subElement.GetType() == typeof(SE_LinkedInstance))
                     {
                         if ((subElement.Element as FamilyInstance).Symbol.FamilyName == Variables.family_mep_round)
@@ -56,11 +64,44 @@ namespace ExtensibleOpeningManager.Tools
             }
             if (UserPreferences.Department == Department.MEP)
             {
-                return CreateFamilyInstance(new PlaceParameters(wall, Intersections, doc), doc, SymbolType.Square);
+                PlaceParameters creationParameters = new PlaceParameters(wall, Intersections, doc);
+                if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
+                {
+                    return CreateFamilyInstance(creationParameters, doc, SymbolType.Square);
+                }
+                return null;
             }
             else 
             {
-                return CreateFamilyInstance(wall, new PlaceParameters(wall, Intersections, doc), doc, SymbolType.Square);
+                if (types.Count > 1)
+                {
+                    foreach (var i in types)
+                    {
+                        if (defaultTypesDescription != "")
+                        { defaultTypesDescription += ", "; }
+                        defaultTypesDescription += i; }
+                    PlaceParameters creationParameters = new PlaceParameters(wall, Intersections, doc);
+                    if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
+                    {
+                        FamilyInstance createdInstance = CreateFamilyInstance(wall, creationParameters, doc, SymbolType.Square, "Несколько категорий");
+                        try
+                        {
+                            createdInstance.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(defaultTypesDescription);
+                        }
+                        catch (System.Exception) { }
+                        return createdInstance;
+                    }
+                    return null;
+                }
+                else
+                {
+                    PlaceParameters creationParameters = new PlaceParameters(wall, Intersections, doc);
+                    if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
+                    {
+                        return CreateFamilyInstance(creationParameters, doc, SymbolType.Square, defaultType);
+                    }
+                    return null;
+                }
             }
         }
         public static FamilyInstance CreateFamilyInstance(SE_LinkedWall wall, ExtensibleSubElement subElement, Document doc)
@@ -68,11 +109,12 @@ namespace ExtensibleOpeningManager.Tools
             Intersection intersection = new Intersection(subElement.Element, IntersectionTools.SolidIntersection(wall.Solid, subElement.Solid));
             if (UserPreferences.Department != Department.MEP)
             {
+                string symbolType = (subElement.Element as FamilyInstance).Symbol.Name;
                 PlaceParameters creationParameters = null;
                 SymbolType type = SymbolType.Square;
                 if (subElement.GetType() == typeof(SE_LinkedInstance))
                 {
-                    if ((subElement.Element as FamilyInstance).Symbol.FamilyName == Variables.family_mep_round)
+                    if ((subElement.Element as FamilyInstance).Symbol.FamilyName == Variables.family_mep_round || (subElement.Element as FamilyInstance).Symbol.FamilyName == Variables.family_ar_round || (subElement.Element as FamilyInstance).Symbol.FamilyName == Variables.family_kr_round)
                     {
                         type = SymbolType.Round;
                         intersection = new Intersection(subElement.Element, subElement.Solid);
@@ -83,16 +125,29 @@ namespace ExtensibleOpeningManager.Tools
                         creationParameters = new PlaceParameters(wall, intersection, doc);
                     }
                 }
-                return CreateFamilyInstance(wall, creationParameters, doc, type);
+                if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
+                { 
+                    return CreateFamilyInstance(wall, creationParameters, doc, type, symbolType);
+                }
             }
             else
             {
-                return CreateFamilyInstance(new PlaceParameters(wall, intersection, doc), doc, SymbolType.Square);
+                PlaceParameters creationParameters = new PlaceParameters(wall, intersection, doc);
+                if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
+                { 
+                    return CreateFamilyInstance(creationParameters, doc, SymbolType.Square);
+                }
             }
+            return null;
         }
         public static FamilyInstance CreateFamilyInstance(SE_LinkedWall wall, Intersection intersection, Document doc)
         {
-            return CreateFamilyInstance(new PlaceParameters(wall, intersection, doc), doc, SymbolType.Square);
+            PlaceParameters creationParameters = new PlaceParameters(wall, intersection, doc);
+            if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
+            {
+                return CreateFamilyInstance(creationParameters, doc, SymbolType.Square);
+            }
+            return null;
         }
         private static FamilyInstance CreateFamilyInstance(PlaceParameters parameters, Document doc, SymbolType type, string subType = null)
         {

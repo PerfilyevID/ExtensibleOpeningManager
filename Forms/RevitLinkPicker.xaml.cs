@@ -38,6 +38,7 @@ namespace ExtensibleOpeningManager.Forms
 
         private void OnBtnApply(object sender, RoutedEventArgs args)
         {
+            Dialogs.ShowDialog("При работе с данным инструментом необходимо предварительно подготовить и открыть 3D вид с настроенной графикой отображения специально для расстановки отверстий", "Совет");
             List<RevitLinkInstance> revitLinkInstances = new List<RevitLinkInstance>();
             WPFSource<RLI_element> collection = LinkControll.DataContext as WPFSource<RLI_element>;
             foreach (RLI_element wpfElement in collection.Collection)

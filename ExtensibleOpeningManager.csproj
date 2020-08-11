@@ -163,6 +163,7 @@
     <Compile Include="Tools\GeometryTools.cs" />
     <Compile Include="Tools\Instances\Intersection.cs" />
     <Compile Include="Tools\Instances\PlaceParameters.cs" />
+    <Compile Include="Tools\Instances\UVLine.cs" />
     <Compile Include="Tools\IntersectionTools.cs" />
     <Compile Include="Controll\LoopController.cs" />
     <Compile Include="Tools\UiTools.cs" />

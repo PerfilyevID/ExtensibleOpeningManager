@@ -25,22 +25,27 @@ namespace ExtensibleOpeningManager.Commands
                     matrix = new Matrix.Matrix<Element>(CollectorTools.GetMepElements(app.ActiveUIDocument.Document));
                     context = matrix.GetContext(wall);
                 }
-                catch (System.Exception)
+                catch (System.Exception e)
                 {
+                    PrintError(e);
                     return Result.Failed;
                 }
                 foreach (Intersection intersection in context)
                 {
-                    if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection, wall))
+                    try
                     {
-                        continue;
+                        if (UiController.GetControllerByDocument(app.ActiveUIDocument.Document).IntersectionExist(intersection, wall))
+                        {
+                            continue;
+                        }
+                        ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, intersection, app.ActiveUIDocument.Document));
+                        element.SetWall(wall);
+                        element.AddSubElement(new SE_LocalElement(intersection.Element));
+                        element.Reject();
+                        element.AddComment(Variables.msg_created);
+                        element.Approve(true);
                     }
-                    ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, intersection, app.ActiveUIDocument.Document));
-                    element.SetWall(wall);
-                    element.AddSubElement(new SE_LocalElement(intersection.Element));
-                    element.Reject();
-                    element.AddComment(Variables.msg_created);
-                    element.Approve(true);
+                    catch (System.Exception) { }
                 }
                 return Result.Succeeded;
             }

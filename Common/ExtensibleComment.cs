@@ -87,7 +87,6 @@ namespace ExtensibleOpeningManager.Common
             StackPanel spBody = new StackPanel() { Orientation = Orientation.Vertical };
             StackPanel spUser = new StackPanel() { Orientation = Orientation.Horizontal };
             Button btnClose = new Button() { Content = "❌", Width = 14, Height = 14, VerticalAlignment = VerticalAlignment.Top, Background = null, FontSize = 6, BorderBrush = fgColor, Foreground = fgColor, Margin = new Thickness() { Left = 2, Top = 2, Right = 2, Bottom = 2 } };
-            TextBlock tbSysUser = new TextBlock() { Text = User, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top, FontSize = 12, Foreground = fgColor, Margin = new Thickness() { Left = 1.5, Top = 1.5, Right = 1.5, Bottom = 1.5 } };
             TextBlock tbDate = new TextBlock() { Text = Time.ToString("G"), Margin = new Thickness() { Left = 5, Top = 5, Right = 5, Bottom = 5 } };
             TextBlock tbFrom = new TextBlock() { Text = "от:", VerticalAlignment = VerticalAlignment.Bottom, FontSize = 10, Margin = new Thickness() { Left = 5, Top = 0, Right = 1, Bottom = 0 } };
             TextBlock tbUser = new TextBlock() { Text = GetUserNameBySystemName(User) };
@@ -101,7 +100,6 @@ namespace ExtensibleOpeningManager.Common
             spBody.Children.Add(spUser);
             spBody.Children.Add(sp);
             spBody.Children.Add(tbMessage);
-            spControlls.Children.Add(tbSysUser);
             if (UserPreferences.Department == Department && Parent != null && user.SystemName == KPLN_Loader.Preferences.User.SystemName && Message != Variables.msg_created && Message != Variables.msg_approved && Message != Variables.msg_rejected)
             { spControlls.Children.Add(btnClose); }
             grid.Children.Add(rectangle);

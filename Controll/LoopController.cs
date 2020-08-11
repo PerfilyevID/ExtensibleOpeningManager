@@ -22,6 +22,7 @@ namespace ExtensibleOpeningManager.Controll
         private Matrix<Element> Matrix { get; set; }
         private Document Document { get; set; }
         private Queue<SE_LinkedWall> Walls { get; set; }
+        private int Max { get; set; }
         public LoopController(Document doc)
         {
             IsActive = false;
@@ -47,7 +48,7 @@ namespace ExtensibleOpeningManager.Controll
                 { }
             }
             string format = "{0} из " + max.ToString() + " стен обработано";
-            using (Progress_Single progress = new Progress_Single("Подготовка", format, max))
+            using (Progress_Single progress = new Progress_Single("Поиск новых пересечений", format, max))
             {
                 foreach (RevitLinkInstance instance in revitLinks)
                 {
@@ -86,6 +87,7 @@ namespace ExtensibleOpeningManager.Controll
             {
                 Walls.Enqueue(wall);
             }
+            Max = Walls.Count;
             if (Walls.Count == 0)
             {
                 Dialogs.ShowDialog("Новых пересечений не найдено!", "Предупреждение");
@@ -94,8 +96,22 @@ namespace ExtensibleOpeningManager.Controll
             }
             UiController.CurrentController.UpdateEnability();
         }
+        public void UpdateButtonToolTips()
+        {
+            if (IsActive)
+            {
+                DockablePreferences.Page.btnLoopNext.Content = string.Format("Далее {0}/{1}", (Max - Walls.Count).ToString(), Max.ToString());
+                DockablePreferences.Page.btnLoopNext2.Content = string.Format("Далее {0}/{1}", (Max - Walls.Count).ToString(), Max.ToString());
+            }
+            else
+            {
+                DockablePreferences.Page.btnLoopNext.Content = "Далее";
+                DockablePreferences.Page.btnLoopNext2.Content = "Далее";
+            }
+        }
         public void Next()
         {
+
             CreatedElements.Clear();
             if (Walls.Count != 0)
             {

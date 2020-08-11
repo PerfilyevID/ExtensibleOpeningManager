@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using ExtensibleOpeningManager.Extensible;
+using ExtensibleOpeningManager.Tools;
 using System;
 using System.Collections.Generic;
 using static KPLN_Loader.Output.Output;
@@ -139,27 +140,14 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Element = element;
             Id = Element.Id.IntegerValue;
             LinkId = linkInstance.Id;
-            try
+            if ((element as FamilyInstance).Symbol.FamilyName == Variables.family_mep_round || (element as FamilyInstance).Symbol.FamilyName == Variables.family_mep_square)
             {
-                foreach (GeometryObject geometry in Element.get_Geometry(new Options() { DetailLevel = ViewDetailLevel.Fine, IncludeNonVisibleObjects = false }).GetTransformed(transform))
-                {
-                    if (geometry.GetType() == typeof(Solid))
-                    {
-                        if (Solid == null)
-                        {
-                            Solid = geometry as Solid;
-                        }
-                        else
-                        {
-                            if (Solid.Volume < (geometry as Solid).Volume)
-                            {
-                                Solid = geometry as Solid;
-                            }
-                        }
-                    }
-                }
+                Solid = GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Fine);
             }
-            catch (Exception e) { PrintError(e); }
+            else
+            {
+                Solid = GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Coarse);
+            }
             try
             {
                 Guid = ExtensibleController.Read(Element as FamilyInstance, Collections.ExtensibleParameter.Document);
