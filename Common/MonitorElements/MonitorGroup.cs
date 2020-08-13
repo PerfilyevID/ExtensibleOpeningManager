@@ -2,10 +2,8 @@
 using ExtensibleOpeningManager.Forms;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Data;
 using static ExtensibleOpeningManager.Common.Collections;
-using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Common.MonitorElements
 {

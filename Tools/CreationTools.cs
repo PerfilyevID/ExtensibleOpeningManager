@@ -5,7 +5,6 @@ using ExtensibleOpeningManager.Forms;
 using ExtensibleOpeningManager.Tools.Instances;
 using System.Collections.Generic;
 using static ExtensibleOpeningManager.Common.Collections;
-using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Tools
 {
@@ -98,7 +97,7 @@ namespace ExtensibleOpeningManager.Tools
                     PlaceParameters creationParameters = new PlaceParameters(wall, Intersections, doc);
                     if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
                     {
-                        return CreateFamilyInstance(creationParameters, doc, SymbolType.Square, defaultType);
+                        return CreateFamilyInstance(wall, creationParameters, doc, SymbolType.Square, defaultType);
                     }
                     return null;
                 }

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using static ExtensibleOpeningManager.Common.Collections;
-using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Common.MonitorElements
 {
@@ -41,6 +40,17 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
                     { tipParts.Add("Стена-основа: Неутвержденные изменения"); }
                     if (element.HasUncommitedSubElements())
                     { tipParts.Add("Субэлементы: Неутвержденные изменения"); }
+                }
+                else
+                {
+                    if (element.ActiveRemarks.Count != 0)
+                    {
+                        Source = new Source.Source(Collections.ImageMonitor.Warning);
+                    }
+                    else
+                    {
+                        Source = new Source.Source(Collections.ImageMonitor.Ok);
+                    }
                 }
             }
             if (element.ActiveRemarks.Count != 0)

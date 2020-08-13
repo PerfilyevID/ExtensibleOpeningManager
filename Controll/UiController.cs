@@ -9,8 +9,6 @@ using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Tools.Instances;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using static ExtensibleOpeningManager.Common.Collections;
 using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Controll
@@ -276,7 +274,7 @@ namespace ExtensibleOpeningManager.Controll
                         }
                     }
                 }
-                catch (Exception e) { PrintError(e); }
+                catch (Exception) { }
             }
             return false;
         }

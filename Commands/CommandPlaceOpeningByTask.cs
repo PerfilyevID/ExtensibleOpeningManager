@@ -6,14 +6,9 @@ using ExtensibleOpeningManager.Controll;
 using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Forms;
 using ExtensibleOpeningManager.Tools;
-using ExtensibleOpeningManager.Tools.Instances;
 using KPLN_Loader.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Commands
 {

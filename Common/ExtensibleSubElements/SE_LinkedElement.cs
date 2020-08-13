@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using ExtensibleOpeningManager.Extensible;
-using ExtensibleOpeningManager.Matrix;
 using ExtensibleOpeningManager.Tools;
 using System;
 using System.Collections.Generic;

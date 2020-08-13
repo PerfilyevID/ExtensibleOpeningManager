@@ -77,7 +77,6 @@
     <Compile Include="Commands\CommandShowPane.cs" />
     <Compile Include="Commands\CommandHidePane.cs" />
     <Compile Include="Commands\CommandLoopPlaceTaskOnPickedWall.cs" />
-    <Compile Include="Commands\CommandPlaceOpeningByOpening.cs" />
     <Compile Include="Commands\CommandPlaceOpeningByTask.cs" />
     <Compile Include="Commands\CommandPlaceTaskOnPickedWall.cs" />
     <Compile Include="Commands\CommandReject.cs" />

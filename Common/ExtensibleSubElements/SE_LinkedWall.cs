@@ -1,10 +1,8 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.IFC;
 using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Tools;
 using System;
 using System.Collections.Generic;
-using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
 {

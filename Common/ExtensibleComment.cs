@@ -1,5 +1,4 @@
-﻿using ExtensibleOpeningManager.Controll;
-using KPLN_Loader.Common;
+﻿using KPLN_Loader.Common;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -7,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using static ExtensibleOpeningManager.Common.Collections;
-using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Common
 {

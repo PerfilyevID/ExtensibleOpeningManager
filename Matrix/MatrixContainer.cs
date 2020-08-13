@@ -6,7 +6,6 @@ using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Tools.Instances;
 using System;
 using System.Collections.Generic;
-using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Matrix
 {

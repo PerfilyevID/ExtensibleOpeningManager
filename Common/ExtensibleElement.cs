@@ -9,7 +9,6 @@ using ExtensibleOpeningManager.Tools.Instances;
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Controll;
-using ExtensibleOpeningManager.Matrix;
 using System.Collections.ObjectModel;
 using ExtensibleOpeningManager.Commands;
 
@@ -364,19 +363,26 @@ namespace ExtensibleOpeningManager.Common
                     intersections.Add(new Intersection(subElement.Element, s));
                 }
             }
-            bool isByRoundMepTask = false;
+            bool isByRoundTask = false;
             if (SubElements.Count == 1)
             {
                 if (SubElements[0].GetType() == typeof(SE_LinkedInstance))
                 {
-                    if ((SubElements[0].Element as FamilyInstance).Symbol.FamilyName == Variables.family_mep_round)
+                    string famName = (SubElements[0].Element as FamilyInstance).Symbol.FamilyName;
+                    if (famName == Variables.family_mep_round ||
+                        famName == Variables.family_ar_round ||
+                        famName == Variables.family_kr_round)
                     {
-                        isByRoundMepTask = true;
+                        isByRoundTask = true;
                     }
                 }
             }
-            if (!isByRoundMepTask)
+            if (!isByRoundTask)
             {
+                string type = Instance.Symbol.Name;
+                try { Instance.Symbol = FamilyTools.GetSquareFamilySymbol(Instance.Document, type); }
+                catch (Exception e) { PrintError(e); }
+                Instance.Document.Regenerate();
                 PlaceParameters placeParameters = new PlaceParameters(Wall, intersections, Instance.Document);
                 try
                 {
@@ -418,6 +424,10 @@ namespace ExtensibleOpeningManager.Common
             }
             else 
             {
+                string type = Instance.Symbol.Name;
+                try { Instance.Symbol = FamilyTools.GetRoundFamilySymbol(Instance.Document, type); }
+                catch (Exception e) { PrintError(e); }
+                Instance.Document.Regenerate();
                 Intersection intersect = new Intersection(SubElements[0].Element, SubElements[0].Solid);
                 PlaceParameters placeParameters = new PlaceParameters(Wall, intersect, Instance.Document);
                 try
@@ -744,7 +754,7 @@ namespace ExtensibleOpeningManager.Common
                     }
                 }
             }
-            catch (Exception e) { PrintError(e); }
+            catch (Exception) { }
             
         }
     }

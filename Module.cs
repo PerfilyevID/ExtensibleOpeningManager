@@ -12,7 +12,6 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Interop;
 using System.Windows;
-using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Commands;
 using System.Windows.Media.Imaging;
 
@@ -35,8 +34,23 @@ namespace ExtensibleOpeningManager
                 string assembly = Assembly.GetExecutingAssembly().Location.Split(new string[] { "\\" }, StringSplitOptions.None).Last().Split('.').First();
                 #region buttons
                 RibbonPanel panel = application.CreateRibbonPanel(tabName, "Мониторинг отверстий");
-                AddPushButtonData("Открыть менеджер отверстий", "Открыть\nменеджер", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowDockablePane"), panel, new Source.Source(Common.Collections.Icon.OpenManager), false);
-                AddPushButtonData("Пользовательскте настройки модуля", "Настройки", "...", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowPreferences"), panel, new Source.Source(Common.Collections.Icon.Settings), true);
+                string description_manager = "...";
+                switch (UserPreferences.Department)
+                {
+                    case Common.Collections.Department.MEP:
+                        description_manager = "Открыть панель для расстановки и мониторинга расставленных заданий на отверстия";
+                        break;
+                    case Common.Collections.Department.AR:
+                        description_manager = "Открыть панель для расстановки и мониторинга расставленных отверстий";
+                        break;
+                    case Common.Collections.Department.KR:
+                        description_manager = "Открыть панель для расстановки и мониторинга расставленных отверстий";
+                        break;
+                    default:
+                        break;
+                }
+                AddPushButtonData("Открыть менеджер отверстий", "Открыть\nменеджер", description_manager, string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowDockablePane"), panel, new Source.Source(Common.Collections.Icon.OpenManager), false);
+                AddPushButtonData("Пользовательскте настройки модуля", "Настройки", "Открыть окно пользовательских настроек", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowPreferences"), panel, new Source.Source(Common.Collections.Icon.Settings), true);
                 #endregion
                 RegisterPane(application);
                 application.Idling += new EventHandler<IdlingEventArgs>(OnIdling);
@@ -166,7 +180,7 @@ namespace ExtensibleOpeningManager
             catch (Exception e)
             { PrintError(e); }
         }
-        private void AddPushButtonData(string name, string text, string description, string className, RibbonPanel panel, Source.Source imageSource, bool avclass, string url = @"https://kpln.kdb24.ru/article/76440/")
+        private void AddPushButtonData(string name, string text, string description, string className, RibbonPanel panel, Source.Source imageSource, bool avclass, string url = null)
         {
             PushButtonData data = new PushButtonData(name, text, Assembly.GetExecutingAssembly().Location, className);
             PushButton button = panel.AddItem(data) as PushButton;
@@ -175,9 +189,16 @@ namespace ExtensibleOpeningManager
             {
                 button.AvailabilityClassName = "ExtensibleOpeningManager.Availability.StaticAvailable";
             }
-            button.LongDescription = string.Format("{0}", Assembly.GetExecutingAssembly().Location);
+            button.LongDescription = string.Format("Верстия: {0}\nСборка: {1}-{2}", ModuleData.Version, ModuleData.Build, ModuleData.Date);
             button.ItemText = text;
-            button.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, url));
+            if (url == null)
+            {
+                button.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, ModuleData.ManualPage));
+            }
+            else
+            {
+                button.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, url));
+            }
             button.LargeImage = new BitmapImage(new Uri(imageSource.Value));
         }
         private static void RegisterPane(UIControlledApplication application)

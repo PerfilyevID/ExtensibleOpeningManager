@@ -7,7 +7,6 @@ using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Tools.Instances;
 using KPLN_Loader.Common;
 using System.Collections.Generic;
-using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Commands
 {
@@ -25,9 +24,8 @@ namespace ExtensibleOpeningManager.Commands
                     matrix = new Matrix.Matrix<Element>(CollectorTools.GetMepElements(app.ActiveUIDocument.Document));
                     context = matrix.GetContext(wall);
                 }
-                catch (System.Exception e)
+                catch (System.Exception)
                 {
-                    PrintError(e);
                     return Result.Failed;
                 }
                 foreach (Intersection intersection in context)

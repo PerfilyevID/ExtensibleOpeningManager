@@ -11,18 +11,10 @@ using ExtensibleOpeningManager.Source;
 using ExtensibleOpeningManager.Tools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using static KPLN_Loader.Output.Output;
 
 namespace DockableDialog.Forms
@@ -182,6 +174,10 @@ namespace DockableDialog.Forms
                 ModuleData.CommandQueue.Enqueue(new CommandPlaceTaskOnPickedWall());
             }
             if (UserPreferences.Department == ExtensibleOpeningManager.Common.Collections.Department.AR)
+            {
+                ModuleData.CommandQueue.Enqueue(new CommandPlaceOpeningByTaskOnPickedWall());
+            }
+            if (UserPreferences.Department == ExtensibleOpeningManager.Common.Collections.Department.KR)
             {
                 ModuleData.CommandQueue.Enqueue(new CommandPlaceOpeningByTaskOnPickedWall());
             }

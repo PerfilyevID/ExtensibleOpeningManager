@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using static KPLN_Loader.Common.SQLDepartmentInfo;
 using static ExtensibleOpeningManager.Common.Collections;
 using static KPLN_Loader.Output.Output;
 
@@ -9,25 +8,7 @@ namespace ExtensibleOpeningManager
 {
     public static class UserPreferences
     {
-        public static Department Department
-        {
-            get
-            {
-                if(KPLN_Loader.Preferences.User.Department.Code == "АР")
-                {
-                    return Department.AR;
-                }
-                if (KPLN_Loader.Preferences.User.Department.Code == "КР")
-                {
-                    return Department.KR;
-                }
-                if (KPLN_Loader.Preferences.User.Department.Code == "MEP")
-                {
-                    return Department.MEP;
-                }
-                return Department.MEP;
-            }
-        }
+        public static Department Department = Department.KR;
         public static string SubDepartment = "ОВ";
         public static bool PlaceOnArchitecturalWalls = true;
         public static bool PlaceOnStructuralWalls = true;
