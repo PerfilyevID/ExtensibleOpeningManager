@@ -263,57 +263,5 @@ namespace ExtensibleOpeningManager.Tools
             double d = Math.Sin(angleVertR);
             return new XYZ(a * b, a * c, d);
         }
-        public static void Create3DView(Document doc)
-        {
-            FillPatternElement pattern = new FilteredElementCollector(doc).OfClass(typeof(FillPatternElement)).Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
-            foreach (ViewFamilyType viewType in new FilteredElementCollector(doc).OfClass(typeof(ViewFamilyType)).WhereElementIsElementType())
-            {
-                try
-                {
-                    ViewFamilyType viewFamilyType = doc.GetElement(viewType.Id) as ViewFamilyType;
-                    if (viewFamilyType.ViewFamily == ViewFamily.ThreeDimensional)
-                    {
-                        try
-                        {
-                            View3D newView = View3D.CreateIsometric(doc, viewFamilyType.Id);
-                            newView.get_Parameter(BuiltInParameter.VIEW_NAME).Set(Variables.default3dViewName);
-                            Color colorBlack = new Color(0, 0, 0);
-                            Color colorBlue = new Color(255, 0, 0);
-                            foreach (BuiltInCategory category in CategoryListMEP)
-                            {
-                                try
-                                {
-                                    Category cat = Category.GetCategory(doc, category);
-                                    OverrideGraphicSettings settings = new OverrideGraphicSettings();
-                                    settings.SetProjectionLineColor(colorBlack);
-                                    settings.SetProjectionLineWeight(4);
-                                    settings.SetHalftone(false);
-                                    settings.SetCutForegroundPatternColor(colorBlue);
-                                    settings.SetCutForegroundPatternId(pattern.Id);
-                                    settings.SetDetailLevel(ViewDetailLevel.Fine);
-                                    newView.SetCategoryOverrides(cat.Id, settings);
-                                }
-                                catch (Exception e) { PrintError(e); }
-                            }
-                            foreach (BuiltInCategory category in CategoryListEnvironment)
-                            {
-                                try
-                                {
-                                    Category cat = Category.GetCategory(doc, category);
-                                    OverrideGraphicSettings settings = new OverrideGraphicSettings();
-                                    settings.SetHalftone(true);
-                                    settings.SetSurfaceTransparency(30);
-                                    newView.SetCategoryOverrides(cat.Id, settings);
-                                }
-                                catch (Exception) { }
-                            }
-                            return;
-                        }
-                        catch (Exception) { }
-                    }
-                }
-                catch (Exception) { }
-            }
-        }
     }
 }

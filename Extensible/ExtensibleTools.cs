@@ -130,7 +130,7 @@ namespace ExtensibleOpeningManager.Extensible
                 string[] parts = c.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.None);
                 if (subElement.GetType() == typeof(SE_LinkedElement) || subElement.GetType() == typeof(SE_LinkedInstance))
                 {
-                    if (parts[1] == subElement.Element.Id.ToString() && parts[2] == subElement.LinkId.ToString())
+                    if (parts[1] == subElement.Id.ToString() && parts[2] == subElement.LinkId.ToString())
                     {
                         continue;
                     }
@@ -141,7 +141,7 @@ namespace ExtensibleOpeningManager.Extensible
                 }
                 if(subElement.GetType() == typeof(SE_LocalElement))
                 {
-                    if (parts[1] == subElement.Element.Id.ToString() && parts[0] == Variables.type_subelement_local_element)
+                    if (parts[1] == subElement.Id.ToString() && parts[0] == Variables.type_subelement_local_element)
                     {
                         continue;
                     }

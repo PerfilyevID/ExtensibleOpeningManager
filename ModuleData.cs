@@ -6,10 +6,10 @@ namespace ExtensibleOpeningManager
 {
     public static class ModuleData
     {
-        public static string Build = "Revit 2020 AR";
+        public static string Build = "Revit 2018 MEP";
         public static string Version = "1.0.0.0b";
-        public static string Date = "2020/08/13";
-        public static string RevitVersion = "2020";
+        public static string Date = "2020/08/14";
+        public static string RevitVersion = "2018";
         public static string ManualPage = "https://kpln.kdb24.ru/article/87288/";
         public static bool SystemClosed = false;
         public static string ModuleName = "Мониторинг отверстий";
