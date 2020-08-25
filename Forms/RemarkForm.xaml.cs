@@ -11,7 +11,9 @@ namespace ExtensibleOpeningManager.Forms
     {
         public RemarkForm(RemarkType type)
         {
+            #if Revit2020
             Owner = ModuleData.RevitWindow;
+            #endif
             InitializeComponent();
             switch (type)
             {

@@ -22,7 +22,9 @@ namespace ExtensibleOpeningManager.Forms
     {
         public OffsetPicker()
         {
+            #if Revit2020
             Owner = ModuleData.RevitWindow;
+            #endif
             InitializeComponent();
         }
 

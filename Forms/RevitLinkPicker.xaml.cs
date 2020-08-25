@@ -14,7 +14,9 @@ namespace ExtensibleOpeningManager.Forms
     {
         public RevitLinkPicker(List<RevitLinkInstance> instances)
         {
+            #if Revit2020
             Owner = ModuleData.RevitWindow;
+            #endif
             InitializeComponent();
             LinkControll.DataContext = instances;
             List<RLI_element> elements = new List<RLI_element>();

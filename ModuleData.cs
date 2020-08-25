@@ -6,14 +6,22 @@ namespace ExtensibleOpeningManager
 {
     public static class ModuleData
     {
-        public static string Build = "Revit 2018 MEP";
-        public static string Version = "1.0.0.0b";
-        public static string Date = "2020/08/14";
+        #if Revit2020
+        public static string RevitVersion = "2020";
+        #endif
+        #if Revit2018
         public static string RevitVersion = "2018";
+        #endif
+        public static string Build = string.Format("Revit {0} MEP", RevitVersion);
+        public static string Version = "1.0.0.1b";
+        public static string Date = "2020/08/20";
+        
         public static string ManualPage = "https://kpln.kdb24.ru/article/87288/";
         public static bool SystemClosed = false;
         public static string ModuleName = "Мониторинг отверстий";
+        #if Revit2020
         public static Window RevitWindow { get; set; }
+        #endif
         public static readonly Queue<IExecutableCommand> CommandQueue = new Queue<IExecutableCommand>();
     }
 }

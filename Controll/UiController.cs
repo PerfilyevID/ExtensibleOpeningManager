@@ -119,8 +119,12 @@ namespace ExtensibleOpeningManager.Controll
                 List<ExtensibleElement> newElementCollection = new List<ExtensibleElement>();
                 foreach (ExtensibleElement el in Elements)
                 {
-                    ExtensibleElement elem = ExtensibleElement.GetExtensibleElementByInstance(el.Instance);
-                    newElementCollection.Add(elem);
+                    try
+                    {
+                        ExtensibleElement elem = ExtensibleElement.GetExtensibleElementByInstance(el.Instance);
+                        newElementCollection.Add(elem);
+                    }
+                    catch (Exception) { }
                 }
                 Elements = newElementCollection;
                 foreach (ExtensibleElement element in newElementCollection)
@@ -215,10 +219,10 @@ namespace ExtensibleOpeningManager.Controll
                                 }
                             }
                         }
-                        catch (Exception e) { PrintError(e); }
+                        catch (Exception) { }
                     }
                 }
-                catch (Exception e) { PrintError(e); }
+                catch (Exception) { }
             }
             return false;
         }
@@ -242,11 +246,11 @@ namespace ExtensibleOpeningManager.Controll
                                     }
                                 }
                             }
-                            catch (Exception e) { PrintError(e); }
+                            catch (Exception) { }
                         }
                     }
                 }
-                catch (Exception e) { PrintError(e); }
+                catch (Exception) { }
             }
             return false;
         }
@@ -297,7 +301,7 @@ namespace ExtensibleOpeningManager.Controll
                     AllSelectionSet = string.Join(Variables.separator_element, allSelectionSet);
                 }
             }
-            catch (Exception e) { PrintError(e); }
+            catch (Exception) { }
             List<string> newSelectionSetCollection = new List<string>();
             List<ExtensibleElement> newSelection = new List<ExtensibleElement>();
             foreach (ElementId id in elements)
@@ -328,10 +332,7 @@ namespace ExtensibleOpeningManager.Controll
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    PrintError(e);
-                }
+                catch (Exception) { }
             }
             newSelectionSetCollection.Sort();
             if (SelectionSet != string.Join(Variables.separator_element, newSelectionSetCollection))

@@ -161,6 +161,7 @@ namespace ExtensibleOpeningManager.Tools
         private static Solid GetByGeometryElement(GeometryElement geometryElement)
         {
             Solid theSolid = null;
+            List<Solid> solids = new List<Solid>();
             foreach (GeometryObject obj in geometryElement)
             {
                 try

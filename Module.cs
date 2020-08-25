@@ -27,10 +27,12 @@ namespace ExtensibleOpeningManager
         {
             try
             {
+                #if Revit2020
                 IntPtr MainWindowHandle = application.MainWindowHandle;
                 IntPtr handle = MainWindowHandle;
                 HwndSource hwndSource = HwndSource.FromHwnd(handle);
                 RevitWindow = hwndSource.RootVisual as Window;
+                #endif
                 string assembly = Assembly.GetExecutingAssembly().Location.Split(new string[] { "\\" }, StringSplitOptions.None).Last().Split('.').First();
                 #region buttons
                 RibbonPanel panel = application.CreateRibbonPanel(tabName, "Мониторинг отверстий");
@@ -125,7 +127,11 @@ namespace ExtensibleOpeningManager
                     }
                 }
             }
-            UiController.GetControllerByDocument(uiapp.ActiveUIDocument.Document).SetSelection(uiapp.ActiveUIDocument.Selection.GetElementIds());
+            try
+            {
+                UiController.GetControllerByDocument(uiapp.ActiveUIDocument.Document).SetSelection(uiapp.ActiveUIDocument.Selection.GetElementIds());
+            }
+            catch (Exception) { }
         }
         private void OnDocumentChanged(object sender, DocumentChangedEventArgs args)
         {
@@ -209,7 +215,7 @@ namespace ExtensibleOpeningManager
                 dockablePaneProviderData.FrameworkElement = DockablePreferences.Page;
                 dockablePaneProviderData.InitialState = new DockablePaneState();
                 dockablePaneProviderData.InitialState.DockPosition = DockPosition.Tabbed;
-                dockablePaneProviderData.InitialState.MinimumWidth = 400;
+                //dockablePaneProviderData.InitialState.MinimumWidth = 400;
                 dockablePaneProviderData.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser;
                 application.RegisterDockablePane(new DockablePaneId(DockablePreferences.PageGuid), "Мониторинг : Отверстия", DockablePreferences.Page as IDockablePaneProvider);
             }
