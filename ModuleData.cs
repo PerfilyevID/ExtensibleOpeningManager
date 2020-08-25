@@ -13,7 +13,7 @@ namespace ExtensibleOpeningManager
         public static string RevitVersion = "2018";
         #endif
         public static string Build = string.Format("Revit {0} MEP", RevitVersion);
-        public static string Version = "1.0.0.1b";
+        public static string Version = "1.0.0.2b";
         public static string Date = "2020/08/20";
         
         public static string ManualPage = "https://kpln.kdb24.ru/article/87288/";

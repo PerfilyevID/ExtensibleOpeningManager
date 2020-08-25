@@ -160,7 +160,6 @@ namespace ExtensibleOpeningManager.Tools
         }
         private static Solid GetByGeometryElement(GeometryElement geometryElement)
         {
-            Solid theSolid = null;
             List<Solid> solids = new List<Solid>();
             foreach (GeometryObject obj in geometryElement)
             {
@@ -169,66 +168,53 @@ namespace ExtensibleOpeningManager.Tools
                     if (obj.GetType() == typeof(Solid))
                     {
                         Solid solid = obj as Solid;
-                        if (!SolidIsValid(theSolid))
+                        if (SolidIsValid(solid))
                         {
-                            theSolid = solid;
-                            break;
-                        }
-                        else
-                        {
-                            if (solid.Volume > theSolid.Volume || !SolidIsValid(theSolid))
-                            {
-                                theSolid = solid;
-                                break;
-                            }
+                            solids.Add(solid);
                         }
                     }
                 }
                 catch (Exception) { }
             }
-            if (!SolidIsValid(theSolid))
+            foreach (GeometryObject obj in geometryElement)
             {
-                foreach (GeometryObject obj in geometryElement)
+                try
                 {
-                    try
+                    GeometryInstance gInstance = obj as GeometryInstance;
+                    if (gInstance != null)
                     {
-                        GeometryInstance geoInst = obj as GeometryInstance;
-                        if (geoInst != null)
+                        GeometryElement gElement = gInstance.GetInstanceGeometry();
+                        foreach (GeometryObject gObject in gElement)
                         {
-                            GeometryElement geoElemTmp = geoInst.GetInstanceGeometry();
-                            foreach (GeometryObject geomObjTmp in geoElemTmp)
+                            try
                             {
-                                try
+                                if (gObject.GetType() == typeof(Solid))
                                 {
-                                    if (geomObjTmp.GetType() == typeof(Solid))
+                                    Solid solid = gObject as Solid;
+                                    if (SolidIsValid(solid))
                                     {
-                                        Solid solidObj2 = geomObjTmp as Solid;
-                                        if (!SolidIsValid(theSolid) && solidObj2.Faces.Size > 0)
-                                        {
-                                            theSolid = solidObj2;
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            if (!SolidIsValid(theSolid))
-                                            {
-                                                if ((solidObj2.Volume > theSolid.Volume || !SolidIsValid(theSolid)) && solidObj2.Faces.Size > 0)
-                                                {
-                                                    theSolid = solidObj2;
-                                                    break;
-                                                }
-                                            }
-                                        }
+                                        solids.Add(solid);
                                     }
                                 }
-                                catch (Exception) { }
                             }
+                            catch (Exception) { }
                         }
                     }
-                    catch (Exception) { }
+                }
+                catch (Exception) { }
+            }
+            solids = solids.OrderBy(x => x.Volume).ToList();
+            solids.Reverse();
+            Solid combinedSolid = solids[0];
+            try
+            {
+                foreach (Solid s in solids)
+                {
+                    combinedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(combinedSolid, s, BooleanOperationsType.Union);
                 }
             }
-            return theSolid;
+            catch (Exception) { return solids[0]; }
+            return combinedSolid;
         }
         public static Solid GetSolidOfElement(Element element, ViewDetailLevel level)
         {
