@@ -6,11 +6,13 @@ using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Tools.Instances;
 using System;
 using System.Collections.Generic;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Matrix
 {
     public class MatrixContainer
     {
+        public static readonly double Size = 48;
         private static int Count = 0;
         private double Length { get; }
         private double Width { get; }
@@ -29,7 +31,7 @@ namespace ExtensibleOpeningManager.Matrix
             Width = Math.Round(Math.Abs(BoundingBox.Max.X - BoundingBox.Min.X));
             Length = Math.Round(Math.Abs(BoundingBox.Max.Y - BoundingBox.Min.Y));
             Height = Math.Round(Math.Abs(BoundingBox.Max.Z - BoundingBox.Min.Z));
-            if (Length >= 48.0 && Height >= 48.0 && Width >= 48.0)
+            if (Length >= Size && Height >= Size && Width >= Size)
             {
                 //##
                 //$#

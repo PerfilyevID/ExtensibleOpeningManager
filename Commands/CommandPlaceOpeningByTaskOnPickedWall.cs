@@ -18,17 +18,21 @@ namespace ExtensibleOpeningManager.Commands
         {
             try
             {
-                SE_LinkedWall wall = UiTools.PickWall(app, Collections.PickOptions.Local);
+                SE_LinkedWall wall;
+                try { wall = UiTools.PickWall(app, Collections.PickOptions.Local); }
+                catch (Exception) { return Result.Cancelled; }
                 Matrix.Matrix<ExtensibleSubElement> matrix;
                 List<ExtensibleSubElement> context;
                 try
                 {
+                    foreach (var i in CollectorTools.GetAllSubInstances(app.ActiveUIDocument.Document))
+                    {
+                    }
                     matrix = new Matrix.Matrix<ExtensibleSubElement>(CollectorTools.GetAllSubInstances(app.ActiveUIDocument.Document));
                     context = matrix.GetSubElements(wall);
                 }
-                catch (System.Exception e)
+                catch (System.Exception)
                 {
-                    PrintError(e);
                     return Result.Failed;
                 }
                 foreach (ExtensibleSubElement subElement in context)
@@ -46,39 +50,13 @@ namespace ExtensibleOpeningManager.Commands
                             continue;
                         }
                         bool isConcreteOpening = bool.Parse(valueParts[8]);
-                        if (isConcreteOpening)
+                        if (isConcreteOpening && !UserPreferences.PlaceOnStructuralWalls)
                         {
-                            if (UserPreferences.Department == Collections.Department.AR && ((subElement.Element as FamilyInstance).Symbol.FamilyName == Variables.family_kr_round || (subElement.Element as FamilyInstance).Symbol.FamilyName == Variables.family_kr_square))
-                            {
-                                ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, subElement, app.ActiveUIDocument.Document));
-                                element.SetWall(wall);
-                                element.AddSubElement(subElement);
-                                element.Reject();
-                                element.AddComment(Variables.msg_created);
-                                element.Approve(true);
-                                continue;
-                            }
-                            if (UserPreferences.Department == Collections.Department.AR)
-                            {
-                                continue;
-                            }
+                            continue;
                         }
-                        else
+                        if (!isConcreteOpening && !UserPreferences.PlaceOnArchitecturalWalls)
                         {
-                            if (UserPreferences.Department == Collections.Department.KR && ((subElement.Element as FamilyInstance).Symbol.FamilyName == Variables.family_ar_round || (subElement.Element as FamilyInstance).Symbol.FamilyName == Variables.family_ar_square))
-                            {
-                                ExtensibleElement element = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, subElement, app.ActiveUIDocument.Document));
-                                element.SetWall(wall);
-                                element.AddSubElement(subElement);
-                                element.Reject();
-                                element.AddComment(Variables.msg_created);
-                                element.Approve(true);
-                                continue;
-                            }
-                            if (UserPreferences.Department == Collections.Department.KR)
-                            {
-                                continue;
-                            }
+                            continue;
                         }
                         ExtensibleElement selement = ExtensibleElement.GetExtensibleElementByInstance(CreationTools.CreateFamilyInstance(wall, subElement, app.ActiveUIDocument.Document));
                         selement.SetWall(wall);
@@ -87,13 +65,12 @@ namespace ExtensibleOpeningManager.Commands
                         selement.AddComment(Variables.msg_created);
                         selement.Approve(true);
                     }
-                    catch (Exception e) { PrintError(e); }
+                    catch (Exception) { }
                 }
                 return Result.Succeeded;
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             {
-                PrintError(e);
                 return Result.Failed;
             }
 

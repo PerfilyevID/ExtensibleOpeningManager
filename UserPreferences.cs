@@ -8,7 +8,7 @@ namespace ExtensibleOpeningManager
 {
     public static class UserPreferences
     {
-        public static Department Department = Department.MEP;
+        public static Department Department = Department.AR;
         public static string SubDepartment = "ОВ";
         public static bool PlaceOnArchitecturalWalls = true;
         public static bool PlaceOnStructuralWalls = true;
@@ -38,22 +38,35 @@ namespace ExtensibleOpeningManager
                             MinWallWidth = double.Parse(parts[5], System.Globalization.NumberStyles.Float);
                             DefaultOffset = double.Parse(parts[6], System.Globalization.NumberStyles.Float);
                         }
-
+                    }
+                    else
+                    {
+                        SetDefaultValues();
                     }
                 }
+                else
+                {
+                    SetDefaultValues();
+                }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                PrintError(e);
-                SubDepartment = "ОВ";
-                PlaceOnArchitecturalWalls = true;
-                PlaceOnStructuralWalls = true;
-                MinInstanceWidth = 10;
-                MinInstanceHeight = 10;
-                MinWallWidth = 80;
-                DefaultOffset = 25;
+                SetDefaultValues();
             }
 
+        }
+        private static void SetDefaultValues()
+        {
+            SubDepartment = "ОВ";
+            PlaceOnArchitecturalWalls = Department == Department.AR;
+            PlaceOnStructuralWalls = Department == Department.KR;
+            MinInstanceWidth = 10;
+            MinInstanceHeight = 10;
+            MinWallWidth = 80;
+            if (Department == Department.MEP)
+            { DefaultOffset = 25; }
+            else
+            { DefaultOffset = 0; }
         }
         public static void TrySaveParameters()
         {

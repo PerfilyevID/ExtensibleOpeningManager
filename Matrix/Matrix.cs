@@ -138,14 +138,14 @@ namespace ExtensibleOpeningManager.Matrix
             double x_length = Math.Abs(boundingBox.Max.X - boundingBox.Min.X);
             double y_length = Math.Abs(boundingBox.Max.Y - boundingBox.Min.Y);
             double z_length = Math.Abs(boundingBox.Max.Z - boundingBox.Min.Z);
-            double length = Math.Ceiling(Math.Max(x_length, y_length) / 12) * 12;
-            length = Math.Ceiling(Math.Max(length, z_length) / 12) * 12 * 2;
-            XYZ c = new XYZ(Math.Round((boundingBox.Max.X + boundingBox.Min.X) / 2 / 12) * 12, Math.Round((boundingBox.Max.Y + boundingBox.Min.Y) / 2 / 12) * 12, Math.Round((boundingBox.Max.Z + boundingBox.Min.Z) / 2 / 12) * 12);
+            double length = Math.Ceiling(Math.Max(x_length, y_length) / MatrixContainer.Size) * MatrixContainer.Size;
+            length = Math.Ceiling(Math.Max(length, z_length) / MatrixContainer.Size) * MatrixContainer.Size * 2;
+            XYZ c = new XYZ(Math.Round((boundingBox.Max.X + boundingBox.Min.X) / 2 / MatrixContainer.Size) * MatrixContainer.Size, Math.Round((boundingBox.Max.Y + boundingBox.Min.Y) / 2 / MatrixContainer.Size) * MatrixContainer.Size, Math.Round((boundingBox.Max.Z + boundingBox.Min.Z) / 2 / MatrixContainer.Size) * MatrixContainer.Size);
             BoundingBox = new BoundingBoxXYZ() { Min = new XYZ(c.X - length, c.Y - length, c.Z - length), Max = new XYZ(c.X + length, c.Y + length, c.Z + length) };
 
             if (showProgress)
             {
-                int l = (int)(Math.Ceiling(length / 48) + 2) * (int)(Math.Ceiling(length / 48) + 2) * (int)(Math.Ceiling(length / 48) + 2);
+                int l = (int)(Math.Ceiling(length / MatrixContainer.Size / 2)) * (int)(Math.Ceiling(length / MatrixContainer.Size / 2)) * (int)(Math.Ceiling(length / MatrixContainer.Size / 2));
                 format = "{0} из " + l.ToString() + " поисковых частей создано";
                 using (Progress_Single progress = new Progress_Single("Подготовка поисковой матрицы", format, l))
                 {
@@ -156,7 +156,6 @@ namespace ExtensibleOpeningManager.Matrix
             {
                 Container = new MatrixContainer(BoundingBox.Min, BoundingBox.Max, true, null);
             }
-                
             if (showProgress)
             {
                 format = "{0} из " + Elements.Count.ToString() + " элементов добавлено в матрицу поиска";
@@ -193,9 +192,8 @@ namespace ExtensibleOpeningManager.Matrix
                 return Container.GetBySolidIntersection(new MatrixElement(element));
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                PrintError(e);
                 return new List<Intersection>();
             }
         }

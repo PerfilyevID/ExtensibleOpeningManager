@@ -11,7 +11,7 @@ namespace ExtensibleOpeningManager.Tools
     {
         public static Solid GetCorrectSolid(Wall wall, Transform transform = null)
         {
-            Solid solid = null;
+            Solid solid;
             try
             {
                 solid = GetOptimizedWallSolid(wall);
@@ -158,6 +158,13 @@ namespace ExtensibleOpeningManager.Tools
                 return false;
             }
         }
+        public static void CreateShape(Document doc, Solid s)
+        {
+            List<GeometryObject> g = new List<GeometryObject>() { s };
+            DirectShape shape = DirectShape.CreateElement(doc, new ElementId(-2000151));
+            IList <GeometryObject> ig = g;
+            shape.AppendShape(ig);
+        }
         private static Solid GetByGeometryElement(GeometryElement geometryElement)
         {
             List<Solid> solids = new List<Solid>();
@@ -175,9 +182,6 @@ namespace ExtensibleOpeningManager.Tools
                     }
                 }
                 catch (Exception) { }
-            }
-            foreach (GeometryObject obj in geometryElement)
-            {
                 try
                 {
                     GeometryInstance gInstance = obj as GeometryInstance;
@@ -213,7 +217,11 @@ namespace ExtensibleOpeningManager.Tools
                     combinedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(combinedSolid, s, BooleanOperationsType.Union);
                 }
             }
-            catch (Exception) { return solids[0]; }
+            catch (Exception e)
+            {
+                PrintError(e);
+                return solids[0];
+            }
             return combinedSolid;
         }
         public static Solid GetSolidOfElement(Element element, ViewDetailLevel level)
@@ -287,8 +295,9 @@ namespace ExtensibleOpeningManager.Tools
                 }
                 return GeometryCreationUtilities.CreateExtrusionGeometry(iLoops, normal.Negate(), wall.Width, new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                PrintError(e);
                 return null;
             }
         }

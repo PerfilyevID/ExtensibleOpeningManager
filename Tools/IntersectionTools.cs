@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using ExtensibleOpeningManager.Tools.Instances;
 using System;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Tools
 {
@@ -34,9 +35,8 @@ namespace ExtensibleOpeningManager.Tools
         {
             try
             {
-
                 Solid intersection_result = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
-                if (Math.Abs(intersection_result.Volume) != 0)
+                if (Math.Abs(intersection_result.Edges.Size) != 0)
                 {
                     return true;
                 }

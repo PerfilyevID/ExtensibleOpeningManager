@@ -185,6 +185,33 @@ namespace ExtensibleOpeningManager.Extensible
             }
             return remarks;
         }
+        public static string GetLinkedElementMeta(FamilyInstance instance)
+        {
+
+            return ExtensibleController.Read(instance, ExtensibleParameter.Instance);
+        }
+        public static SubStatus GetLinkedElementStatus(FamilyInstance instance)
+        {
+            try
+            {
+                Status status;
+                Enum.TryParse(ExtensibleController.Read(instance, ExtensibleParameter.Status), out status);
+                switch (status)
+                {
+                    case Status.Applied:
+                        return SubStatus.Applied;
+                    case Status.Rejected:
+                        return SubStatus.Rejected;
+                    default:
+                        return SubStatus.Rejected;
+                }
+            }
+            catch (Exception)
+            {
+                return SubStatus.Rejected;
+            }
+
+        }
         public static string GetSubElementMeta(FamilyInstance instance, ExtensibleSubElement subElement)
         {
             foreach (string part in ExtensibleController.Read(instance, ExtensibleParameter.SubElementsCollection).Split(new string[] { Variables.separator_element }, StringSplitOptions.RemoveEmptyEntries))

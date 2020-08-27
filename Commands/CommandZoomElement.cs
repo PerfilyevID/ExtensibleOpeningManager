@@ -48,9 +48,8 @@ namespace ExtensibleOpeningManager.Commands
                 UiTools.ZoomElement(Box, Solid.ComputeCentroid(), app.ActiveUIDocument);
                 return Result.Succeeded;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                PrintError(e);
                 return Result.Failed;
             }
         }

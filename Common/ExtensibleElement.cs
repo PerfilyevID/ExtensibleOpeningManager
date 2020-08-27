@@ -545,7 +545,7 @@ namespace ExtensibleOpeningManager.Common
         {
             foreach (ExtensibleSubElement subElement in SubElements)
             { 
-                if (subElement.Status == SubStatus.Changed)
+                if (subElement.Status == SubStatus.Changed || subElement.Status == SubStatus.Rejected)
                 { return true; }
             }
             return false;

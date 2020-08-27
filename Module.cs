@@ -35,7 +35,8 @@ namespace ExtensibleOpeningManager
                 #endif
                 string assembly = Assembly.GetExecutingAssembly().Location.Split(new string[] { "\\" }, StringSplitOptions.None).Last().Split('.').First();
                 #region buttons
-                RibbonPanel panel = application.CreateRibbonPanel(tabName, "Мониторинг отверстий");
+                string ribbonName = string.Format("Мониторинг отверстий [{0}]", UserPreferences.Department.ToString("G"));
+                RibbonPanel panel = application.CreateRibbonPanel(tabName, ribbonName);
                 string description_manager = "...";
                 switch (UserPreferences.Department)
                 {
@@ -215,9 +216,11 @@ namespace ExtensibleOpeningManager
                 dockablePaneProviderData.FrameworkElement = DockablePreferences.Page;
                 dockablePaneProviderData.InitialState = new DockablePaneState();
                 dockablePaneProviderData.InitialState.DockPosition = DockPosition.Tabbed;
-                //dockablePaneProviderData.InitialState.MinimumWidth = 400;
+                #if Revit2020
+                dockablePaneProviderData.InitialState.MinimumWidth = 400;
+                #endif
                 dockablePaneProviderData.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser;
-                application.RegisterDockablePane(new DockablePaneId(DockablePreferences.PageGuid), "Мониторинг : Отверстия", DockablePreferences.Page as IDockablePaneProvider);
+                application.RegisterDockablePane(new DockablePaneId(DockablePreferences.PageGuid), string.Format("Мониторинг : Отверстия [{0}]", UserPreferences.Department.ToString("G")), DockablePreferences.Page as IDockablePaneProvider);
             }
             catch (Exception e) { PrintError(e); }
         }

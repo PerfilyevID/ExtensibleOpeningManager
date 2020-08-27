@@ -76,11 +76,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 {
                     try
                     {
-                        if (ExtensibleTools.GetSubElementMeta(Parent.Instance, this) != this.ToString())
-                        {
-                            return Collections.SubStatus.Changed;
-                        }
-                        return Collections.SubStatus.Applied;
+                        return ExtensibleTools.GetLinkedElementStatus(Element as FamilyInstance);
                     }
                     catch (Exception)
                     {
@@ -106,23 +102,9 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Transform transform = linkInstance.GetTotalTransform();
             Element = linkedDocument.GetElement(reference.LinkedElementId) as Element;
             Id = Element.Id.IntegerValue;
-            foreach (GeometryObject geometry in Element.get_Geometry(new Options() { DetailLevel = ViewDetailLevel.Fine, IncludeNonVisibleObjects = false }).GetTransformed(transform))
-            {
-                if (geometry.GetType() == typeof(Solid))
-                {
-                    if (Solid == null)
-                    {
-                        Solid = geometry as Solid;
-                    }
-                    else
-                    {
-                        if (Solid.Volume < (geometry as Solid).Volume)
-                        {
-                            Solid = geometry as Solid;
-                        }
-                    }
-                }
-            }
+            if (transform != null) { Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(Element, ViewDetailLevel.Fine), transform); }
+            else { Solid = GeometryTools.GetSolidOfElement(Element, ViewDetailLevel.Fine); }
+            
             try
             {
                 Guid = ExtensibleController.Read(Element as FamilyInstance, Collections.ExtensibleParameter.Document);
@@ -142,11 +124,13 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             LinkId = linkInstance.Id;
             if ((element as FamilyInstance).Symbol.FamilyName == Variables.family_mep_round || (element as FamilyInstance).Symbol.FamilyName == Variables.family_mep_square)
             {
-                Solid = GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Fine);
+                if (transform != null) { Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Fine), transform); }
+                else { Solid = GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Fine); }
             }
             else
             {
-                Solid = GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Coarse);
+                if (transform != null) { Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Coarse), transform); }
+                else { Solid = GeometryTools.GetSolidOfElement(element, ViewDetailLevel.Coarse); }
             }
             try
             {
