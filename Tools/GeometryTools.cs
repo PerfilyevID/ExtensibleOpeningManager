@@ -27,7 +27,7 @@ namespace ExtensibleOpeningManager.Tools
                     }
                 }
             }
-            catch (Exception e) { PrintError(e); }
+            catch (Exception) { }
             try
             {
                 List<Solid> solids = new List<Solid>();
@@ -214,12 +214,16 @@ namespace ExtensibleOpeningManager.Tools
             {
                 foreach (Solid s in solids)
                 {
-                    combinedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(combinedSolid, s, BooleanOperationsType.Union);
+                    try
+                    {
+                        combinedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(combinedSolid, s, BooleanOperationsType.Union);
+
+                    }
+                    catch (Exception) { }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                PrintError(e);
                 return solids[0];
             }
             return combinedSolid;
@@ -295,9 +299,8 @@ namespace ExtensibleOpeningManager.Tools
                 }
                 return GeometryCreationUtilities.CreateExtrusionGeometry(iLoops, normal.Negate(), wall.Width, new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId));
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                PrintError(e);
                 return null;
             }
         }
