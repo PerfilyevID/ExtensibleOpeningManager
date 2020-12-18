@@ -2,6 +2,7 @@
 using ExtensibleOpeningManager.Common.ExtensibleSubElements;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Tools.Instances
@@ -16,6 +17,7 @@ namespace ExtensibleOpeningManager.Tools.Instances
         public double OffsetDown { get; }
         public double OffsetUp { get; }
         public double Elevation { get; }
+        public double GlobalOffset { get; set; }
         public double GetAngle(FamilyInstance instance)
         {
             XYZ wallLineDirection = LongestLine.Direction;

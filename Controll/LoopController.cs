@@ -25,9 +25,9 @@ namespace ExtensibleOpeningManager.Controll
             IsActive = false;
             Document = doc;
         }
-        public void Prepare(List<RevitLinkInstance> revitLinks, RevitLinkPicker sender)
+        public void Prepare(List<RevitLinkInstance> revitLinks)//, RevitLinkPicker sender)
         {
-            sender.Close();
+            //sender.Close();
             CreatedElements.Clear();
             UiController controller = UiController.GetControllerByDocument(Document);
             IsActive = true;

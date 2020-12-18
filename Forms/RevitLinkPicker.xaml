@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ExtensibleOpeningManager.Forms"
              mc:Ignorable="d" 
              Height="400" Width="600"
-             FontFamily="Monaco, Consolas, 'Andale Mono', 'DejaVu Sans Mono', monospace" WindowStyle="ToolWindow" Title="Расчет пересечений" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+             FontFamily="Monaco, Consolas, 'Andale Mono', 'DejaVu Sans Mono', monospace" WindowStyle="ToolWindow" Title="" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <TextBlock Text="Список подгруженных связей:" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="10"/>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">

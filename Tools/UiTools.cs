@@ -30,8 +30,9 @@ namespace ExtensibleOpeningManager.Tools
                         return null;
                 }
             }
-            catch (Exception) 
+            catch (Exception e) 
             {
+                PrintError(e);
                 return null;
             }
             switch (options)

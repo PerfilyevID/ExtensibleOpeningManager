@@ -14,7 +14,7 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2018|AnyCPU'">
-    <OutputPath>bin\Revit2018\</OutputPath>
+    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\MEP\EOM2018MEP\</OutputPath>
     <DefineConstants>Revit2018</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -23,7 +23,7 @@
     <ErrorReport>none</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2020|AnyCPU'">
-    <OutputPath>bin\Revit2020\</OutputPath>
+    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\MEP\EOM2020MEP\</OutputPath>
     <DefineConstants>Revit2020</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -107,6 +107,7 @@
     <Compile Include="Commands\CommandSetOffset.cs" />
     <Compile Include="Commands\CommandSetWall.cs" />
     <Compile Include="Commands\CommandSwapType.cs" />
+    <Compile Include="Commands\CommandTryAutoLink.cs" />
     <Compile Include="Commands\CommandUngroup.cs" />
     <Compile Include="Commands\CommandUpdate.cs" />
     <Compile Include="Commands\CommandUpdateAllElements.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Extensible\ExtensibleConverter.cs" />
     <Compile Include="Extensible\ExtensibleMultipleCollectionElement.cs" />
     <Compile Include="Extensible\ExtensibleTools.cs" />
+    <Compile Include="ExternalCommands\CommandParseSelectedGroup.cs" />
     <Compile Include="ExternalCommands\CommandShowDockablePane.cs" />
     <Compile Include="ExternalCommands\CommandShowPreferences.cs" />
     <Compile Include="Filters\LinkedElementFilter.cs" />
@@ -186,6 +188,7 @@
     <Compile Include="Tools\IntersectionTools.cs" />
     <Compile Include="Controll\LoopController.cs" />
     <Compile Include="Tools\UiTools.cs" />
+    <Compile Include="Tools\WindowHandleSearch.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="Variables.cs" />
   </ItemGroup>
@@ -228,6 +231,9 @@
     <Content Include="Source\Buttons\ApproveWall.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Source\Buttons\FindSubelements.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Source\Buttons\Group.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -241,6 +247,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Source\Buttons\SetMonitoring.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\Buttons\SetWall.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Source\Buttons\SwapType.png">
@@ -287,6 +296,9 @@
     </Content>
     <Content Include="Source\Monitor\Icon_Warning.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Source\icon_parse_groups.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

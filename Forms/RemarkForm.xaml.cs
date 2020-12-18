@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using static ExtensibleOpeningManager.Common.Collections;
 
 namespace ExtensibleOpeningManager.Forms
@@ -11,9 +12,13 @@ namespace ExtensibleOpeningManager.Forms
     {
         public RemarkForm(RemarkType type)
         {
-            #if Revit2020
+#if Revit2020
             Owner = ModuleData.RevitWindow;
-            #endif
+#endif
+#if Revit2018
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            helper.Owner = ModuleData.MainWindowHandle;
+#endif
             InitializeComponent();
             switch (type)
             {

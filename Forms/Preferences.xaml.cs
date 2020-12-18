@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace ExtensibleOpeningManager.Forms
@@ -13,6 +14,13 @@ namespace ExtensibleOpeningManager.Forms
     {
         public Preferences()
         {
+#if Revit2020
+            Owner = ModuleData.RevitWindow;
+#endif
+#if Revit2018
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            helper.Owner = ModuleData.MainWindowHandle;
+#endif
             InitializeComponent();
             if (UserPreferences.Department == Common.Collections.Department.MEP)
             {

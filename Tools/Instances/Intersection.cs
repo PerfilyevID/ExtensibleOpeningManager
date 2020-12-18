@@ -18,6 +18,10 @@ namespace ExtensibleOpeningManager.Tools.Instances
         public Element Element { get; }
         public Solid Solid { get; }
         public BoundingBoxXYZ BoundingBox { get; set; }
+        public bool Intersects(Intersection intersection)
+        {
+            return IntersectionTools.IntersectsSolid(Solid, intersection.Solid);
+        }
         public Intersection(Element element, Solid solid)
         {
             Element = element;
@@ -27,7 +31,6 @@ namespace ExtensibleOpeningManager.Tools.Instances
                 BoundingBox = new BoundingBoxXYZ();
                 BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
                 BoundingBox.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid();
-
             }
             catch (System.Exception)
             {

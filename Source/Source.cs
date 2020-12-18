@@ -52,7 +52,7 @@ namespace ExtensibleOpeningManager.Source
                     Value = Path.Combine(AssemblyPath, @"Source\Buttons\SetMonitoring.png");
                     break;
                 case ImageButton.SetWall:
-                    Value = Path.Combine(AssemblyPath, @"");
+                    Value = Path.Combine(AssemblyPath, @"Source\Buttons\SetWall.png");
                     break;
                 case ImageButton.Reset:
                     Value = Path.Combine(AssemblyPath, @"Source\Buttons\Reset.png");
@@ -62,6 +62,9 @@ namespace ExtensibleOpeningManager.Source
                     break;
                 case ImageButton.Swap:
                     Value = Path.Combine(AssemblyPath, @"Source\Buttons\SwapType.png");
+                    break;
+                case ImageButton.FindSubelements:
+                    Value = Path.Combine(AssemblyPath, @"Source\Buttons\FindSubelements.png");
                     break;
                 default:
                     break;

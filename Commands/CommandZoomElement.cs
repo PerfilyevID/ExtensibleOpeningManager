@@ -17,6 +17,8 @@ namespace ExtensibleOpeningManager.Commands
     {
         public CommandZoomElement(SE_LinkedWall wall)
         {
+            try { Id = wall.Wall.Id; }
+            catch (Exception) { Id = null; }
             Solid = wall.Solid;
             BoundingBoxXYZ box = new BoundingBoxXYZ();
             box.Min = wall.BoundingBox.Min + new XYZ(-5, -5, -2);
@@ -25,6 +27,8 @@ namespace ExtensibleOpeningManager.Commands
         }
         public CommandZoomElement(ExtensibleElement element)
         {
+            try { Id = element.Instance.Id; }
+            catch (Exception) { Id = null; }
             Solid = element.Solid;
             BoundingBoxXYZ box = new BoundingBoxXYZ();
             box.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid() + new XYZ(-5, -5, -2);
@@ -33,12 +37,15 @@ namespace ExtensibleOpeningManager.Commands
         }
         public CommandZoomElement(ExtensibleSubElement subElement)
         {
+            try { Id = subElement.Element.Id; }
+            catch (Exception) { Id = null; }
             Solid = subElement.Solid;
             BoundingBoxXYZ box = new BoundingBoxXYZ();
             box.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid() + new XYZ(-5, -5, -2);
             box.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid() + new XYZ(5, 5, 1);
             Box = box;
         }
+        private ElementId Id { get; }
         private Solid Solid { get; }
         private BoundingBoxXYZ Box { get; }
         public Result Execute(UIApplication app)
@@ -46,6 +53,11 @@ namespace ExtensibleOpeningManager.Commands
             try
             {
                 UiTools.ZoomElement(Box, Solid.ComputeCentroid(), app.ActiveUIDocument);
+                try
+                {
+                    if (Id != null) { app.ActiveUIDocument.Selection.SetElementIds(new List<ElementId>() { Id }); }
+                }
+                catch (Exception) { }
                 return Result.Succeeded;
             }
             catch (Exception)

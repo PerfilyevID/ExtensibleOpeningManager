@@ -9,12 +9,12 @@ namespace ExtensibleOpeningManager.Tools
 {
     public static class GeometryTools
     {
-        public static Solid GetCorrectSolid(Wall wall, Transform transform = null)
+        public static Solid GetCorrectSolid(Wall wall, Document doc, Transform transform = null)
         {
             Solid solid;
             try
             {
-                solid = GetOptimizedWallSolid(wall);
+                solid = GetOptimizedWallSolid(wall, doc);
                 if (solid != null)
                 {
                     if (transform == null)
@@ -249,7 +249,8 @@ namespace ExtensibleOpeningManager.Tools
             catch (Exception) { }
             return theSolid;
         }
-        public static Solid GetOptimizedWallSolid(Wall wall)
+
+        public static Solid GetOptimizedWallSolid(Wall wall, Document doc)
         {
             try
             {
@@ -265,39 +266,65 @@ namespace ExtensibleOpeningManager.Tools
                 IList<CurveLoop> iLoops = new List<CurveLoop>();
                 foreach (CurveLoop loop in loops)
                 {
-                    if (loop.IsCounterclockwise(normal))
+                    try
                     {
-                        edgeLoop = loop;
-                        List<Line> optimizedCurves = RemoveCounterClockwiseLines(edgeLoop, surface);
-                        List<Line> saved = new List<Line>();
-                        int count = 0;
-                        while (optimizedCurves.Count != count)
+                        if (loop.IsCounterclockwise(normal))
                         {
-                            saved = optimizedCurves;
-                            try
+                            edgeLoop = loop;
+                            List<Line> optimizedCurves = new List<Line>();
+                            foreach (Curve i in edgeLoop)
+                            {
+                                optimizedCurves.Add(i as Line);
+                            }
+                            int count = 0;
+                            while (optimizedCurves.Count != count)
                             {
                                 optimizedCurves = RemoveCoherentLines(optimizedCurves);
-                                optimizedCurves = JoinCurves(optimizedCurves);
-                                optimizedCurves = RemoveCoherentLines(optimizedCurves);
-                                optimizedCurves = RemoveCounterClockwiseLines(optimizedCurves, surface);
                                 optimizedCurves = JoinCurves(optimizedCurves);
                                 count = optimizedCurves.Count();
                             }
-                            catch (Exception)
+                            List<Line> saved = new List<Line>();
+                            count = 0;
+                            while (optimizedCurves.Count != count)
                             {
-                                optimizedCurves = saved;
-                                break;
+                                saved = optimizedCurves;
+                                try
+                                {
+                                    optimizedCurves = RemoveCounterClockwiseLines(optimizedCurves, surface);
+                                    optimizedCurves = JoinCurves(optimizedCurves);
+                                    count = optimizedCurves.Count();
+                                }
+                                catch (Exception)
+                                {
+                                    optimizedCurves = saved;
+                                    break;
+                                }
                             }
+                            try
+                            {
+                                CurveLoop resultLoop = new CurveLoop();
+                                foreach (Curve c in optimizedCurves)
+                                {
+                                    resultLoop.Append(c);
+                                }
+                                iLoops.Add(resultLoop);
+                            }
+                            catch (Exception)
+                            { }
                         }
-                        CurveLoop resultLoop = new CurveLoop();
-                        foreach (Curve c in optimizedCurves)
-                        {
-                            resultLoop.Append(c);
-                        }
-                        iLoops.Add(resultLoop);
                     }
+                    catch (Exception) { }
+
                 }
-                return GeometryCreationUtilities.CreateExtrusionGeometry(iLoops, normal.Negate(), wall.Width, new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId));
+                try
+                {
+                    return GeometryCreationUtilities.CreateExtrusionGeometry(iLoops, normal.Negate(), wall.Width, new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId));
+                }
+                catch (Exception)
+                {
+                    return null;
+                    
+                }
             }
             catch (Exception)
             {
@@ -318,7 +345,9 @@ namespace ExtensibleOpeningManager.Tools
                     current = curveloop.ElementAt(0);
                     next = curveloop.ElementAt(1);
                     if (!CounterClockVise(previous, current, next, surface))
-                    { list.Add(GetLine(current)); }
+                    {
+                        list.Add(GetLine(current));
+                    }
                 }
                 if (i == curveloop.Count() - 1)
                 {
@@ -326,7 +355,9 @@ namespace ExtensibleOpeningManager.Tools
                     current = curveloop.ElementAt(i);
                     next = curveloop.ElementAt(0);
                     if (!CounterClockVise(previous, current, next, surface))
-                    { list.Add(GetLine(current)); }
+                    { 
+                        list.Add(GetLine(current));
+                    }
                 }
                 if (i != curveloop.Count() - 1 && i != 0)
                 {
@@ -334,42 +365,9 @@ namespace ExtensibleOpeningManager.Tools
                     current = curveloop.ElementAt(i);
                     next = curveloop.ElementAt(i + 1);
                     if (!CounterClockVise(previous, current, next, surface))
-                    { list.Add(GetLine(current)); }
-                }
-            }
-            return list;
-        }
-        private static List<Line> RemoveCounterClockwiseLines(CurveLoop curveloop, Surface surface)
-        {
-            List<Line> list = new List<Line>();
-            Curve previous;
-            Curve current;
-            Curve next;
-            for (int i = 0; i < curveloop.Count(); i++)
-            {
-                if (i == 0)
-                {
-                    previous = curveloop.Last();
-                    current = curveloop.ElementAt(0);
-                    next = curveloop.ElementAt(1);
-                    if (!CounterClockVise(previous, current, next, surface))
-                    { list.Add(GetLine(current)); }
-                }
-                if (i == curveloop.Count() - 1)
-                {
-                    previous = curveloop.ElementAt(i - 1);
-                    current = curveloop.ElementAt(i);
-                    next = curveloop.ElementAt(0);
-                    if (!CounterClockVise(previous, current, next, surface))
-                    { list.Add(GetLine(current)); }
-                }
-                if (i != curveloop.Count() - 1 && i != 0)
-                {
-                    previous = curveloop.ElementAt(i - 1);
-                    current = curveloop.ElementAt(i);
-                    next = curveloop.ElementAt(i + 1);
-                    if (!CounterClockVise(previous, current, next, surface))
-                    { list.Add(GetLine(current)); }
+                    { 
+                        list.Add(GetLine(current));
+                    }
                 }
             }
             return list;
@@ -383,33 +381,38 @@ namespace ExtensibleOpeningManager.Tools
             List<XYZ> points = new List<XYZ>();
             Line current;
             Line next;
-            List<Line> curveLoop = new List<Line>();
+            List<Line> curveLoop = new List<Line>() {  };
             for (int i = 0; i < curves.Count; i++)
             {
+                bool end = false;
                 if (i == curves.Count - 1)
                 {
+                    end = true;
                     current = curves.ElementAt(i);
                     next = curves.ElementAt(0);
-                    try
-                    {
-                        points.Add(FindIntersection(current, next));
-                    }
-                    catch (Exception) { }
                 }
                 else
                 {
                     current = curves.ElementAt(i);
                     next = curves.ElementAt(i + 1);
-                    try
+                }
+                XYZ intersect_point = FindIntersection(current, next);
+                if (intersect_point != null)
+                {
+                    points.Add(intersect_point);
+                }
+                else
+                {
+                    points.Add(current.GetEndPoint(0));
+                    if (end)
                     {
-                        points.Add(FindIntersection(current, next));
+                        points.Add(next.GetEndPoint(0));
                     }
-                    catch (Exception) { }
                 }
             }
             for (int i = 0; i < points.Count; i++)
             {
-                if (i == curves.Count - 1)
+                if (i == points.Count - 1)
                 {
                     try
                     {
@@ -424,61 +427,104 @@ namespace ExtensibleOpeningManager.Tools
                     {
                         curveLoop.Add(Line.CreateBound(points[i], points[i + 1]));
                     }
-                    catch (Exception) { }
+                    catch (Exception)
+                    { }
                 }
             }
             return curveLoop;
         }
-        private static XYZ FindIntersection(Line curve_a, Line curve_b)
+        /*
+        private static List<Line> ResetCurves(List<Line> curves)
         {
-
-            Line curve_A = Line.CreateBound(curve_a.GetEndPoint(0) + (curve_a as Line).Direction.Negate() * 200, curve_a.GetEndPoint(1) + (curve_a as Line).Direction * 200);
-            Line curve_B = Line.CreateBound(curve_b.GetEndPoint(0) + (curve_b as Line).Direction.Negate() * 200, curve_b.GetEndPoint(1) + (curve_b as Line).Direction * 200);
-            IntersectionResultArray result;
-            curve_A.Intersect(curve_B, out result);
-            try
+            List<XYZ> points = new List<XYZ>();
+            List<Line> curveLoop = new List<Line>();
+            foreach (Line l in curves)
             {
-                foreach (IntersectionResult i in result)
+                points.Add(l.GetEndPoint(1));
+            }
+            for (int i = 0; i < points.Count(); i++)
+            {
+                if (i == points.Count() - 1)
                 {
-                    try
-                    {
-                        return i.XYZPoint;
-                    }
-                    catch (Exception) { }
+                    curveLoop.Add(Line.CreateBound(points[i], points[0]));
+                }
+                if (i != points.Count() - 1)
+                {
+                    curveLoop.Add(Line.CreateBound(points[i], points[i + 1]));
                 }
             }
-            catch (Exception) { }
-            IList<ClosestPointsPairBetweenTwoCurves> res = new List<ClosestPointsPairBetweenTwoCurves>();
-            curve_A.ComputeClosestPoints(curve_B, false, false, false, out res);
-            foreach (var i in res)
+            return curveLoop;
+        }
+        */
+        private static XYZ FindIntersection(Line curve_a, Line curve_b)
+        {
+            try
             {
-                return i.XYZPointOnFirstCurve;
+                Line curve_A = Line.CreateBound(curve_a.GetEndPoint(0) + (curve_a as Line).Direction.Negate() * 200, curve_a.GetEndPoint(1) + (curve_a as Line).Direction * 200);
+                Line curve_B = Line.CreateBound(curve_b.GetEndPoint(0) + (curve_b as Line).Direction.Negate() * 200, curve_b.GetEndPoint(1) + (curve_b as Line).Direction * 200);
+                IntersectionResultArray result;
+                curve_A.Intersect(curve_B, out result);
+                try
+                {
+                    foreach (IntersectionResult i in result)
+                    {
+                        try
+                        {
+                            return i.XYZPoint;
+                        }
+                        catch (Exception) { }
+                    }
+                }
+                catch (Exception) { }
+                IList<ClosestPointsPairBetweenTwoCurves> res = new List<ClosestPointsPairBetweenTwoCurves>();
+                curve_A.ComputeClosestPoints(curve_B, false, false, false, out res);
+                foreach (var i in res)
+                {
+                    return i.XYZPointOnFirstCurve;
+                }
+                return null;
             }
-            return null;
+            catch (Exception)
+            {
+                return null;
+            }
+
+        }
+        private static bool SameOrigin(Line a, Line b)
+        {
+            if (a.GetEndPoint(1).ToString() == b.GetEndPoint(1).ToString())
+            {
+                return true;
+            }
+            if (a.GetEndPoint(0).ToString() == b.GetEndPoint(0).ToString())
+            {
+                return true;
+            }
+            if (a.GetEndPoint(1).ToString() == b.GetEndPoint(0).ToString())
+            {
+                return true;
+            }
+            if (a.GetEndPoint(0).ToString() == b.GetEndPoint(1).ToString())
+            {
+                return true;
+            }
+            return false;
         }
         private static List<Line> RemoveCoherentLines(List<Line> curves)
         {
-            int r = 3;
             List<Line> optimizedCurves = new List<Line>();
             for (int i = 0; i < curves.Count(); i++)
             {
-                if (i == 0)
+                if (i != curves.Count() - 1)
                 {
-                    if (curves[i].Direction.ToString() != curves[i + 1].Direction.ToString() && curves[i].Direction.ToString() != curves[i + 1].Direction.Negate().ToString())
+                    if (SameOrigin(curves[i], curves[i + 1]) && ( curves[i].Direction.ToString() != curves[i + 1].Direction.ToString() || curves[i].Direction.ToString() != curves[i + 1].Direction.Negate().ToString()))
                     {
                         optimizedCurves.Add(curves[i]);
                     }
                 }
-                if (i == curves.Count() - 1)
+                else
                 {
-                    if (curves[i].Direction.ToString() != curves[0].Direction.ToString() && curves[i].Direction.ToString() != curves[0].Direction.Negate().ToString())
-                    {
-                        optimizedCurves.Add(curves[i]);
-                    }
-                }
-                if (i != curves.Count() - 1 && i != 0)
-                {
-                    if (curves[i].Direction.ToString() != curves[i + 1].Direction.ToString() && curves[i].Direction.ToString() != curves[i + 1].Direction.Negate().ToString())
+                    if (SameOrigin(curves[i], curves[0]) && (curves[i].Direction.ToString() != curves[0].Direction.ToString() || curves[i].Direction.ToString() != curves[0].Direction.Negate().ToString()))
                     {
                         optimizedCurves.Add(curves[i]);
                     }
@@ -491,7 +537,7 @@ namespace ExtensibleOpeningManager.Tools
             UVLine pr = new UVLine(previous, surface);
             UVLine cr = new UVLine(current, surface);
             UVLine nt = new UVLine(next, surface);
-            if (cr.AngleTo(nt) > 180 || pr.AngleTo(cr) > 180)
+            if (pr.AngleTo(cr) > 180)
             {
                 return true;
             }

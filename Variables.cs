@@ -38,5 +38,6 @@ namespace ExtensibleOpeningManager
         public static readonly string msg_created = "<!@%элемент~создан%@!>";
         public static readonly string msg_approved = "<!@%утверждено%@!>";
         public static readonly string msg_rejected = "<!@%отклонено%@!>";
+        public static readonly string msg_autoJoined = "<!@%автопривязка%@!>";
     }
 }

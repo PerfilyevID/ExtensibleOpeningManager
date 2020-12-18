@@ -3,6 +3,7 @@ using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Tools;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
 {
@@ -19,10 +20,34 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Wall = wall;
             Transform = null;
             WallLine = (wall.Location as LocationCurve).Curve as Line;
-            Solid = GeometryTools.GetCorrectSolid(Wall, Transform);
+            Solid = GeometryTools.GetCorrectSolid(Wall, Document, Transform);
             BoundingBox = new BoundingBoxXYZ();
-            BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
-            BoundingBox.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid();
+            List<double> X = new List<double>();
+            List<double> Y = new List<double>();
+            List<double> Z = new List<double>();
+            try
+            {
+                foreach (Edge edge in Solid.Edges)
+                {
+
+                    Curve curve = edge.AsCurve();
+                    XYZ pt = curve.GetEndPoint(0);
+                    X.Add(pt.X);
+                    Y.Add(pt.Y);
+                    Z.Add(pt.Z);
+                    pt = curve.GetEndPoint(1);
+                    X.Add(pt.X);
+                    Y.Add(pt.Y);
+                    Z.Add(pt.Z);
+                }
+                BoundingBox.Max = new XYZ(X.Max(), Y.Max(), Z.Max());
+                BoundingBox.Min = new XYZ(X.Min(), Y.Min(), Z.Min());
+            }
+            catch (Exception)
+            {
+                BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
+                BoundingBox.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid();
+            }
         }
         public SE_LinkedWall(RevitLinkInstance revitLinkInstance, Wall wall)
         {
@@ -32,10 +57,34 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Transform = revitLinkInstance.GetTransform();
             Line wallLine = (wall.Location as LocationCurve).Curve as Line;
             WallLine = wallLine.CreateTransformed(Transform) as Line;
-            Solid = GeometryTools.GetCorrectSolid(Wall, Transform);
+            Solid = GeometryTools.GetCorrectSolid(Wall, revitLinkInstance.Document, Transform);
             BoundingBox = new BoundingBoxXYZ();
-            BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
-            BoundingBox.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid();
+            List<double> X = new List<double>();
+            List<double> Y = new List<double>();
+            List<double> Z = new List<double>();
+            try
+            {
+                foreach (Edge edge in Solid.Edges)
+                {
+
+                    Curve curve = edge.AsCurve();
+                    XYZ pt = curve.GetEndPoint(0);
+                    X.Add(pt.X);
+                    Y.Add(pt.Y);
+                    Z.Add(pt.Z);
+                    pt = curve.GetEndPoint(1);
+                    X.Add(pt.X);
+                    Y.Add(pt.Y);
+                    Z.Add(pt.Z);
+                }
+                BoundingBox.Max = new XYZ(X.Max(), Y.Max(), Z.Max());
+                BoundingBox.Min = new XYZ(X.Min(), Y.Min(), Z.Min());
+            }
+            catch (Exception)
+            {
+                BoundingBox.Max = Solid.GetBoundingBox().Max + Solid.ComputeCentroid();
+                BoundingBox.Min = Solid.GetBoundingBox().Min + Solid.ComputeCentroid();
+            }
         }
         public void CreateSolid(Document doc)
         {
@@ -131,7 +180,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                 if (wallElement != null && wallElement.GetType() == typeof(Wall))
                 {
                     wall = wallElement as Wall;
-                    solid = GeometryTools.GetCorrectSolid(wall);
+                    solid = GeometryTools.GetCorrectSolid(wall, doc);
                 }
             }
             else
@@ -145,7 +194,7 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                         if (wallElement != null && wallElement.GetType() == typeof(Wall))
                         {
                             wall = wallElement as Wall;
-                            solid = GeometryTools.GetCorrectSolid(wall, link.GetTransform());
+                            solid = GeometryTools.GetCorrectSolid(wall, doc, link.GetTransform());
                         }
                     }
                     catch (Exception)
@@ -155,10 +204,33 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             if (wall != null)
             {
                 Line wallLine = (wall.Location as LocationCurve).Curve as Line;
-
                 BoundingBoxXYZ BoundingBox = new BoundingBoxXYZ();
-                BoundingBox.Max = solid.GetBoundingBox().Max + solid.ComputeCentroid();
-                BoundingBox.Min = solid.GetBoundingBox().Min + solid.ComputeCentroid();
+                List<double> X = new List<double>();
+                List<double> Y = new List<double>();
+                List<double> Z = new List<double>();
+                try
+                {
+                    foreach (Edge edge in solid.Edges)
+                    {
+
+                        Curve curve = edge.AsCurve();
+                        XYZ pt = curve.GetEndPoint(0);
+                        X.Add(pt.X);
+                        Y.Add(pt.Y);
+                        Z.Add(pt.Z);
+                        pt = curve.GetEndPoint(1);
+                        X.Add(pt.X);
+                        Y.Add(pt.Y);
+                        Z.Add(pt.Z);
+                    }
+                    BoundingBox.Max = new XYZ(X.Max(), Y.Max(), Z.Max());
+                    BoundingBox.Min = new XYZ(X.Min(), Y.Min(), Z.Min());
+                }
+                catch (Exception)
+                {
+                    BoundingBox.Max = solid.GetBoundingBox().Max + solid.ComputeCentroid();
+                    BoundingBox.Min = solid.GetBoundingBox().Min + solid.ComputeCentroid();
+                }
                 Transform transform = null;
                 if (link != null)
                 {

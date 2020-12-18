@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -22,9 +23,13 @@ namespace ExtensibleOpeningManager.Forms
     {
         public OffsetPicker()
         {
-            #if Revit2020
+#if Revit2020
             Owner = ModuleData.RevitWindow;
-            #endif
+#endif
+#if Revit2018
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            helper.Owner = ModuleData.MainWindowHandle;
+#endif
             InitializeComponent();
         }
 

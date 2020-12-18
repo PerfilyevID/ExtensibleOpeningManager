@@ -61,19 +61,26 @@ namespace ExtensibleOpeningManager.Controll
         {
             foreach (UiController controller in Controllers)
             {
-                if (doc.IsWorkshared && controller.Document.IsWorkshared)
+                try
                 {
-                    if (doc.GetWorksharingCentralModelPath().CentralServerPath == controller.Document.GetWorksharingCentralModelPath().CentralServerPath)
+                    if (doc.IsWorkshared && controller.Document.IsWorkshared)
                     {
-                        return controller;
+                        if (doc.GetWorksharingCentralModelPath().CentralServerPath == controller.Document.GetWorksharingCentralModelPath().CentralServerPath)
+                        {
+                            return controller;
+                        }
+                    }
+                    if (!doc.IsWorkshared && !controller.Document.IsWorkshared)
+                    {
+                        if (doc.PathName == controller.Document.PathName)
+                        {
+                            return controller;
+                        }
                     }
                 }
-                if (!doc.IsWorkshared && !controller.Document.IsWorkshared)
+                catch (Exception)
                 {
-                    if (doc.PathName == controller.Document.PathName)
-                    {
-                        return controller;
-                    }
+                    Controllers.Remove(controller);
                 }
             }
             UiController newController = new UiController(doc);
@@ -111,6 +118,11 @@ namespace ExtensibleOpeningManager.Controll
                 CurrentController = null;
                 Controllers.Remove(this);
             }
+        }
+        public ExtensibleElement GetExtensibleElementById(ElementId member_id)
+        {
+            ExtensibleElement result = Elements.Find(x => x.Id == member_id.IntegerValue);
+            return result;
         }
         public void UpdateAllElements()
         {
@@ -357,7 +369,14 @@ namespace ExtensibleOpeningManager.Controll
                     UpdateSubMonitor();
                     UpdateEnability();
                     DockablePreferences.Page.tabMain.SelectedIndex = 1;
-                    UpdateComments(Selection[0].AllComments);
+                    if (Selection[0].Status != Collections.Status.Null)
+                    {
+                        UpdateComments(Selection[0].AllComments);
+                    }
+                    else
+                    {
+                        ClearComments();
+                    }
                 }
                 if (Selection.Count > 1)
                 {
@@ -548,6 +567,15 @@ namespace ExtensibleOpeningManager.Controll
                 if (Selection.Count == 0) { return; }
                 UpdateSubMonitor();
                 HashSet<int> wallIds = new HashSet<int>();
+                bool isNotMonitoredInSelection = false;
+                foreach (ExtensibleElement el in Selection)
+                {
+                    if (el.Status == Collections.Status.Null)
+                    {
+                        isNotMonitoredInSelection = true;
+                    }
+                }
+                bool isNotMonitored = Selection[0].Status == Collections.Status.Null;
                 bool isNullSelection = Selection.Count == 0;
                 bool isSingleSelection = Selection.Count == 1;
                 bool isNotApproved = false;
@@ -647,15 +675,20 @@ namespace ExtensibleOpeningManager.Controll
                 DockablePreferences.Page.btnSwap.Visibility = System.Windows.Visibility.Collapsed;
                 DockablePreferences.Page.btnUngroup.Visibility = System.Windows.Visibility.Collapsed;
                 DockablePreferences.Page.btnUpdate.Visibility = System.Windows.Visibility.Collapsed;
-                if (isSingleSelection && !isByOpening)
+                DockablePreferences.Page.btnFindSubelements.Visibility = System.Windows.Visibility.Collapsed;
+                if (isNotMonitoredInSelection)
+                {
+                    DockablePreferences.Page.btnFindSubelements.Visibility = System.Windows.Visibility.Visible;
+                }
+                if (isSingleSelection && !isByOpening && !isNotMonitored)
                 {
                     DockablePreferences.Page.btnAddSubElement.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isNotCommitedSubElements && isSingleSelection)
+                if (isNotCommitedSubElements && isSingleSelection && !isNotMonitored)
                 {
                     DockablePreferences.Page.btnApplySubElements.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isNotCommitedWall && isWallExist)
+                if (isNotCommitedWall && isWallExist && !isNotMonitored)
                 {
                     DockablePreferences.Page.btnApplyWall.Visibility = System.Windows.Visibility.Visible;
                 }
@@ -667,16 +700,16 @@ namespace ExtensibleOpeningManager.Controll
                 {
                     DockablePreferences.Page.btnGroup.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isNotRejected && !isChanged)
+                if (isNotRejected && !isChanged && !isNotMonitored)
                 {
                     DockablePreferences.Page.btnReject.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isChanged && isSingleSelection && !isNotFoundElementsInElement)
+                if (isChanged && isSingleSelection && !isNotFoundElementsInElement && !isNotMonitored)
                 {
                     DockablePreferences.Page.btnReset.Visibility = System.Windows.Visibility.Visible;
                 }
                 DockablePreferences.Page.btnSetOffset.Visibility = System.Windows.Visibility.Visible;
-                if (!isWallExist && isSingleSelection)
+                if (!isWallExist && isSingleSelection && !isNotMonitored)
                 {
                     DockablePreferences.Page.btnSetWall.Visibility = System.Windows.Visibility.Visible;
                 }
@@ -684,11 +717,11 @@ namespace ExtensibleOpeningManager.Controll
                 {
                     DockablePreferences.Page.btnSwap.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isMultipleSubelements && isSingleSelection && !isNotFoundElementsInElement)
+                if (isMultipleSubelements && isSingleSelection && !isNotFoundElementsInElement && !isNotMonitored)
                 {
                     DockablePreferences.Page.btnUngroup.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isAbleToUpdate && isSingleSelection && !isNotFoundElementsInElement)
+                if (isAbleToUpdate && isSingleSelection && !isNotFoundElementsInElement && !isNotMonitored)
                 {
                     DockablePreferences.Page.btnUpdate.Visibility = System.Windows.Visibility.Visible;
                 }

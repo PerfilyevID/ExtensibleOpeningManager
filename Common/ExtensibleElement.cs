@@ -562,7 +562,16 @@ namespace ExtensibleOpeningManager.Common
         }
         public void Apply()
         {
-            bool overrideGuid = Status == Status.Null;
+            bool isNotMonitored = Status == Status.Null;
+            if (isNotMonitored)
+            {
+                try
+                {
+                    ExtensibleController.Write(Instance, ExtensibleParameter.CommentsCollection, string.Empty);
+                }
+                catch (Exception)
+                { }
+            }
             try
             {
                 ApplySubElements();
@@ -581,7 +590,7 @@ namespace ExtensibleOpeningManager.Common
             }
             ExtensibleTools.SetStatus(Instance, Collections.Status.Applied);
             Status = Status.Applied;
-            Approve(overrideGuid);
+            Approve(isNotMonitored);
         }
         public void Approve(bool overrideGuid)
         {
@@ -737,8 +746,7 @@ namespace ExtensibleOpeningManager.Common
                                 {
                                     Wall = new SE_LinkedWall(instance.Host as Wall);
                                 }
-                                catch (Exception)
-                                { Wall = null; }
+                                catch (Exception) { Wall = null; }
                             }
 
                             SavedData = ExtensibleController.Read(Instance, ExtensibleParameter.Instance);

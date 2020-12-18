@@ -14,6 +14,7 @@ using System.Windows.Interop;
 using System.Windows;
 using ExtensibleOpeningManager.Commands;
 using System.Windows.Media.Imaging;
+using ExtensibleOpeningManager.Tools;
 
 namespace ExtensibleOpeningManager
 {
@@ -27,15 +28,21 @@ namespace ExtensibleOpeningManager
         {
             try
             {
-                #if Revit2020
-                IntPtr MainWindowHandle = application.MainWindowHandle;
-                IntPtr handle = MainWindowHandle;
-                HwndSource hwndSource = HwndSource.FromHwnd(handle);
+#if Revit2020
+                MainWindowHandle = application.MainWindowHandle;
+                HwndSource hwndSource = HwndSource.FromHwnd(MainWindowHandle);
                 RevitWindow = hwndSource.RootVisual as Window;
-                #endif
+#endif
+#if Revit2018
+                try
+                {
+                    MainWindowHandle = WindowHandleSearch.MainWindowHandle.Handle;
+                }
+                catch (Exception) { }
+#endif
                 string assembly = Assembly.GetExecutingAssembly().Location.Split(new string[] { "\\" }, StringSplitOptions.None).Last().Split('.').First();
                 #region buttons
-                string ribbonName = string.Format("Мониторинг отверстий [{0}]", UserPreferences.Department.ToString("G"));
+                string ribbonName = string.Format("Отверстия {0}", UserPreferences.Department.ToString("G"));
                 RibbonPanel panel = application.CreateRibbonPanel(tabName, ribbonName);
                 string description_manager = "...";
                 switch (UserPreferences.Department)
@@ -53,6 +60,7 @@ namespace ExtensibleOpeningManager
                         break;
                 }
                 AddPushButtonData("Открыть менеджер отверстий", "Открыть\nменеджер", description_manager, string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowDockablePane"), panel, new Source.Source(Common.Collections.Icon.OpenManager), false);
+                panel.AddSlideOut();
                 AddPushButtonData("Пользовательскте настройки модуля", "Настройки", "Открыть окно пользовательских настроек", string.Format("{0}.{1}", assembly, "ExternalCommands.CommandShowPreferences"), panel, new Source.Source(Common.Collections.Icon.Settings), true);
                 #endregion
                 RegisterPane(application);
@@ -213,6 +221,8 @@ namespace ExtensibleOpeningManager
             try
             {
                 DockablePaneProviderData dockablePaneProviderData = new DockablePaneProviderData();
+                dockablePaneProviderData.VisibleByDefault = false;
+                dockablePaneProviderData.EditorInteraction.InteractionType = EditorInteractionType.KeepAlive;
                 dockablePaneProviderData.FrameworkElement = DockablePreferences.Page;
                 dockablePaneProviderData.InitialState = new DockablePaneState();
                 dockablePaneProviderData.InitialState.DockPosition = DockPosition.Tabbed;
@@ -220,7 +230,7 @@ namespace ExtensibleOpeningManager
                 dockablePaneProviderData.InitialState.MinimumWidth = 400;
                 #endif
                 dockablePaneProviderData.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser;
-                application.RegisterDockablePane(new DockablePaneId(DockablePreferences.PageGuid), string.Format("Мониторинг : Отверстия [{0}]", UserPreferences.Department.ToString("G")), DockablePreferences.Page as IDockablePaneProvider);
+                application.RegisterDockablePane(new DockablePaneId(DockablePreferences.PageGuid), string.Format("Отверстия ({0})", UserPreferences.Department.ToString("G")), DockablePreferences.Page as IDockablePaneProvider);
             }
             catch (Exception e) { PrintError(e); }
         }

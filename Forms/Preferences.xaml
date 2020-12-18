@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ExtensibleOpeningManager.Forms"
              mc:Ignorable="d"
              Title="Настройки"
-             Height="450" Width="800" FontFamily="Monaco, Consolas, 'Andale Mono', 'DejaVu Sans Mono', monospace" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" Topmost="True">
+             Height="450" Width="800" FontFamily="Monaco, Consolas, 'Andale Mono', 'DejaVu Sans Mono', monospace" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" Topmost="True">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -36,9 +36,9 @@
                 <CheckBox x:Name="chbxArchitecture" IsChecked="True" Margin="5"  Width="400" HorizontalAlignment="Left" Content="Да"  Unchecked="OnChbxUnchecked" Checked="OnChbxChecked"/>
                 <TextBlock x:Name="tbxMinWidthHeader" FontWeight="Black" Text="Минимальная толщина стен:" ToolTip="В миллиметрах. Стены с меньшей толщиной будут проигнорированы." TextWrapping="Wrap"/>
                 <TextBox x:Name="tbxMinWidth" Text="80" Margin="5" Width="400" HorizontalAlignment="Left" TextChanged="OnTbChanged"/>
-                <TextBlock x:Name="tbxMinOpeningWidthHeader" FontWeight="Black" Text="Минимальная ширина отверстий:" ToolTip="В миллиметрах. Стены с меньшей толщиной будут проигнорированы." TextWrapping="Wrap"/>
+                <TextBlock x:Name="tbxMinOpeningWidthHeader" FontWeight="Black" Text="Минимальная ширина отверстий:" ToolTip="В миллиметрах. Элементы с меньшей толщиной расставлены не будут." TextWrapping="Wrap"/>
                 <TextBox x:Name="tbxMinOpeningWidth" Text="80" Margin="5" Width="400" HorizontalAlignment="Left" TextChanged="OnTbChanged"/>
-                <TextBlock x:Name="tbxMinOpeningHeightHeader" FontWeight="Black" Text="Минимальная высота отверстий:" ToolTip="В миллиметрах. Стены с меньшей толщиной будут проигнорированы." TextWrapping="Wrap"/>
+                <TextBlock x:Name="tbxMinOpeningHeightHeader" FontWeight="Black" Text="Минимальная высота отверстий:" ToolTip="В миллиметрах. Элементы с меньшей толщиной расставлены не будут." TextWrapping="Wrap"/>
                 <TextBox x:Name="tbxMinOpeningHeight" Text="80" Margin="5" Width="400" HorizontalAlignment="Left" TextChanged="OnTbChanged"/>
                 <TextBlock FontWeight="Black" Text="Стандартный отступ границ:" TextWrapping="Wrap"/>
                 <ComboBox x:Name="cbxOffsett" Margin="5"  Width="400" HorizontalAlignment="Left" Background="White">
@@ -59,9 +59,32 @@
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5">
-            <Button x:Name="btnApply" Content="Применить" Margin="0" Background="White" Click="OnBtnApplyClick" ToolTip="Закрыть и применить изменения"/>
-            <Button x:Name="btnClose" Content="Отмена" Margin="5,0,0,0" Background="White" Click="OnBtnCloseClick" ToolTip="Закрыть без сохранения"/>
-            <Button x:Name="btnManual" Content="?" Margin="5,0,0,0" Background="White" Click="OnBtnManualClick" ToolTip="База знаний Bitrix24"/>
+            <Button Padding="5,0,5,0" x:Name="btnApply" Content="Применить" Margin="0" Background="White" Click="OnBtnApplyClick">
+                <Button.ToolTip>
+                    <StackPanel MaxWidth="300">
+                        <TextBlock TextWrapping="Wrap" FontWeight="Bold" Margin="0,0,0,5" Text="Применить"/>
+                        <TextBlock TextWrapping="Wrap" Text="Закрыть окно и сохранить изменения"/>
+                    </StackPanel>
+                </Button.ToolTip>
+            </Button>
+            <Button  Padding="5,0,5,0" x:Name="btnClose" Content="Отмена" Margin="5,0,0,0" Background="White" Click="OnBtnCloseClick">
+                <Button.ToolTip>
+                    <StackPanel MaxWidth="300">
+                        <TextBlock TextWrapping="Wrap" FontWeight="Bold" Margin="0,0,0,5" Text="Отмена"/>
+                        <TextBlock TextWrapping="Wrap" Text="Закрыть окно и не сохранять изменения"/>
+                    </StackPanel>
+                </Button.ToolTip>
+            </Button>
+            <Button Padding="5,0,5,0" x:Name="btnManual" Content="?" Margin="5,0,0,0" Background="White" Click="OnBtnManualClick">
+                <Button.ToolTip>
+                    <StackPanel MaxWidth="300">
+                        <TextBlock TextWrapping="Wrap" FontWeight="Bold" Margin="0,0,0,5" Text="Bitrix24"/>
+                        <TextBlock TextWrapping="Wrap" Text="Подробная инструкция по работе плагина"/>
+                        <Border BorderBrush="Silver" BorderThickness="0,1,0,0" Margin="0,8" />
+                        <TextBlock TextWrapping="Wrap" Text="Подсказка: необходима авторизация в Bitrix24" FontStyle="Italic"/>
+                    </StackPanel>
+                </Button.ToolTip>
+            </Button>
         </StackPanel>
 
     </Grid>

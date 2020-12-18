@@ -21,14 +21,6 @@ namespace DockableDialog.Forms
 {
     public partial class DockableManager : Page, IDockablePaneProvider
     {
-        #region Data
-        private Guid m_targetGuid;
-        private DockPosition m_position = DockPosition.Bottom;
-        private int m_left = 1;
-        private int m_right = 1;
-        private int m_top = 1;
-        private int m_bottom = 1;
-        #endregion
         public DockableManager()
         {
             InitializeComponent();
@@ -44,6 +36,7 @@ namespace DockableDialog.Forms
             btnSwap.DataContext = new Source(ExtensibleOpeningManager.Common.Collections.ImageButton.Swap);
             btnUngroup.DataContext = new Source(ExtensibleOpeningManager.Common.Collections.ImageButton.Ungroup);
             btnUpdate.DataContext = new Source(ExtensibleOpeningManager.Common.Collections.ImageButton.Update);
+            btnFindSubelements.DataContext = new Source(ExtensibleOpeningManager.Common.Collections.ImageButton.FindSubelements);
         }
 
         public void SetupDockablePane(DockablePaneProviderData data)
@@ -137,19 +130,32 @@ namespace DockableDialog.Forms
         {
 
         }
-        private void OnBtnLoop(object sender, RoutedEventArgs e)
+        private void OnBtnLoop(object sender, RoutedEventArgs args)
         {
             List<RevitLinkInstance> links = CollectorTools.GetRevitLinks(UiController.CurrentController.Document);
             if (links.Count != 0)
             {
-                RevitLinkPicker linkPicker = new RevitLinkPicker(links);
+                RevitLinkPicker linkPicker = new RevitLinkPicker(links, "Расчет пересечений", true);
                 linkPicker.ShowDialog();
+                if (RevitLinkPicker.PickedRevitLinkInstances != null)
+                {
+                    if (RevitLinkPicker.PickedRevitLinkInstances.Count != 0)
+                    {
+                        try
+                        {
+                            UiController.CurrentController.LoopController.Prepare(RevitLinkPicker.PickedRevitLinkInstances);
+                        }
+                        catch (Exception e)
+                        {
+                            PrintError(e);
+                        }
+                    }
+                }
             }
             else
             {
                 Dialogs.ShowDialog("В проекте отсутствуют подгруженные связи", "Ошибка");
             }
-            
         }
         private void OnBtnLoopDeny(object sender, RoutedEventArgs e)
         {
@@ -187,6 +193,12 @@ namespace DockableDialog.Forms
         {
             if (tbMessage.Text != "")
             {
+                if (UiController.CurrentController.Selection[0].Status == Collections.Status.Null)
+                {
+                    Dialogs.ShowDialog("Сперва необходимо назначить мониторинг!", "Предупреждение");
+                    tbMessage.Text = "";
+                    return;
+                }
                 ModuleData.CommandQueue.Enqueue(new CommandAddComment(UiController.CurrentController.Selection[0], this.tbMessage.Text));
                 tbMessage.Text = "";
             }
@@ -247,6 +259,37 @@ namespace DockableDialog.Forms
             {
                 ExtensibleSubElement subElement = storedObject as ExtensibleSubElement;
                 ModuleData.CommandQueue.Enqueue(new CommandAddRemark(subElement.Parent, subElement as SE_LinkedInstance));
+            }
+        }
+
+        private void OnBtnFindSubelements(object sender, RoutedEventArgs args)
+        {
+            List<RevitLinkInstance> links = CollectorTools.GetRevitLinks(UiController.CurrentController.Document);
+            if (links.Count != 0)
+            {
+                RevitLinkPicker linkPicker = new RevitLinkPicker(links, "Поиск привязок", false);
+                linkPicker.ShowDialog();
+                if (RevitLinkPicker.PickedRevitLinkInstances != null)
+                {
+                    if (RevitLinkPicker.PickedRevitLinkInstances.Count != 0)
+                    {
+                        try
+                        {
+                            foreach (ExtensibleElement el in UiController.CurrentController.Selection)
+                            {
+                                ModuleData.CommandQueue.Enqueue(new CommandTryAutoLink(el, RevitLinkPicker.PickedRevitLinkInstances));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            PrintError(e);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Dialogs.ShowDialog("В проекте отсутствуют подгруженные связи", "Ошибка");
             }
         }
     }
