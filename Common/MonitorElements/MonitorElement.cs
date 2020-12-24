@@ -34,7 +34,7 @@ namespace ExtensibleOpeningManager.Common.MonitorElements
                     Source = new Source.Source(Collections.ImageMonitor.Warning);
                     if (element.Status != Status.Applied)
                     { tipParts.Add("Элемент: Не одобрен"); }
-                    if (element.ToString() != element.SavedData)
+                    else if (element.ToString() != element.SavedData)
                     { tipParts.Add("Элемент: Неутвержденные изменения"); }
                     if (element.WallStatus == WallStatus.NotCommited)
                     { tipParts.Add("Стена-основа: Неутвержденные изменения"); }

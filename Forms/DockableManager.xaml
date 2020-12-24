@@ -468,7 +468,7 @@
                     <ScrollViewer x:Name="svComments"  Grid.Row="3" Margin="1,21,1,81" VerticalScrollBarVisibility= "Auto">
                         <StackPanel x:Name="chatPanel" CanVerticallyScroll="True" Margin="5"/>
                     </ScrollViewer>
-                    <TextBox TextWrapping="Wrap" x:Name="tbMessage" Grid.Row="3" Height="45" VerticalAlignment="Bottom" Margin="0,0,0,28" Background="White" HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" SpellCheck.IsEnabled="True" BorderBrush="#FF707070"/>
+                    <TextBox SpellCheck.IsEnabled="False" TextWrapping="Wrap" x:Name="tbMessage" Grid.Row="3" Height="45" VerticalAlignment="Bottom" Margin="0,0,0,28" Background="White" HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" BorderBrush="#FF707070"/>
                     <Button Grid.Row="3" Content="Добавить комментарий >>" x:Name="btnChatMessage" Height="22" VerticalAlignment="Bottom" Margin="0,0,0,0" Background="White" Click="OnBtnAddComment" IsDefault="True">
                         <Button.ToolTip>
                             <StackPanel MaxWidth="300">

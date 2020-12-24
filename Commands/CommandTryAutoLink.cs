@@ -88,7 +88,6 @@ namespace ExtensibleOpeningManager.Commands
                                 controller.UpdateComments(controller.Selection[0].AllComments);
                             }
                             catch (Exception) { }
-                            Element.AddComment(Variables.msg_created);
                             Element.AddComment(Variables.msg_autoJoined);
                             Element.Reject();
                             return Result.Succeeded;

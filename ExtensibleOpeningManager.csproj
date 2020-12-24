@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Revit2018</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Revit2018_AR</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{8D6365A8-16BE-4631-A2EB-C573DEB2C451}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -13,21 +13,59 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2018|AnyCPU'">
-    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\MEP\EOM2018MEP\</OutputPath>
-    <DefineConstants>Revit2018</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2018_AR|AnyCPU'">
+    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\AR\EOM2018AR\</OutputPath>
+    <DefineConstants>Revit2018_AR</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <Optimize>true</Optimize>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <ErrorReport>none</ErrorReport>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2020|AnyCPU'">
-    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\MEP\EOM2020MEP\</OutputPath>
-    <DefineConstants>Revit2020</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2020_AR|AnyCPU'">
+    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\AR\EOM2020AR\</OutputPath>
+    <DefineConstants>Revit2020_AR</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <Optimize>true</Optimize>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <ErrorReport>none</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2018_MEP|AnyCPU'">
+    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\MEP\EOM2018MEP\</OutputPath>
+    <DefineConstants>Revit2018_MEP</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <Optimize>true</Optimize>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <ErrorReport>none</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2020_MEP|AnyCPU'">
+    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\MEP\EOM2020MEP\</OutputPath>
+    <DefineConstants>Revit2020_MEP</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <Optimize>true</Optimize>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <ErrorReport>none</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2018_KR|AnyCPU'">
+    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\KR\EOM2018KR\</OutputPath>
+    <DefineConstants>Revit2018_KR</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <Optimize>true</Optimize>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <ErrorReport>none</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2020_KR|AnyCPU'">
+    <OutputPath>..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\EOM\KR\EOM2020KR\</OutputPath>
+    <DefineConstants>Revit2020_KR</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <Optimize>true</Optimize>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <ErrorReport>none</ErrorReport>
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -53,7 +91,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <Choose>
-    <When Condition=" '$(Configuration)'=='Revit2018' ">
+    <When Condition="$(Configuration.StartsWith('Revit2018'))">
       <ItemGroup>
         <Reference Include="RevitAPI">
           <HintPath>C:\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
@@ -65,7 +103,7 @@
         </Reference>
       </ItemGroup>
     </When>
-    <When Condition=" '$(Configuration)'=='Revit2020' ">
+    <When Condition="$(Configuration.StartsWith('Revit2020'))">
       <ItemGroup>
         <Reference Include="RevitAPI">
           <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
@@ -148,6 +186,9 @@
     </Compile>
     <Compile Include="Forms\DockablePreferences.cs" />
     <Compile Include="Forms\Dialogs.cs" />
+    <Compile Include="Forms\LinkLevelPicker.xaml.cs">
+      <DependentUpon>LinkLevelPicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Forms\OffsetPicker.xaml.cs">
       <DependentUpon>OffsetPicker.xaml</DependentUpon>
     </Compile>
@@ -194,6 +235,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Forms\DockableManager.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\LinkLevelPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

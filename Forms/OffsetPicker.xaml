@@ -4,21 +4,53 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ExtensibleOpeningManager.Forms"
-             mc:Ignorable="d" WindowStyle="ToolWindow"
+             mc:Ignorable="d" WindowStyle="None"
              Title="Выбор значения"
              SizeToContent="Height"
              Width="150"
-             FontFamily="Monaco, Consolas, 'C:\Users\iperfilyev\source\repos\ExtensibleOpeningManager\Forms\OffsetPicker.xamlAndale Mono', 'DejaVu Sans Mono', monospace" WindowStartupLocation="CenterOwner">
+             FontFamily="Monaco, Consolas, 'C:\Users\iperfilyev\source\repos\ExtensibleOpeningManager\Forms\OffsetPicker.xamlAndale Mono', 'DejaVu Sans Mono', monospace" WindowStartupLocation="CenterOwner" Background="{x:Null}" AllowsTransparency="True">
+    <Window.Resources>
+        <Style x:Key="BTN" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#7F3D3F42"/>
+            <Setter Property="Margin" Value="0,2,0,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="5" Background="{TemplateBinding Background}">
+                            <Grid>
+                                <Rectangle RadiusX="5" RadiusY="5" Fill="{TemplateBinding Background}"/>
+                                <Path x:Name="PathIcon" Width="15" Height="25" Stretch="Fill" Fill="#4C87B3" HorizontalAlignment="Left" Margin="17,0,0,0"/>
+                                <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#E59400" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter TargetName="PathIcon" Property="Fill" Value="Black" />
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FF00C867" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <StackPanel Orientation="Vertical">
-            <Button Content="0мм" Background="White" Click="OnClick"/>
-            <Button Content="25мм" Background="White" Click="OnClick"/>
-            <Button Content="50мм" Background="White" Click="OnClick"/>
-            <Button Content="75мм" Background="White" Click="OnClick"/>
-            <Button Content="100мм" Background="White" Click="OnClick"/>
-            <Button Content="125мм" Background="White" Click="OnClick"/>
-            <Button Content="150мм" Background="White" Click="OnClick"/>
-            <Button Content="200мм" Background="White" Click="OnClick"/>
+            <Button Style="{StaticResource BTN}" Content="0мм" Click="OnClick"/>
+            <Button Style="{StaticResource BTN}" Content="25мм" Click="OnClick"/>
+            <Button Style="{StaticResource BTN}" Content="50мм" Click="OnClick"/>
+            <Button Style="{StaticResource BTN}" Content="75мм" Click="OnClick"/>
+            <Button Style="{StaticResource BTN}" Content="100мм" Click="OnClick"/>
+            <Button Style="{StaticResource BTN}" Content="125мм" Click="OnClick"/>
+            <Button Style="{StaticResource BTN}" Content="150мм" Click="OnClick"/>
+            <Button Style="{StaticResource BTN}" Content="200мм" Click="OnClick"/>
         </StackPanel>
     </Grid>
 </Window>

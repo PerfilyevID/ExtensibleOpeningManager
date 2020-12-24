@@ -548,7 +548,29 @@ namespace ExtensibleOpeningManager.Common
                 if (subElement.Status == SubStatus.Changed || subElement.Status == SubStatus.Rejected)
                 { return true; }
             }
-            return false;
+            //return false;
+            return !SubElementsMatches();
+        }
+        public bool HasUncommitedChangesInSubElements()
+        {
+            foreach (ExtensibleSubElement subElement in SubElements)
+            {
+                if (subElement.Status == SubStatus.Changed)
+                { return true; }
+            }
+            //return false;
+            return !SubElementsMatches();
+        }
+        private bool SubElementsMatches()
+        {
+            List<string> parts = new List<string>();
+            foreach (ExtensibleSubElement subElement in SubElements)
+            {
+                parts.Add(subElement.ToString());
+            }
+            //bool rslt = string.Join(Variables.separator_element, parts) == ExtensibleController.Read(Instance, ExtensibleParameter.SubElementsCollection);
+            //Print(rslt.ToString(), KPLN_Loader.Preferences.MessageType.Code);
+            return string.Join(Variables.separator_element, parts) == ExtensibleController.Read(Instance, ExtensibleParameter.SubElementsCollection);
         }
         public bool HasUnfoundSubElements()
         {
@@ -604,6 +626,11 @@ namespace ExtensibleOpeningManager.Common
         }
         public void AddSubElement(ExtensibleSubElement element)
         {
+            foreach (ExtensibleSubElement se in SubElements)
+            {
+                if (se.Element.Id.IntegerValue == element.Element.Id.IntegerValue &&
+                    se.LinkId.IntegerValue == element.LinkId.IntegerValue)
+                { return; } }
             SubElements.Add(element);
             element.SetParent(this);
             ExtensibleTools.AddSubElement(Instance, element);

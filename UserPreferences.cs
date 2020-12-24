@@ -8,7 +8,15 @@ namespace ExtensibleOpeningManager
 {
     public static class UserPreferences
     {
+#if Revit2018_AR || Revit2020_AR
+        public static Department Department = Department.AR;
+#endif
+#if Revit2018_KR || Revit2020_KR
+        public static Department Department = Department.KR;
+#endif
+#if Revit2018_MEP || Revit2020_MEP
         public static Department Department = Department.MEP;
+#endif
         public static string SubDepartment = "ОВ";
         public static bool PlaceOnArchitecturalWalls = true;
         public static bool PlaceOnStructuralWalls = true;

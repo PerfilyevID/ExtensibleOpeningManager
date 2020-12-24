@@ -14,6 +14,7 @@ namespace ExtensibleOpeningManager.Commands
         public Result Execute(UIApplication app)
         {
             Element.Apply();
+            //Element.AddComment(Variables.msg_approved);
             return Result.Succeeded;
         }
     }

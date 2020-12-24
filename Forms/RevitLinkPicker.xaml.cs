@@ -19,11 +19,12 @@ namespace ExtensibleOpeningManager.Forms
         {
             ShowWarning = showWarning;
             Title = title;
-            PickedRevitLinkInstances = null;
-#if Revit2020
+            PickedRevitLinkInstances = new List<RevitLinkInstance>();
+#if Revit2020_AR || Revit2020_KR || Revit2020_MEP
             Owner = ModuleData.RevitWindow;
 #endif
-#if Revit2018
+#if Revit2018_AR || Revit2018_KR || Revit2018_MEP
+            
             WindowInteropHelper helper = new WindowInteropHelper(this);
             helper.Owner = ModuleData.MainWindowHandle;
 #endif
@@ -36,7 +37,6 @@ namespace ExtensibleOpeningManager.Forms
             }
             LinkControll.DataContext = new WPFSource<RLI_element>(elements);
         }
-
         private void OnBtnApply(object sender, RoutedEventArgs args)
         {
             if (ShowWarning)
@@ -54,20 +54,6 @@ namespace ExtensibleOpeningManager.Forms
             }
             PickedRevitLinkInstances = revitLinkInstances;
             Close();
-            /*
-            if (revitLinkInstances.Count != 0)
-            {
-                try
-                {
-                    UiController.CurrentController.LoopController.Prepare(revitLinkInstances, this);
-                }
-                catch (Exception e)
-                {
-                    PrintError(e);
-                    Close();
-                }
-            }
-            */
         }
     }
 }

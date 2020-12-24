@@ -25,7 +25,7 @@
                 <TextBlock Text="*" Margin="0,5,0,3" Foreground="Red"/>
             </StackPanel>
             <TextBox x:Name="tbBody" Height="140" TextChanged="OnTextChanged"/>
-            <Button x:Name="btnApply" HorizontalAlignment="Left" Width="80"  Content="Отправить" Margin="0,5,0,0" Background="White" Click="OnApply" IsEnabled="False"/>
+            <Button x:Name="btnApply" HorizontalAlignment="Left" Width="80"  Content="Отправить" Margin="0,5,0,0" Background="White" Click="OnApply" IsEnabled="False" IsDefault="True"/>
             <Grid Height="50" Margin="0,10,0,0">
                 <Rectangle Fill="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Margin="-4"/>
                 <Separator VerticalAlignment="Top" Margin="-4"/>

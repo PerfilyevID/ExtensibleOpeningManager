@@ -141,13 +141,42 @@ namespace DockableDialog.Forms
                 {
                     if (RevitLinkPicker.PickedRevitLinkInstances.Count != 0)
                     {
-                        try
+                        if (RevitLinkPicker.PickedRevitLinkInstances.Count > 1)
                         {
-                            UiController.CurrentController.LoopController.Prepare(RevitLinkPicker.PickedRevitLinkInstances);
+                            try
+                            {
+                                UiController.CurrentController.LoopController.Prepare(RevitLinkPicker.PickedRevitLinkInstances);
+                            }
+                            catch (Exception e)
+                            {
+                                PrintError(e);
+                            }
                         }
-                        catch (Exception e)
+                        if (RevitLinkPicker.PickedRevitLinkInstances.Count == 1)
                         {
-                            PrintError(e);
+                            RevitLinkInstance link = RevitLinkPicker.PickedRevitLinkInstances[0];
+                            Document doc = link.GetLinkDocument();
+                            List<Level> levels = new List<Level>();
+                            foreach (Level l in new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Levels).WhereElementIsNotElementType().ToElements())
+                            {
+                                levels.Add(l);
+                            }
+                            LinkLevelPicker levelPicker = new LinkLevelPicker(levels, "Расчет пересечений по выбранным уровням");
+                            levelPicker.ShowDialog();
+                            if (LinkLevelPicker.PickedLevelInstances != null)
+                            {
+                                if (LinkLevelPicker.PickedLevelInstances.Count != 0)
+                                {
+                                    try
+                                    {
+                                        UiController.CurrentController.LoopController.Prepare(link, LinkLevelPicker.PickedLevelInstances);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        PrintError(e);
+                                    }
+                                }
+                            }
                         }
                     }
                 }

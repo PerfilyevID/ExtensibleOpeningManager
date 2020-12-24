@@ -28,12 +28,12 @@ namespace ExtensibleOpeningManager
         {
             try
             {
-#if Revit2020
+#if Revit2020_AR || Revit2020_KR || Revit2020_MEP
                 MainWindowHandle = application.MainWindowHandle;
                 HwndSource hwndSource = HwndSource.FromHwnd(MainWindowHandle);
                 RevitWindow = hwndSource.RootVisual as Window;
 #endif
-#if Revit2018
+#if Revit2018_AR || Revit2018_KR || Revit2018_MEP
                 try
                 {
                     MainWindowHandle = WindowHandleSearch.MainWindowHandle.Handle;
@@ -204,7 +204,7 @@ namespace ExtensibleOpeningManager
             {
                 button.AvailabilityClassName = "ExtensibleOpeningManager.Availability.StaticAvailable";
             }
-            button.LongDescription = string.Format("Верстия: {0}\nСборка: {1}-{2}", ModuleData.Version, ModuleData.Build, ModuleData.Date);
+            button.LongDescription = string.Format("Версия: {0}\nСборка: {1}-{2}", ModuleData.Version, ModuleData.Build, ModuleData.Date);
             button.ItemText = text;
             if (url == null)
             {
@@ -226,11 +226,11 @@ namespace ExtensibleOpeningManager
                 dockablePaneProviderData.FrameworkElement = DockablePreferences.Page;
                 dockablePaneProviderData.InitialState = new DockablePaneState();
                 dockablePaneProviderData.InitialState.DockPosition = DockPosition.Tabbed;
-                #if Revit2020
+#if Revit2020_AR || Revit2020_KR || Revit2020_MEP
                 dockablePaneProviderData.InitialState.MinimumWidth = 400;
-                #endif
+#endif
                 dockablePaneProviderData.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser;
-                application.RegisterDockablePane(new DockablePaneId(DockablePreferences.PageGuid), string.Format("Отверстия ({0})", UserPreferences.Department.ToString("G")), DockablePreferences.Page as IDockablePaneProvider);
+                application.RegisterDockablePane(new DockablePaneId(DockablePreferences.PageGuid), string.Format("Отверстия : {0}", UserPreferences.Department.ToString("G")), DockablePreferences.Page as IDockablePaneProvider);
             }
             catch (Exception e) { PrintError(e); }
         }

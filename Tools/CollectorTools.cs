@@ -192,6 +192,40 @@ namespace ExtensibleOpeningManager.Tools
             }
             return instances;
         }
+        private static bool IsLevelPicked(Element e, ref List<Level> levels)
+        {
+            try
+            {
+                foreach (Level l in levels)
+                {
+                    if (l.Id.IntegerValue == e.LevelId.IntegerValue)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception) { }
+            return false;
+        }
+        public static List<SE_LinkedWall> GetLinkedWalls(Document doc, RevitLinkInstance instance, List<Level> pickedLevels)
+        {
+            List<SE_LinkedWall> instances = new List<SE_LinkedWall>();
+            foreach (Element e in new FilteredElementCollector(instance.GetLinkDocument()).OfCategory(BuiltInCategory.OST_Walls).WhereElementIsNotElementType().ToElements())
+            {
+                if (IsLevelPicked(e, ref pickedLevels))
+                {
+                    try
+                    {
+                        if (LocalFilter.Passes(e as Wall))
+                        {
+                            instances.Add(new SE_LinkedWall(instance, e as Wall));
+                        }
+                    }
+                    catch (Exception) { }
+                }
+            }
+            return instances;
+        }
         public static List<SE_LinkedWall> GetLinkedWalls(Document doc, RevitLinkInstance instance)
         {
             List<SE_LinkedWall> instances = new List<SE_LinkedWall>();

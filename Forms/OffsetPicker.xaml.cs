@@ -23,10 +23,11 @@ namespace ExtensibleOpeningManager.Forms
     {
         public OffsetPicker()
         {
-#if Revit2020
+#if Revit2020_AR || Revit2020_KR || Revit2020_MEP
             Owner = ModuleData.RevitWindow;
 #endif
-#if Revit2018
+#if Revit2018_AR || Revit2018_KR || Revit2018_MEP
+            
             WindowInteropHelper helper = new WindowInteropHelper(this);
             helper.Owner = ModuleData.MainWindowHandle;
 #endif

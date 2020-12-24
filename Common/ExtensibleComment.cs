@@ -76,18 +76,18 @@ namespace ExtensibleOpeningManager.Common
             Rectangle rectangle = new Rectangle() { Fill = bgColor, RadiusX = 5, RadiusY = 5 };
             string visibleMessage = Message;
             if (Message == Variables.msg_created)
-            { visibleMessage = "<Элемент создан>"; }
+            { visibleMessage = "<Создан>"; }
             if (Message == Variables.msg_approved)
-            { visibleMessage = "<Задание одобрено>"; }
+            { visibleMessage = "<Одобрен>"; }
             if (Message == Variables.msg_rejected)
-            { visibleMessage = "<Элемент отклонен>"; }
+            { visibleMessage = "<Отклонен>"; }
             if (Message == Variables.msg_autoJoined)
-            { visibleMessage = "<Связи автоматически определены>"; }
+            { visibleMessage = "<Автопривязка>"; }
             StackPanel spControlls = new StackPanel() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
             StackPanel spBody = new StackPanel() { Orientation = Orientation.Vertical };
             StackPanel spUser = new StackPanel() { Orientation = Orientation.Horizontal };
             Button btnClose = new Button() { Content = "❌", Width = 14, Height = 14, VerticalAlignment = VerticalAlignment.Top, Background = null, FontSize = 6, BorderBrush = fgColor, Foreground = fgColor, Margin = new Thickness() { Left = 2, Top = 2, Right = 2, Bottom = 2 } };
-            TextBlock tbDate = new TextBlock() { Text = Time.ToString("G"), Margin = new Thickness() { Left = 5, Top = 5, Right = 5, Bottom = 5 } };
+            TextBlock tbDate = new TextBlock() { Text = Time.ToString("G"), Margin = new Thickness() { Left = 5, Top = 5, Right = 5, Bottom = 5 }, HorizontalAlignment=HorizontalAlignment.Left };
             TextBlock tbFrom = new TextBlock() { Text = "от:", VerticalAlignment = VerticalAlignment.Bottom, FontSize = 10, Margin = new Thickness() { Left = 5, Top = 0, Right = 1, Bottom = 0 } };
             TextBlock tbUser = new TextBlock() { Text = GetUserNameBySystemName(User) };
             TextBlock tbDepartment = new TextBlock() { Text = departmentText, HorizontalAlignment = HorizontalAlignment.Right, FontWeight = FontWeights.Bold, VerticalAlignment = VerticalAlignment.Top, FontSize = 8, Foreground = fgColor, Margin = new Thickness() { Left = 2, Top = 0, Right = 0, Bottom = 0 } };

@@ -6,8 +6,6 @@ namespace ExtensibleOpeningManager
     {
         public static readonly int round_system_value = 7;
 
-        public static readonly string empty = "";
-
         public static readonly string default3dViewName = "SYS_DEFAULT_EOM";
 
         public static readonly string parameter_offset_down = "SYS_OFFSET_DOWN";

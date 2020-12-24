@@ -104,7 +104,6 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Id = Element.Id.IntegerValue;
             if (transform != null) { Solid = SolidUtils.CreateTransformed(GeometryTools.GetSolidOfElement(Element, ViewDetailLevel.Fine), transform); }
             else { Solid = GeometryTools.GetSolidOfElement(Element, ViewDetailLevel.Fine); }
-            
             try
             {
                 Guid = ExtensibleController.Read(Element as FamilyInstance, Collections.ExtensibleParameter.Document);

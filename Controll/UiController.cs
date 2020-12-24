@@ -9,6 +9,7 @@ using ExtensibleOpeningManager.Tools;
 using ExtensibleOpeningManager.Tools.Instances;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Controll
@@ -385,6 +386,7 @@ namespace ExtensibleOpeningManager.Controll
                     DockablePreferences.Page.tabMain.SelectedIndex = 1;
                     ClearComments();
                 }
+                DockablePreferences.Page.tbMessage.Text = string.Empty;
             }
             catch (Exception e)
             {
@@ -404,7 +406,7 @@ namespace ExtensibleOpeningManager.Controll
         {
             Comments = comments;
             DockablePreferences.Page.chatPanel.Children.Clear();
-            foreach (ExtensibleMessage comment in comments)
+            foreach (ExtensibleMessage comment in comments.OrderBy(x => x.Time.Ticks).Reverse())
             {
                 DockablePreferences.Page.chatPanel.Children.Add(comment.GetUiElement());
             }
@@ -589,12 +591,14 @@ namespace ExtensibleOpeningManager.Controll
                     isNotCommitedWall = Selection[0].WallStatus == Collections.WallStatus.NotCommited;
                 }
                 bool isNotCommitedSubElements = false;
+                bool hasUncommitedChangesInSubElements = false;
                 bool isMultipleSubelements = false;
                 bool isChanged = false;
                 bool isRoundInSelection = false;
                 bool isNotFoundElementsInElement = false;
                 foreach (ExtensibleElement el in Selection)
                 {
+                    if (el.HasUncommitedChangesInSubElements()) { hasUncommitedChangesInSubElements = true; }
                     foreach (ExtensibleSubElement subelement in el.SubElements)
                     {
                         try
@@ -676,7 +680,7 @@ namespace ExtensibleOpeningManager.Controll
                 DockablePreferences.Page.btnUngroup.Visibility = System.Windows.Visibility.Collapsed;
                 DockablePreferences.Page.btnUpdate.Visibility = System.Windows.Visibility.Collapsed;
                 DockablePreferences.Page.btnFindSubelements.Visibility = System.Windows.Visibility.Collapsed;
-                if (isNotMonitoredInSelection)
+                if (isNotMonitoredInSelection && UserPreferences.Department == Collections.Department.MEP)
                 {
                     DockablePreferences.Page.btnFindSubelements.Visibility = System.Windows.Visibility.Visible;
                 }
@@ -684,7 +688,7 @@ namespace ExtensibleOpeningManager.Controll
                 {
                     DockablePreferences.Page.btnAddSubElement.Visibility = System.Windows.Visibility.Visible;
                 }
-                if (isNotCommitedSubElements && isSingleSelection && !isNotMonitored)
+                if (isNotCommitedSubElements && isSingleSelection && !isNotMonitored && hasUncommitedChangesInSubElements)
                 {
                     DockablePreferences.Page.btnApplySubElements.Visibility = System.Windows.Visibility.Visible;
                 }

@@ -33,5 +33,19 @@ namespace ExtensibleOpeningManager.Forms
                 ToolTip = "Документ не найден";
             }
         }
+        public RLI_element(Level level)
+        {
+            Source = level;
+            IsChecked = true;
+            IsEnabled = true;
+            string sign = string.Empty;
+            if (level.Elevation >= 0)
+            {
+                sign = "+";
+            }
+            Name = string.Format("{0}: [на отм. {1}{2}mm]", level.Name, sign, (System.Math.Round(level.Elevation * 304.8, 2)).ToString());
+            ToolTip = string.Format("Id элемента - {0}", level.Id.ToString());
+        }
+
     }
 }
