@@ -58,7 +58,7 @@ namespace ExtensibleOpeningManager.Forms
         }
         private void OnHelp(object sender, RoutedEventArgs e)
         {
-
+            System.Diagnostics.Process.Start(ModuleData.ManualPage);
         }
         private void OnOk(object sender, RoutedEventArgs e)
         {
