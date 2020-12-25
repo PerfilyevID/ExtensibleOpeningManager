@@ -47,9 +47,8 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
                     Element.LevelId.ToString(),
                     Guid});
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                PrintError(e);
                 if (Value != null)
                 {
                     return Value;
@@ -93,7 +92,14 @@ namespace ExtensibleOpeningManager.Common.ExtensibleSubElements
             Element = null;
             Solid = null;
             Value = value;
-            LinkId = ElementId.InvalidElementId;
+            int elId = -1;
+            try
+            {
+                elId = int.Parse(value.Split(new string[] { Variables.separator_sub_element }, StringSplitOptions.RemoveEmptyEntries)[2], System.Globalization.NumberStyles.Integer);
+            }
+            catch (Exception)
+            { }
+            LinkId = new ElementId(elId);
         }
         public SE_LinkedInstance(Reference reference, Document doc)
         {

@@ -466,9 +466,10 @@ namespace ExtensibleOpeningManager.Controll
                         DockablePreferences.Page.cbxDepartment.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.lblDepartmentHeader.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Collapsed;
-                        DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;
-                        DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
-                        DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
+                        //DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;
+                        //DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
+                        DockablePreferences.Page.btnPlaceMEP2.Visibility = System.Windows.Visibility.Visible;
+                        DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
                         DockablePreferences.Page.btnPlaceOnSelectedTask.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.btnPlaceOnSelectedTask2.Visibility = System.Windows.Visibility.Visible;
@@ -477,8 +478,9 @@ namespace ExtensibleOpeningManager.Controll
                         DockablePreferences.Page.cbxDepartment.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.lblDepartmentHeader.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Collapsed;
-                        DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
-                        DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
+                        //DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
+                        //DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
+                        DockablePreferences.Page.btnPlaceMEP2.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
                         DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Collapsed;//collapsed until loop is enabled
                         DockablePreferences.Page.btnPlaceOnSelectedTask.Visibility = System.Windows.Visibility.Visible;
@@ -490,8 +492,9 @@ namespace ExtensibleOpeningManager.Controll
                         DockablePreferences.Page.cbxDepartment.Text = UserPreferences.SubDepartment;
                         DockablePreferences.Page.lblDepartmentHeader.Visibility = System.Windows.Visibility.Visible;
                         DockablePreferences.Page.sepDep.Visibility = System.Windows.Visibility.Collapsed;
-                        DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;
-                        DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
+                        //DockablePreferences.Page.btnPlaceAR.Visibility = System.Windows.Visibility.Collapsed;
+                        //DockablePreferences.Page.btnPlaceKR.Visibility = System.Windows.Visibility.Collapsed;
+                        DockablePreferences.Page.btnPlaceMEP2.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceMEP.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.sep.Visibility = System.Windows.Visibility.Collapsed;
                         DockablePreferences.Page.btnPlaceOnSelectedTask.Visibility = System.Windows.Visibility.Collapsed;
@@ -584,11 +587,25 @@ namespace ExtensibleOpeningManager.Controll
                 bool isNotRejected = false;
                 bool isByOpening = false;
                 bool isNotCommitedWall = false;
-                if (Selection.Count != 0)
+                foreach (ExtensibleElement e in Selection)
                 {
-                    isNotApproved = Selection[0].Status != Collections.Status.Applied;
-                    isNotRejected = Selection[0].Status != Collections.Status.Rejected;
-                    isNotCommitedWall = Selection[0].WallStatus == Collections.WallStatus.NotCommited;
+                    try
+                    {
+                        if (e.Status != Collections.Status.Applied)
+                        {
+                            isNotApproved = true;
+                        }
+                        if (e.Status != Collections.Status.Rejected)
+                        {
+                            isNotRejected = true;
+                        }
+                        if (e.WallStatus == Collections.WallStatus.NotCommited)
+                        {
+                            isNotCommitedWall = true;
+                        }
+                    }
+                    catch (Exception)
+                    { }
                 }
                 bool isNotCommitedSubElements = false;
                 bool hasUncommitedChangesInSubElements = false;

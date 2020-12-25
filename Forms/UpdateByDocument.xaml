@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ExtensibleOpeningManager.Forms"
-             mc:Ignorable="d" WindowStyle="ToolWindow" ResizeMode="NoResize" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner">
+             mc:Ignorable="d" WindowStyle="ToolWindow" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" Title="Параметры обновления">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
@@ -20,9 +20,9 @@
         <Rectangle Grid.Column="0" Grid.Row="3" Fill="#FFFFD100" Grid.ColumnSpan="2"/>
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Список документов:" Margin="5,5,5,5" Foreground="Black" ToolTip="Необходимо отметить документы, которые будут участвовать в расчете"/>
         <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" Height="22" Margin="5">
-            <Button x:Name="btnOk"  Content="Запуск" Margin="0,0,0,0" Background="White"/>
-            <Button x:Name="btnCancel" Content="Отмена" Margin="5,0,0,0" Background="White"/>
-            <Button x:Name="btnHelp" Content="?" Margin="5,0,0,0" Width="22" Background="White"/>
+            <Button x:Name="btnOk"  Content="Запуск" Margin="0,0,0,0" Background="White" Click="OnOk"/>
+            <Button x:Name="btnCancel" Content="Отмена" Margin="5,0,0,0" Background="White" Click="OnCancel"/>
+            <Button x:Name="btnHelp" Content="?" Margin="5,0,0,0" Width="22" Background="White" Click="OnHelp"/>
         </StackPanel>
         <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <StackPanel Orientation="Vertical" Margin="10, 40, 10, 40">
@@ -35,7 +35,7 @@
                                         <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.InfoColorKey}}"/>
                                     </Rectangle.Fill>
                                 </Rectangle>
-                                <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Content="{Binding Name}" IsEnabled="{Binding IsEnabled}" Margin="10,10,10,15" Background="#FFF4F4F4"/>
+                                <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Content="{Binding Name}" IsEnabled="{Binding IsEnabled}" Margin="10,10,10,15" Background="#FFF4F4F4" Unchecked="OnDocUnchecked" Checked="OnDocChecked"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -46,11 +46,11 @@
             <Grid Margin="0,5,5,0">
                 <Rectangle Fill="#FFE8E8E8" RadiusX="3" RadiusY="3"/>
                 <StackPanel Orientation="Vertical" Margin="2">
-                    <TextBlock TextWrapping="Wrap" Text="Учитываемые стены" FontWeight="Bold"/>
+                    <TextBlock x:Name="wallsHeader" TextWrapping="Wrap" Text="Учитываемые стены" FontWeight="Bold"/>
                     <Separator/>
                     <WrapPanel Orientation="Horizontal" Margin="5">
-                        <CheckBox Margin="0,0,5,5" IsChecked="False" Content="Монолитные стены"/>
-                        <CheckBox Margin="0,0,5,0" IsChecked="False" Content="Не монолитные стены"/>
+                        <CheckBox x:Name="wallsConcrete"  Margin="0,0,5,5" IsChecked="True" Content="Монолитные стены" Checked="OnWallCheck" Unchecked="OnWallUncheck"/>
+                        <CheckBox x:Name="wallsArchitecture"  Margin="0,0,5,0" IsChecked="True" Content="Не монолитные стены" Checked="OnWallCheck" Unchecked="OnWallUncheck"/>
                     </WrapPanel>
                     <Separator/>
                     <TextBlock Margin="5,0,5,5" TextWrapping="Wrap" Text="К монолитным стенам относятся типы, имя которых начинается с «00_»" Foreground="#FF8B8A8A"/>
@@ -59,26 +59,26 @@
             <Grid Margin="0,5,5,0">
                 <Rectangle Fill="#FFE8E8E8" RadiusX="3" RadiusY="3"/>
                 <StackPanel Orientation="Vertical" Margin="2">
-                    <TextBlock TextWrapping="Wrap" Text="Мин. размеры отверстия" FontWeight="Bold"/>
+                    <TextBlock x:Name="minHeader" TextWrapping="Wrap" Text="Мин. размеры отверстия" FontWeight="Bold"/>
                     <Separator/>
                     <StackPanel Orientation="Vertical" Margin="5">
                         <TextBlock TextWrapping="Wrap" Text="Высота:"/>
-                        <TextBox x:Name="tbxMaxHeight"/>
+                        <TextBox x:Name="tbxMinHeight" Text="0" TextChanged="OnTbChanged"/>
                         <TextBlock TextWrapping="Wrap" Text="Ширина:"/>
-                        <TextBox x:Name="tbxMaxWidth"/>
+                        <TextBox x:Name="tbxMinWidth" Text="0" TextChanged="OnTbChanged"/>
                     </StackPanel>
                 </StackPanel>
             </Grid>
             <Grid Margin="0,5,5,5">
                 <Rectangle Fill="#FFE8E8E8" RadiusX="3" RadiusY="3"/>
                 <StackPanel Orientation="Vertical" Margin="2">
-                    <TextBlock TextWrapping="Wrap" Text="Макс. размеры отверстия" FontWeight="Bold"/>
+                    <TextBlock x:Name="maxHeader" TextWrapping="Wrap" Text="Макс. размеры отверстия" FontWeight="Bold"/>
                     <Separator/>
                     <StackPanel Orientation="Vertical" Margin="5">
                         <TextBlock TextWrapping="Wrap" Text="Высота:"/>
-                        <TextBox x:Name="tbxMinHeight"/>
+                        <TextBox x:Name="tbxMaxHeight" Text="1000" TextChanged="OnTbChanged"/>
                         <TextBlock TextWrapping="Wrap" Text="Ширина:"/>
-                        <TextBox x:Name="tbxMinWidth"/>
+                        <TextBox x:Name="tbxMaxWidth" Text="1000" TextChanged="OnTbChanged"/>
                     </StackPanel>
                 </StackPanel>
             </Grid>
@@ -91,8 +91,8 @@
                     <Separator/>
                     <WrapPanel Orientation="Horizontal" Margin="5">
                         <CheckBox x:Name="chbxChangedUpdate"  Margin="0,0,5,5" IsChecked="False" Content="Обновить"/>
-                        <CheckBox x:Name="chbxChangedReject" Margin="0,0,5,5" IsChecked="False" Content="Отклонить"/>
-                        <CheckBox x:Name="chbxChangedApply" Margin="0,0,5,5" IsChecked="False" Content="Одобрить"/>
+                        <CheckBox x:Name="chbxChangedReject" Margin="0,0,5,5" IsChecked="True" Content="Отклонить" Checked="OnCheckedN" Unchecked="OnUncheckedN"/>
+                        <CheckBox x:Name="chbxChangedApply" Margin="0,0,5,5" IsChecked="False" Content="Одобрить" Checked="OnCheckedN" Unchecked="OnUncheckedN"/>
                         <CheckBox x:Name="chbxChangedRemoveNotFound" Margin="0,0,5,5" IsChecked="False" Content="Удалить ненайденные субэлементы"/>
                     </WrapPanel>
                     <Separator/>
@@ -105,10 +105,10 @@
                     <TextBlock TextWrapping="Wrap" Text="Действие: новые элементы" FontWeight="Bold"/>
                     <Separator/>
                     <WrapPanel Orientation="Horizontal" Margin="5">
-                        <CheckBox x:Name="chbxNewCreate" Margin="0,0,5,5" IsChecked="False" Content="Расставить"/>
-                        <CheckBox x:Name="chbxNewGroup" Margin="0,0,5,5" IsChecked="False" Content="Сгруппировать пересекающиеся"/>
-                        <CheckBox x:Name="chbxNewReject" Margin="0,0,5,5" IsChecked="False" Content="Отклонить"/>
-                        <CheckBox x:Name="chbxNewApply" Margin="0,0,5,5" IsChecked="False" Content="Одобрить"/>
+                        <CheckBox x:Name="chbxNewCreate" Margin="0,0,5,5" IsChecked="True" Content="Расставить"/>
+                        <CheckBox x:Name="chbxNewGroup" Margin="0,0,5,5" IsChecked="True" Content="Сгруппировать пересекающиеся"/>
+                        <CheckBox x:Name="chbxNewReject" Margin="0,0,5,5" IsChecked="True" Content="Отклонить" Checked="OnCheckedN" Unchecked="OnUncheckedN"/>
+                        <CheckBox x:Name="chbxNewApply" Margin="0,0,5,5" IsChecked="False" Content="Одобрить" Checked="OnCheckedN" Unchecked="OnUncheckedN"/>
                     </WrapPanel>
                 </StackPanel>
             </Grid>

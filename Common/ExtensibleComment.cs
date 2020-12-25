@@ -83,6 +83,8 @@ namespace ExtensibleOpeningManager.Common
             { visibleMessage = "<Отклонен>"; }
             if (Message == Variables.msg_autoJoined)
             { visibleMessage = "<Автопривязка>"; }
+            if (Message == Variables.msg_autocreated)
+            { visibleMessage = "<Создан автоматически>"; }
             StackPanel spControlls = new StackPanel() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
             StackPanel spBody = new StackPanel() { Orientation = Orientation.Vertical };
             StackPanel spUser = new StackPanel() { Orientation = Orientation.Horizontal };
@@ -100,7 +102,7 @@ namespace ExtensibleOpeningManager.Common
             spBody.Children.Add(spUser);
             spBody.Children.Add(sp);
             spBody.Children.Add(tbMessage);
-            if (UserPreferences.Department == Department && Parent != null && user.SystemName == KPLN_Loader.Preferences.User.SystemName && Message != Variables.msg_created && Message != Variables.msg_approved && Message != Variables.msg_rejected && Message != Variables.msg_autoJoined)
+            if (UserPreferences.Department == Department && Parent != null && user.SystemName == KPLN_Loader.Preferences.User.SystemName && Message != Variables.msg_created && Message != Variables.msg_approved && Message != Variables.msg_rejected && Message != Variables.msg_autoJoined && Message != Variables.msg_autocreated)
             { spControlls.Children.Add(btnClose); }
             grid.Children.Add(rectangle);
             grid.Children.Add(spControlls);

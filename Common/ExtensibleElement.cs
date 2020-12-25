@@ -626,11 +626,14 @@ namespace ExtensibleOpeningManager.Common
         }
         public void AddSubElement(ExtensibleSubElement element)
         {
+            if (element == null) { return; }
             foreach (ExtensibleSubElement se in SubElements)
             {
-                if (se.Element.Id.IntegerValue == element.Element.Id.IntegerValue &&
-                    se.LinkId.IntegerValue == element.LinkId.IntegerValue)
-                { return; } }
+                if (se.Id == element.Element.Id.IntegerValue && se.LinkId.IntegerValue == element.LinkId.IntegerValue)
+                {
+                    return;
+                }
+            }
             SubElements.Add(element);
             element.SetParent(this);
             ExtensibleTools.AddSubElement(Instance, element);

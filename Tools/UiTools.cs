@@ -67,8 +67,10 @@ namespace ExtensibleOpeningManager.Tools
                             return null;
                     }
                 }
-                catch (Exception) 
+                catch (Exception e) 
                 {
+                    PrintError(e);
+                    Print("+", KPLN_Loader.Preferences.MessageType.Code);
                     return null;
                 }
             }
@@ -88,8 +90,10 @@ namespace ExtensibleOpeningManager.Tools
                             return null;
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    PrintError(e);
+                    Print("+", KPLN_Loader.Preferences.MessageType.Code);
                     return null;
                 }
             }

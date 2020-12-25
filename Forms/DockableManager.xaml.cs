@@ -118,6 +118,8 @@ namespace DockableDialog.Forms
         {
             ModuleData.CommandQueue.Enqueue(new CommandSwapType(UiController.CurrentController.Selection[0]));
         }
+        //До тех пор пока не появится плагин для КР
+        /*
         private void OnBtnPlaceOnKR(object sender, RoutedEventArgs e)
         {
 
@@ -126,9 +128,27 @@ namespace DockableDialog.Forms
         {
 
         }
-        private void OnBtnPlaceOnMEP(object sender, RoutedEventArgs e)
+        */
+        private void OnBtnPlaceOnMEP(object sender, RoutedEventArgs args)
         {
-
+            List<RevitLinkInstance> links = CollectorTools.GetRevitLinks(UiController.CurrentController.Document);
+            if (links.Count != 0)
+            {
+                try
+                {
+                    UpdateByDocument form = new UpdateByDocument(UiController.CurrentController.Document, links);
+                    form.ShowDialog();
+                }
+                catch (Exception e)
+                {
+                    PrintError(e);
+                }
+                
+            }
+            else
+            {
+                Dialogs.ShowDialog("В проекте отсутствуют подгруженные связи", "Ошибка");
+            }
         }
         private void OnBtnLoop(object sender, RoutedEventArgs args)
         {

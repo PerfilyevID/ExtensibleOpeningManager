@@ -15,8 +15,8 @@ namespace ExtensibleOpeningManager
 #endif
         public static System.IntPtr MainWindowHandle { get; set; }
         public static string Build = string.Format("built for Revit {0} {1}", RevitVersion, UserPreferences.Department.ToString("G"));
-        public static string Version = "1.0.1.0b";
-        public static string Date = "2020/12/20";
+        public static string Version = "1.0.2.0b";
+        public static string Date = "2020/12/25";
         
         public static string ManualPage = "https://kpln.kdb24.ru/article/87288/";
         public static bool SystemClosed = false;

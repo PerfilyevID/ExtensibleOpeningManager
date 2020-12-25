@@ -34,6 +34,7 @@ namespace ExtensibleOpeningManager
         public static readonly string type_subelement_linked_instance = "16916e5868a14746883831a1ab4510b2";
 
         public static readonly string msg_created = "<!@%элемент~создан%@!>";
+        public static readonly string msg_autocreated = "<!@%элемент~создан~автоматически%@!>";
         public static readonly string msg_approved = "<!@%утверждено%@!>";
         public static readonly string msg_rejected = "<!@%отклонено%@!>";
         public static readonly string msg_autoJoined = "<!@%автопривязка%@!>";

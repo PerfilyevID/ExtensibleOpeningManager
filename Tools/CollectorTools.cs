@@ -5,6 +5,7 @@ using ExtensibleOpeningManager.Extensible;
 using ExtensibleOpeningManager.Filters;
 using System;
 using System.Collections.Generic;
+using static ExtensibleOpeningManager.Common.Collections;
 using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Tools
@@ -68,17 +69,17 @@ namespace ExtensibleOpeningManager.Tools
                 try
                 {
                     string name = (e as FamilyInstance).Symbol.FamilyName;
-                    if (UserPreferences.Department == Collections.Department.AR && (name == Variables.family_ar_round || name == Variables.family_ar_square))
+                    if (UserPreferences.Department == Department.AR && (name == Variables.family_ar_round || name == Variables.family_ar_square))
                     {
                         instances.Add(ExtensibleElement.GetExtensibleElementByInstance(e as FamilyInstance));
                         continue;
                     }
-                    if (UserPreferences.Department == Collections.Department.KR && (name == Variables.family_kr_round || name == Variables.family_kr_square))
+                    if (UserPreferences.Department == Department.KR && (name == Variables.family_kr_round || name == Variables.family_kr_square))
                     {
                         instances.Add(ExtensibleElement.GetExtensibleElementByInstance(e as FamilyInstance));
                         continue;
                     }
-                    if (UserPreferences.Department == Collections.Department.MEP && (name == Variables.family_mep_round || name == Variables.family_mep_square))
+                    if (UserPreferences.Department == Department.MEP && (name == Variables.family_mep_round || name == Variables.family_mep_square))
                     {
                         instances.Add(ExtensibleElement.GetExtensibleElementByInstance(e as FamilyInstance));
                         continue;
@@ -101,6 +102,19 @@ namespace ExtensibleOpeningManager.Tools
                     {
                         instances.Add(new SE_LinkedInstance(link, instance));
                     }
+                }
+            }
+            return instances;
+        }
+        public static List<ExtensibleSubElement> GetMepSubInstances(RevitLinkInstance link)
+        {
+            List<ExtensibleSubElement> instances = new List<ExtensibleSubElement>();
+            foreach (Element e in new FilteredElementCollector(link.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElements())
+            {
+                FamilyInstance instance = e as FamilyInstance;
+                if (instance.Symbol.FamilyName == Variables.family_mep_round || instance.Symbol.FamilyName == Variables.family_mep_square)
+                {
+                    instances.Add(new SE_LinkedInstance(link, instance));
                 }
             }
             return instances;

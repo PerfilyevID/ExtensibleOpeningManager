@@ -136,6 +136,8 @@ namespace ExtensibleOpeningManager.Extensible
                     }
                     else
                     {
+                        string m1 = string.Format("{0} != {1}", parts[1], subElement.Id.ToString());
+                        string m2 = string.Format("{0} != {1}", parts[2], subElement.LinkId.ToString());
                         notRemovedElements.Add(c);
                     }
                 }

@@ -5,6 +5,7 @@ using ExtensibleOpeningManager.Forms;
 using ExtensibleOpeningManager.Tools.Instances;
 using System.Collections.Generic;
 using static ExtensibleOpeningManager.Common.Collections;
+using static KPLN_Loader.Output.Output;
 
 namespace ExtensibleOpeningManager.Tools
 {
@@ -103,7 +104,7 @@ namespace ExtensibleOpeningManager.Tools
                 }
             }
         }
-        public static FamilyInstance CreateFamilyInstance(SE_LinkedWall wall, ExtensibleSubElement subElement, Document doc)
+        public static FamilyInstance CreateFamilyInstance(SE_LinkedWall wall, ExtensibleSubElement subElement, Document doc, SizeOptions SizeOptions = null)
         {
             Intersection intersection = new Intersection(subElement.Element, IntersectionTools.SolidIntersection(wall.Solid, subElement.Solid));
             if (UserPreferences.Department != Department.MEP)
@@ -124,18 +125,40 @@ namespace ExtensibleOpeningManager.Tools
                         creationParameters = new PlaceParameters(wall, intersection, doc);
                     }
                 }
-                if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
-                { 
-                    return CreateFamilyInstance(wall, creationParameters, doc, type, symbolType);
+                if (SizeOptions == null)
+                {
+                    if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
+                    {
+                        return CreateFamilyInstance(wall, creationParameters, doc, type, symbolType);
+                    }
+                }
+                else
+                {
+                    if (creationParameters.Width >= SizeOptions.MinWidth && creationParameters.Height >= SizeOptions.MinHeight && creationParameters.Width <= SizeOptions.MaxWidth && creationParameters.Height <= SizeOptions.MaxHeight)
+                    {
+                        return CreateFamilyInstance(wall, creationParameters, doc, type, symbolType);
+                    }
                 }
             }
             else
             {
                 PlaceParameters creationParameters = new PlaceParameters(wall, intersection, doc);
-                if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
-                { 
-                    return CreateFamilyInstance(creationParameters, doc, SymbolType.Square);
+                if (SizeOptions == null)
+                {
+                    if (creationParameters.Width >= UserPreferences.MinInstanceWidth / 304.8 && creationParameters.Height >= UserPreferences.MinInstanceHeight / 304.8)
+                    {
+                        return CreateFamilyInstance(creationParameters, doc, SymbolType.Square);
+                    }
+
                 }
+                else
+                {
+                    if (creationParameters.Width >= SizeOptions.MinWidth && creationParameters.Height >= SizeOptions.MinHeight && creationParameters.Width <= SizeOptions.MaxWidth && creationParameters.Height <= SizeOptions.MaxHeight)
+                    {
+                        return CreateFamilyInstance(creationParameters, doc, SymbolType.Square);
+                    }
+                }
+
             }
             return null;
         }

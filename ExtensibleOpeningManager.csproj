@@ -150,6 +150,7 @@
     <Compile Include="Commands\CommandUpdate.cs" />
     <Compile Include="Commands\CommandUpdateAllElements.cs" />
     <Compile Include="Commands\CommandUpdateComments.cs" />
+    <Compile Include="Commands\CommandCreateOpeningsByTasks_Loop.cs" />
     <Compile Include="Commands\CommandZoomElement.cs" />
     <Compile Include="Common\Collections.cs" />
     <Compile Include="Common\ExtensibleComment.cs" />
@@ -225,6 +226,7 @@
     <Compile Include="Tools\GeometryTools.cs" />
     <Compile Include="Tools\Instances\Intersection.cs" />
     <Compile Include="Tools\Instances\PlaceParameters.cs" />
+    <Compile Include="Tools\Instances\SizeOptions.cs" />
     <Compile Include="Tools\Instances\UVLine.cs" />
     <Compile Include="Tools\IntersectionTools.cs" />
     <Compile Include="Controll\LoopController.cs" />
